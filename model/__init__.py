@@ -1,22 +1,56 @@
 # coding=utf-8
 import tensorflow as tf
+import numpy as np
 from model.layers import GraphConvolution, InnerProductDecoder
-
+import itertools
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
 
 class OptimizerDualGCNAutoEncoder(object):
 
-    def __init__(self, preds_1, labels_1, preds_2, labels_2, model, num_nodes, pos_weight, norm):
+    def initVariable(self):
+        FLAGS.graph1Variable = 1.0
+        FLAGS.graph2Variable = 1.0
+        FLAGS.KLlossVariable = 0.01
+        FLAGS.CenterLossVariable = 10
+
+
+    def updateVariable(self, epoch=0):
+        propotion = (1.0 * float(epoch) / float(FLAGS.epochs)) * (1.0 * float(epoch) / float(FLAGS.epochs))
+        FLAGS.graph1Variable = FLAGS.graph1Variable - propotion * FLAGS.graph1Variable
+        FLAGS.graph2Variable = FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
+        # variable = FLAGS.graph1Variable - FLAGS.graph1Variable * epoch * (1.0 / FLAGS.epochs)
+        FLAGS.KLlossVariable = FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
+        # variable = FLAGS.KLlossVariable - FLAGS.KLlossVariable * epoch * (1.0 / FLAGS.epochs)
+        # FLAGS.CenterLossVariable = FLAGS.CenterLossVariable * propotion
+        FLAGS.CenterLossVariable = 0
+
+
+    def updateLabel(self, z_label):
+        self.z_label = z_label
+
+    def __init__(self, preds_1, labels_1, preds_2, labels_2, model, num_nodes, pos_weight, norm, z_label):
+
+        self.epoch = 0
         self.num_nodes = num_nodes
+        self.z_label = z_label
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.cost = self.Cost(preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm)
-        print ('cost: ', self.cost)
+        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, self.z_label)
+        # self.centerloss = FLAGS.CenterLossVariable
+        self.centerloss = self.centerloss * FLAGS.CenterLossVariable
+        # self.centerloss = self.centerloss * self.getVariable('centerLossVariable', self.tepoch)
+        # self.centerloss = self.centerloss * FLAGS.CenterLossVariable
 
-        self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.learning_rate)
-        self.opt_op = self.optimizer.minimize(self.cost)
+        self.cost = self.Cost(preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm, self.epoch)
+        self.cost += self.centerloss
+
+        self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
+
+        with tf.control_dependencies([self.centers_update_op]):
+            self.opt_op = self.optimizer.minimize(self.cost)
+
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
         # 这个accuracy没啥用
@@ -24,15 +58,25 @@ class OptimizerDualGCNAutoEncoder(object):
                                            tf.cast(labels_1, tf.int32))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
 
-    def Cost(self, preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm):
+    def CenterLoss(self, model, z_label, alpha=1.0):
+        loss, centers, centers_update_op = model.get_center_loss(model.z_3, z_label, alpha, len(set(z_label)))
+        return loss, centers, centers_update_op
+
+    def Cost(self, preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm, epoch):
         # loss1
         self.loss1 = FLAGS.graph1Variable * (self.VAEloss(preds_1, labels_1, pos_weight, norm, model.z_mean_1, model.z_log_std_1))
+        # self.loss1 = FLAGS.graph1Variable * (self.VAEloss(preds_1, labels_1, pos_weight, norm, model.z_mean_1, model.z_log_std_1))
 
         # loss2
         self.loss2 = FLAGS.graph2Variable * (self.VAEloss(preds_2, labels_2, pos_weight, norm, model.z_mean_2, model.z_log_std_2))
+        # self.loss2 = FLAGS.graph2Variable * (self.VAEloss(preds_2, labels_2, pos_weight, norm, model.z_mean_2, model.z_log_std_2))
 
         # KL loss
-        self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2))
+        self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
+        # self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
+        # self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2))
+
+        # return self.loss1 +  self.loss2
         return self.loss1 +  self.loss2 + self.loss3
         # return loss3
 
@@ -57,33 +101,7 @@ class OptimizerDualGCNAutoEncoder(object):
         cost -= kl
         return cost
 
-class OptimizerVAE(object):
-    def __init__(self, preds, labels, model, num_nodes, pos_weight, norm):
-        preds_sub = preds
-        labels_sub = labels
 
-        self.preds = preds
-        self.labels = labels
-
-        self.cost = norm * tf.reduce_mean(
-            tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight))
-        # self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
-
-        # Latent loss
-        self.log_lik = self.cost
-        self.kl = (0.5 / num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * model.z_log_std - tf.square(model.z_mean) -
-                                                                   tf.square(tf.exp(model.z_log_std)), 1))
-        self.cost -= self.kl
-
-        self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.learning_rate)
-
-
-        self.opt_op = self.optimizer.minimize(self.cost)
-        self.grads_vars = self.optimizer.compute_gradients(self.cost)
-
-        self.correct_prediction = tf.equal(tf.cast(tf.greater_equal(tf.sigmoid(preds_sub), 0.5), tf.int32),
-                                           tf.cast(labels_sub, tf.int32))
-        self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
 
 class Model(object):
     def __init__(self, **kwargs):
@@ -124,6 +142,7 @@ class DualGCNGraphFusion(Model):
     def __init__(self,  placeholders, num_features, num_nodes, features_nonzero=None, **kwargs):
         super(DualGCNGraphFusion, self).__init__(**kwargs)
 
+        self.epoch = 0
         self.inputs = placeholders['features']
         self.input_dim = num_features
         self.features_nonzero = features_nonzero
@@ -197,59 +216,47 @@ class DualGCNGraphFusion(Model):
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
         self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2)
 
+    def get_center_loss(self, features, labels, alpha, num_classes):
+        """获取center loss及center的更新op
 
+        Arguments:
+            features: Tensor,表征样本特征,一般使用某个fc层的输出,shape应该为[batch_size, feature_length].
+            labels: Tensor,表征样本label,非one-hot编码,shape应为[batch_size].
+            alpha: 0-1之间的数字,控制样本类别中心的学习率,细节参考原文.
+            num_classes: 整数,表明总共有多少个类别,网络分类输出有多少个神经元这里就取多少.
 
+        Return：
+            loss: Tensor,可与softmax loss相加作为总的loss进行优化.
+            centers: Tensor,存储样本中心值的Tensor，仅查看样本中心存储的具体数值时有用.
+            centers_update_op: op,用于更新样本中心的op，在训练时需要同时运行该op，否则样本中心不会更新
+        """
+        # 获取特征的维数，例如256维
+        len_features = features.get_shape()[1]
+        # 建立一个Variable,shape为[num_classes, len_features]，用于存储整个网络的样本中心，
+        # 设置trainable=False是因为样本中心不是由梯度进行更新的
+        centers = tf.get_variable('centers', [num_classes, len_features], dtype=tf.float32,
+                                  initializer=tf.constant_initializer(0), trainable=False)
 
+        # 将label展开为一维的，输入如果已经是一维的，则该动作其实无必要
+        labels = tf.reshape(labels, [-1])
 
+        # 根据样本label,获取mini-batch中每一个样本对应的中心值
+        centers_batch = tf.gather(centers, labels)
+        # 计算loss
+        loss = tf.nn.l2_loss(features - centers_batch)
 
+        # 当前mini-batch的特征值与它们对应的中心值之间的差
+        diff = centers_batch - features
 
-class GCNModelVAE(Model):
-    def __init__(self, placeholders, num_features, num_nodes, features_nonzero=None, **kwargs):
-        super(GCNModelVAE, self).__init__(**kwargs)
+        # 获取mini-batch中同一类别样本出现的次数,了解原理请参考原文公式(4)
+        unique_label, unique_idx, unique_count = tf.unique_with_counts(labels)
+        appear_times = tf.gather(unique_count, unique_idx)
+        appear_times = tf.reshape(appear_times, [-1, 1])
 
-        self.inputs = placeholders['features']
-        self.input_dim = num_features
-        self.features_nonzero = features_nonzero
-        self.n_samples = num_nodes
-        self.adj = placeholders['adj']
-        self.dropout = placeholders['dropout']
-        self.build()
+        diff = diff / tf.cast((1 + appear_times), tf.float32)
+        diff = alpha * diff
 
-    def _build(self):
-        '''
-        self.hidden1 = GraphConvolutionSparse(input_dim=self.input_dim,
-                                              output_dim=FLAGS.hidden1,
-                                              adj=self.adj,
-                                              features_nonzero=self.features_nonzero,
-                                              act=tf.nn.relu,
-                                              dropout=self.dropout,
-                                              logging=self.logging)(self.inputs)
-        '''
+        centers_update_op = tf.scatter_sub(centers, labels, diff)
 
-        self.hidden1 = GraphConvolution(input_dim=self.input_dim,
-                                        output_dim=FLAGS.hidden1,
-                                        adj=self.adj,
-                                        act=tf.nn.relu,
-                                        dropout=self.dropout,
-                                        logging=self.logging)(self.inputs)
+        return loss, centers, centers_update_op
 
-        self.z_mean = GraphConvolution(input_dim=FLAGS.hidden1,
-                                       output_dim=FLAGS.hidden2,
-                                       adj=self.adj,
-                                       act=lambda x: x,
-                                       dropout=self.dropout,
-                                       logging=self.logging)(self.hidden1)
-
-        self.z_log_std = GraphConvolution(input_dim=FLAGS.hidden1,
-                                          output_dim=FLAGS.hidden2,
-                                          adj=self.adj,
-                                          act=lambda x: x,
-                                          dropout=self.dropout,
-                                          logging=self.logging)(self.hidden1)
-
-        self.z = self.z_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std)  # element-wise
-
-        self.reconstructions = InnerProductDecoder(input_dim=FLAGS.hidden2,
-                                                   act=lambda x: x,
-                                                   # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z)

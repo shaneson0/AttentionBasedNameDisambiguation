@@ -28,8 +28,8 @@ def lossPrint(x, loss1, loss2, loss3):
 # setting for model
 def getSetting():
     flags = tf.app.flags
-    flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
-    flags.DEFINE_integer('epochs', 5000, 'Number of epochs to train.')
+    flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
+    flags.DEFINE_integer('epochs', 10000, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
     flags.DEFINE_float('weight_decay', 0., 'Weight for L2 loss on embedding matrix.')
@@ -42,10 +42,24 @@ def getSetting():
 
     flags.DEFINE_float('graph1Variable', 1, 'Weight for graph loss on graph1.')
     flags.DEFINE_float('graph2Variable', 1, 'Weight for graph loss on graph2.')
-    flags.DEFINE_float('KLlossVariable', 0.002, 'Weight for KL loss on graph comparing.')
+    flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
+    flags.DEFINE_float('CenterLossVariable', 10, 'Weight for the cluster loss --- CenterLoss .')
 
 
     return flags
+
+
+
+
+from sklearn.manifold import TSNE
+
+def tSNEAnanlyse(emb, labels):
+    labels = np.array(labels) + 2
+    print('labels : ', labels)
+    print('labels type: ', len(set(labels)))
+    X_new = TSNE(learning_rate=100).fit_transform(emb)
+    plt.scatter(X_new[:, 0], X_new[:, 1], c=labels, marker='o')
+    plt.show()
 
 
 def PCAAnanlyse(emb, labels):

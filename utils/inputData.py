@@ -41,10 +41,14 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
 
     idx_features_labels = np.genfromtxt(join(path, "{}_pubs_content.txt".format(name)), dtype=np.dtype(str))
     print(idx_features_labels)
-    features = np.array(idx_features_labels[:, 1:-1], dtype=np.float32)  # sparse?
-    labels = encode_labels(idx_features_labels[:, -1])
-    print(features)
-    print( 'features: ', set(idx_features_labels[:, -1]))
+    features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
+
+    # print(list(set(idx_features_labels[:, -1])))
+    # print('len of cluster label', len(list(set(idx_features_labels[:, -1]))))
+
+
+    labels = encode_labels(idx_features_labels[:, -2])
+    Clusterlabels = encode_labels(idx_features_labels[:, -1])
 
     # build graph
     adj = buildGraph(join(path, "{}_pubs_network.txt".format(name)), idx_features_labels, features)
@@ -52,7 +56,7 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
 
     # print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
 
-    return adj, adj2, features, labels
+    return adj, adj2, features, labels, Clusterlabels
 
 def loadAuthorSocial():
     AuthorSocial = {}

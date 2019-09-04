@@ -40,7 +40,7 @@ def preprocess_graph(adj):  # use original version, adj not contain diags
     #     'dropout': tf.placeholder_with_default(0., shape=())
     # }
 
-def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders):
+def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders,labels):
     # construct feed dictionary
     feed_dict = dict()
     feed_dict.update({placeholders['features']: features})

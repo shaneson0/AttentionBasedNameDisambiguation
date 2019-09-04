@@ -6,9 +6,10 @@ from global_.global_model import GlobalTripletModel
 from utils.eval_utils import get_hidden_output
 from utils.cache import LMDBClient
 from utils import data_utils, inputData
-from utils import settings
+from utils import settings, string_utils
 from collections import defaultdict
 
+IDLength = 24
 IDF_THRESHOLD = 32  # small data
 # IDF_THRESHOLD = 10
 
@@ -49,9 +50,20 @@ def dump_inter_emb():
     print(Res)
 
 
+pubs_dict = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'pubs_raw.json')
+Author2Id = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'Author2Id.json')
 
 
-
+def getLabelId(pid, authorName):
+    authorName = string_utils.clean_name(authorName)
+    PapaerInfo = pubs_dict[pid]
+    authors = PapaerInfo['authors']
+    # print(authorName, authors)
+    for author in authors:
+        if string_utils.clean_name(author['name']) == authorName:
+            print('get the same')
+            return Author2Id[author['name'] + ':' + author.get('org', 'null')]
+    return -1
 
 def gen_local_data(idf_threshold=10):
     """
@@ -60,7 +72,6 @@ def gen_local_data(idf_threshold=10):
     """
 
     AuthorSocial = inputData.loadAuthorSocial()
-    # Id2Author =
 
     name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
     idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
@@ -87,6 +98,7 @@ def gen_local_data(idf_threshold=10):
                 pids2label[pid] = aid
                 pids.append(pid)
         shuffle(pids)
+
         for pid in pids:
             cur_pub_emb = lc_inter.get(pid)
             if cur_pub_emb is not None:
@@ -94,7 +106,9 @@ def gen_local_data(idf_threshold=10):
                 pids_set.add(pid)
                 wf_content.write('{}\t'.format(pid))
                 wf_content.write('\t'.join(cur_pub_emb))
-                wf_content.write('\t{}\n'.format(pids2label[pid]))
+                wf_content.write('\t{}'.format(pids2label[pid]))
+                LabelId = getLabelId(pid[:IDLength], name)
+                wf_content.write('\t{}\n'.format(LabelId))
         wf_content.close()
 
         # generate network1
