@@ -6,6 +6,7 @@ import scipy.sparse as sp
 import time
 from model.preprocessing import gen_train_edges, preprocess_graph, normalize_vectors, sparse_to_tuple, construct_feed_dict
 from sklearn.manifold import TSNE
+from finch import FINCH
 
 from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings
 from utils.inputData import load_local_data
@@ -70,24 +71,7 @@ def train(name, needtSNE=False):
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
 
-    model = BuildModel(placeholders, input_feature_dim, num_nodes)
-    opt = OptimizerDualGCNAutoEncoder(preds_1=model.reconstructions_1,
-                                      labels_1=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],validate_indices=False), [-1]),
-                                      preds_2=model.reconstructions_1,
-                                      labels_2=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph2_orig'],validate_indices=False), [-1]),
-                                      model=model,
-                                      num_nodes=num_nodes,
-                                      pos_weight=pos_weight,
-                                      norm=norm,
-                                      z_label=Clusterlabels
-                                      )
 
-    # Centers
-    centers = opt.centers
-
-    # Session
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
 
 
     def get_embs():
@@ -98,76 +82,65 @@ def train(name, needtSNE=False):
     loss1s = []
     loss2s = []
     loss3s = []
+
+    n_clusters = len(set(labels))
+
     # Train model
-    for epoch in range(FLAGS.epochs):
+    for clusterepoch in range(FLAGS.clusterEpochs):
 
-        # opt.epoch = epoch
-        model.epoch = epoch
+        model = BuildModel(placeholders, input_feature_dim, num_nodes)
+        opt = OptimizerDualGCNAutoEncoder(preds_1=model.reconstructions_1,
+                                          labels_1=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
+                                                                                        validate_indices=False), [-1]),
+                                          preds_2=model.reconstructions_1,
+                                          labels_2=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph2_orig'],
+                                                                                        validate_indices=False), [-1]),
+                                          model=model,
+                                          num_nodes=num_nodes,
+                                          pos_weight=pos_weight,
+                                          norm=norm,
+                                          z_label=Clusterlabels
+                                          )
 
-        t = time.time()
-        # Construct feed dictionary
+        # Session
+        sess = tf.Session()
+        sess.run(tf.global_variables_initializer())
 
-        feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels)
-        feed_dict.update({placeholders['dropout']: FLAGS.dropout})
-        # Run single weight update
-        outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
+        # Centers
+        centers = opt.centers
 
-        Loss = sess.run(opt.cost, feed_dict=feed_dict)
-        loss1 = sess.run(opt.loss1, feed_dict=feed_dict)
-        loss2 = sess.run(opt.loss2, feed_dict=feed_dict)
-        # loss3 = sess.run(opt.loss3, feed_dict=feed_dict)
-        centerloss = sess.run(opt.centerloss, feed_dict=feed_dict)
+        for epoch in range(FLAGS.epochs):
 
-        print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-        # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
-        loss1s.append(loss1)
-        loss2s.append(loss2)
+            # opt.epoch = epoch
+            model.epoch = epoch
 
-        n_clusters = len(set(labels))
+            t = time.time()
+            # Construct feed dictionary
 
-        if epoch != 0 and epoch % 1000 == 0:
-            Centers = sess.run(centers)
-            X_new = TSNE(learning_rate=100).fit_transform(Centers)
+            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders)
+            feed_dict.update({placeholders['dropout']: FLAGS.dropout})
+            # Run single weight update
+            outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
-            print('centers: ', Centers)
+            # Loss = sess.run(opt.cost, feed_dict=feed_dict)
+            # loss1 = sess.run(opt.loss1, feed_dict=feed_dict)
+            # loss2 = sess.run(opt.loss2, feed_dict=feed_dict)
+            # # loss3 = sess.run(opt.loss3, feed_dict=feed_dict)
+            # centerloss = sess.run(opt.centerloss, feed_dict=feed_dict)
 
-            # 求出最大的distance 和 最小的distance
-            maxdistance = -1
-            mindistance = 100
-            Len = len(X_new)
-            ChangeLabels = {i:i for i in range(Len)}
-            distance = []
-            for i in range(Len):
-                for j in range(i+1, Len, 1):
-                    t = np.linalg.norm(X_new[i] - X_new[j])
-                    if maxdistance < t:
-                        maxdistance = t
-                    if mindistance > t:
-                        mindistance = t
-                    if t < 1:
-                        # j => i
-                        ChangeLabels[j] = ChangeLabels[i]
-                    distance = t
-
-            for k in range(len(Clusterlabels)):
-                if Clusterlabels[k] in ChangeLabels:
-                    Clusterlabels[k] = ChangeLabels[ Clusterlabels[k] ]
-
-            # opt.updateLabel(Clusterlabels)
-            opt.updateVariable(epoch)
-
-            print('distance :', distance)
-            print('maxdistance: ', maxdistance, ', mindistance: ', mindistance)
-            # print()
-            # TempClusterlabels = sess.run(Clusterlabels)
-            print(Clusterlabels)
-            print('len(list(set(Clusterlabels)))', len(list(set(Clusterlabels))))
-            # print(len(Centers))
-
+            # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
+            # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
             emb = get_embs()
-            tSNEAnanlyse(emb, labels)
+            c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='cosine', verbose=True)
 
-        # loss3s.append(loss3)
+
+
+        tf.reset_default_graph()
+
+        emb = get_embs()
+        tSNEAnanlyse(emb, labels)
+
+            # loss3s.append(loss3)
 
 
     emb = get_embs()
