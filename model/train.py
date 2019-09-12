@@ -27,8 +27,8 @@ def AdjPreprocessing(adj):
     adj_train = gen_train_edges(adj)
     return adj_train
 
-def BuildModel(placeholders, input_feature_dim, num_nodes):
-    Model = DualGCNGraphFusion(placeholders, input_feature_dim, num_nodes)
+def BuildModel(placeholders, input_feature_dim, num_nodes, name):
+    Model = DualGCNGraphFusion(placeholders, input_feature_dim, num_nodes, name=name)
     return Model
 
 # def BuildOptimizer()
@@ -43,6 +43,11 @@ def NormalizedAdj(adj):
 
 def train(name, needtSNE=False):
     adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
+
+
+    n_clusters = len(set(labels))
+    OldClusterlabels = Clusterlabels
+    originNumberOfClusterlabels = len(set(Clusterlabels))
 
     num_nodes = adj.shape[0]
     input_feature_dim = features.shape[1]
@@ -71,9 +76,6 @@ def train(name, needtSNE=False):
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
 
-
-
-
     def get_embs():
         feed_dict.update({placeholders['dropout']: 0})
         emb = sess.run(model.z_3, feed_dict=feed_dict)  # z_mean is better
@@ -87,8 +89,15 @@ def train(name, needtSNE=False):
 
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
+        # tf.reset_default_graph()
 
-        model = BuildModel(placeholders, input_feature_dim, num_nodes)
+        model = BuildModel(placeholders, input_feature_dim, num_nodes, name='model%d'%(clusterepoch))
+
+        # Session
+
+        # tf.reset_default_graph()
+        # sess = tf.InteractiveSession()
+
         opt = OptimizerDualGCNAutoEncoder(preds_1=model.reconstructions_1,
                                           labels_1=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
                                                                                         validate_indices=False), [-1]),
@@ -99,10 +108,10 @@ def train(name, needtSNE=False):
                                           num_nodes=num_nodes,
                                           pos_weight=pos_weight,
                                           norm=norm,
-                                          z_label=Clusterlabels
+                                          z_label=Clusterlabels,
+                                          name='model%d' % (clusterepoch)
                                           )
 
-        # Session
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
@@ -114,7 +123,6 @@ def train(name, needtSNE=False):
             # opt.epoch = epoch
             model.epoch = epoch
 
-            t = time.time()
             # Construct feed dictionary
 
             feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders)
@@ -122,31 +130,37 @@ def train(name, needtSNE=False):
             # Run single weight update
             outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
-            # Loss = sess.run(opt.cost, feed_dict=feed_dict)
-            # loss1 = sess.run(opt.loss1, feed_dict=feed_dict)
-            # loss2 = sess.run(opt.loss2, feed_dict=feed_dict)
-            # # loss3 = sess.run(opt.loss3, feed_dict=feed_dict)
-            # centerloss = sess.run(opt.centerloss, feed_dict=feed_dict)
-
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
-            emb = get_embs()
-            c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='cosine', verbose=True)
-
-
-
-        tf.reset_default_graph()
+            # print ('epoch: ', epoch, '， loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
 
         emb = get_embs()
+
+        c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
+
+        NumberOfCluster = num_clust[0]
+        MaxSpeedDescent = 0
+        for idx in range(len(num_clust) - 1):
+            if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
+                NumberOfCluster = num_clust[idx + 1]
+                MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
+
+        if NumberOfCluster > originNumberOfClusterlabels:
+            continue
+
+        originNumberOfClusterlabels = NumberOfCluster
+        # OldClusterlabels = Clusterlabels
+        Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
+        prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
+        print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1)
+
         tSNEAnanlyse(emb, labels)
 
-            # loss3s.append(loss3)
 
 
     emb = get_embs()
 
     emb_norm = normalize_vectors(emb)
-    clusters_pred = clustering(emb_norm, num_clusters=n_clusters)
+    clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1)
     # lossPrint(range(FLAGS.epochs), loss1s, loss2s, loss3s)
@@ -197,9 +211,9 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    train('kexin_xu', needtSNE=True)
+    # train('kexin_xu', needtSNE=True)
     # test('kexin_xu')
-    # train('hongbin_li')
+    train('hongbin_li', needtSNE=True)
     # test('hongbin_li')
 
 

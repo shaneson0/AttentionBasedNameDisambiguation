@@ -16,28 +16,15 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.CenterLossVariable = 10
 
 
-    def updateVariable(self, epoch=0):
-        propotion = (1.0 * float(epoch) / float(FLAGS.epochs)) * (1.0 * float(epoch) / float(FLAGS.epochs))
-        FLAGS.graph1Variable = FLAGS.graph1Variable - propotion * FLAGS.graph1Variable
-        FLAGS.graph2Variable = FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
-        # variable = FLAGS.graph1Variable - FLAGS.graph1Variable * epoch * (1.0 / FLAGS.epochs)
-        FLAGS.KLlossVariable = FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
-        # variable = FLAGS.KLlossVariable - FLAGS.KLlossVariable * epoch * (1.0 / FLAGS.epochs)
-        # FLAGS.CenterLossVariable = FLAGS.CenterLossVariable * propotion
-        FLAGS.CenterLossVariable = 0
+    def  __init__(self, preds_1, labels_1, preds_2, labels_2, model, num_nodes, pos_weight, norm, z_label, name):
 
-
-    def updateLabel(self, z_label):
-        self.z_label = z_label
-
-    def __init__(self, preds_1, labels_1, preds_2, labels_2, model, num_nodes, pos_weight, norm, z_label):
+        self.name = name
 
         self.epoch = 0
         self.num_nodes = num_nodes
-        self.z_label = z_label
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, self.z_label)
+        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
         # self.centerloss = FLAGS.CenterLossVariable
         self.centerloss = self.centerloss * FLAGS.CenterLossVariable
         # self.centerloss = self.centerloss * self.getVariable('centerLossVariable', self.tepoch)
@@ -234,7 +221,8 @@ class DualGCNGraphFusion(Model):
         len_features = features.get_shape()[1]
         # 建立一个Variable,shape为[num_classes, len_features]，用于存储整个网络的样本中心，
         # 设置trainable=False是因为样本中心不是由梯度进行更新的
-        centers = tf.get_variable('centers', [num_classes, len_features], dtype=tf.float32,
+        with tf.variable_scope(self.name):
+            centers = tf.get_variable('centers', [num_classes, len_features], dtype=tf.float32,
                                   initializer=tf.constant_initializer(0), trainable=False)
 
         # 将label展开为一维的，输入如果已经是一维的，则该动作其实无必要

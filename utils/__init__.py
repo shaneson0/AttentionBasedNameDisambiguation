@@ -29,7 +29,7 @@ def lossPrint(x, loss1, loss2, loss3):
 def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
-    flags.DEFINE_integer('epochs', 10000, 'Number of epochs to train.')
+    flags.DEFINE_integer('epochs', 2000, 'Number of epochs to train.')
     flags.DEFINE_integer('clusterEpochs', 3, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
@@ -44,7 +44,7 @@ def getSetting():
     flags.DEFINE_float('graph1Variable', 1, 'Weight for graph loss on graph1.')
     flags.DEFINE_float('graph2Variable', 1, 'Weight for graph loss on graph2.')
     flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
-    flags.DEFINE_float('CenterLossVariable', 10, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('CenterLossVariable', 5, 'Weight for the cluster loss --- CenterLoss .')
 
 
     return flags
