@@ -6,6 +6,7 @@ import sys
 PROJ_DIR = join(abspath(dirname(__file__)), '..')
 sys.path.append(PROJ_DIR)
 
+from collections import Counter
 from utils import settings
 from os.path import join
 import codecs
@@ -50,9 +51,20 @@ def NormalizedAdj(adj):
     adj_label = sparse_to_tuple(adj_label)
     return adj_norm, adj_label
 
+def getOriginClusterLabel(originClusterlabels, CurrentClusterLabels, idx):
+    OriginLabel = originClusterlabels[idx]
+    RelationNewLabels = []
+    for i, label in enumerate(originClusterlabels):
+        if label == OriginLabel:
+            RelationNewLabels.append(CurrentClusterLabels[i])
+    a = np.array(RelationNewLabels)
+    counts = np.bincount(a)
+    return np.argmax(counts)
+
 def train(name, needtSNE=False):
     adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
 
+    originClusterlabels = Clusterlabels
     n_clusters = len(set(labels))
     OldClusterlabels = Clusterlabels
     originNumberOfClusterlabels = len(set(Clusterlabels))
@@ -110,6 +122,8 @@ def train(name, needtSNE=False):
         # tf.reset_default_graph()
         # sess = tf.InteractiveSession()
 
+        print ('Cluster Label: ', Clusterlabels)
+
         opt = OptimizerDualGCNAutoEncoder(preds_1=model.reconstructions_1,
                                           labels_1=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
                                                                                         validate_indices=False), [-1]),
@@ -158,18 +172,41 @@ def train(name, needtSNE=False):
                 NumberOfCluster = num_clust[idx + 1]
                 MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
-        if NumberOfCluster > originNumberOfClusterlabels:
-            continue
-
         originNumberOfClusterlabels = NumberOfCluster
+
         OldClusterlabels = Clusterlabels
         Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
 
+
         # 假如出现只有一种类别的话，这个要做修改和调整的。
+        C = Counter(Clusterlabels)
+        print (C)
+        for idx,v in C.items():
+            if v == 1:
+                tTable = getOriginClusterLabel(originClusterlabels, Clusterlabels, idx)
+                print ('idx: ', idx, ', tTable: ', tTable)
+                for tidx,k in enumerate(Clusterlabels):
+                    if Clusterlabels[tidx] == idx:
+                        Clusterlabels[tidx] = tTable
+
+                # 删了一个label，后面的label往前移
+                for tidx,k in enumerate(Clusterlabels):
+                    if Clusterlabels[tidx] > idx:
+                        Clusterlabels[tidx] = Clusterlabels[tidx] - 1
+
+                NumberOfCluster = NumberOfCluster - 1
+
+        if NumberOfCluster > originNumberOfClusterlabels:
+            continue
+
+        # 重新修改这些参数
+        originNumberOfClusterlabels = NumberOfCluster
 
 
         prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
         print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
+        Cc = Counter(Clusterlabels)
+        print (Cc)
 
         sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
         # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
