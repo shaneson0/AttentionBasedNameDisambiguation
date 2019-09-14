@@ -158,63 +158,63 @@ def train(name, needtSNE=False):
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
             # Run single weight update
             outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
+            [Loss, loss1, loss2, loss3, centerloss] = sess.run([opt.cost, opt.loss1, opt.loss2, opt.loss3, opt.centerloss], feed_dict=feed_dict)
 
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            # print ('epoch: ', epoch, '， loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
+            print ('epoch: ', epoch, '， loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
 
-        emb = get_embs()
-        c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
+        if clusterepoch != FLAGS.clusterEpochs -1 :
+            emb = get_embs()
+            c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
 
-        NumberOfCluster = num_clust[0]
-        MaxSpeedDescent = 0
-        for idx in range(len(num_clust) - 1):
-            if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
-                NumberOfCluster = num_clust[idx + 1]
-                MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
+            NumberOfCluster = num_clust[0]
+            MaxSpeedDescent = 0
+            for idx in range(len(num_clust) - 1):
+                if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
+                    NumberOfCluster = num_clust[idx + 1]
+                    MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
-        originNumberOfClusterlabels = NumberOfCluster
+            originNumberOfClusterlabels = NumberOfCluster
 
-        OldClusterlabels = Clusterlabels
-        Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
-
-
-        # 假如出现只有一种类别的话，这个要做修改和调整的。
-        C = Counter(Clusterlabels)
-        print (C)
-        for idx,v in C.items():
-            if v == 1:
-                tTable = getOriginClusterLabel(originClusterlabels, Clusterlabels, idx)
-                print ('idx: ', idx, ', tTable: ', tTable)
-                for tidx,k in enumerate(Clusterlabels):
-                    if Clusterlabels[tidx] == idx:
-                        Clusterlabels[tidx] = tTable
-
-                # 删了一个label，后面的label往前移
-                for tidx,k in enumerate(Clusterlabels):
-                    if Clusterlabels[tidx] > idx:
-                        Clusterlabels[tidx] = Clusterlabels[tidx] - 1
-
-                NumberOfCluster = NumberOfCluster - 1
-
-        if NumberOfCluster > originNumberOfClusterlabels:
-            continue
-
-        # 重新修改这些参数
-        originNumberOfClusterlabels = NumberOfCluster
+            OldClusterlabels = Clusterlabels
+            Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
 
 
-        prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
-        print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
-        Cc = Counter(Clusterlabels)
-        print (Cc)
+            # 假如出现只有一种类别的话，这个要做修改和调整的。
+            C = Counter(Clusterlabels)
+            print (C)
+            for idx,v in C.items():
+                if v == 1:
+                    tTable = getOriginClusterLabel(originClusterlabels, Clusterlabels, idx)
+                    print ('idx: ', idx, ', tTable: ', tTable)
+                    for tidx,k in enumerate(Clusterlabels):
+                        if Clusterlabels[tidx] == idx:
+                            Clusterlabels[tidx] = tTable
 
-        sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
-        # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
-        # tf.reset_default_graph()
+                    # 删了一个label，后面的label往前移
+                    for tidx,k in enumerate(Clusterlabels):
+                        if Clusterlabels[tidx] > idx:
+                            Clusterlabels[tidx] = Clusterlabels[tidx] - 1
+
+                    NumberOfCluster = NumberOfCluster - 1
+
+            if NumberOfCluster > originNumberOfClusterlabels:
+                continue
+
+            # 重新修改这些参数
+            originNumberOfClusterlabels = NumberOfCluster
+
+
+            prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
+            print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
+            Cc = Counter(Clusterlabels)
+            print (Cc)
+
+            sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
+            # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
+            # tf.reset_default_graph()
 
     emb = get_embs()
-
-
     emb_norm = normalize_vectors(emb)
     clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
