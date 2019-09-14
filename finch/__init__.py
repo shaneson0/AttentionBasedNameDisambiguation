@@ -107,7 +107,7 @@ def FINCH(data, initial_rank=None, req_clust=None, distance='cosine', verbose=Tr
     """ FINCH clustering algorithm.
     :param data: Input matrix with features in rows.
     :param initial_rank: Nx1 first integer neighbor indices (optional).
-    :param req_clust: Set output number of clusters (optional). Not recommended.
+    :param req_clust: Set outpuFINCHt number of clusters (optional). Not recommended.
     :param distance: One of ['cityblock', 'cosine', 'euclidean', 'l1', 'l2', 'manhattan'] Recommended 'cosine'.
     :param verbose: Print verbose output.
     :return:

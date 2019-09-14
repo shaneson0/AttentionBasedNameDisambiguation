@@ -22,14 +22,13 @@ def lossPrint(x, loss1, loss2, loss3):
     plt.plot(x, loss3, '.-', label="loss3")
     plt.legend(loc='best')
 
-
     plt.show()
 
 # setting for model
 def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
-    flags.DEFINE_integer('epochs', 2000, 'Number of epochs to train.')
+    flags.DEFINE_integer('epochs', 800, 'Number of epochs to train.')
     flags.DEFINE_integer('clusterEpochs', 3, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
@@ -42,9 +41,9 @@ def getSetting():
     flags.DEFINE_integer('is_sparse', 0, 'Whether input features are sparse.')
 
     flags.DEFINE_float('graph1Variable', 1, 'Weight for graph loss on graph1.')
-    flags.DEFINE_float('graph2Variable', 1, 'Weight for graph loss on graph2.')
+    flags.DEFINE_float('graph2Variable', 1 , 'Weight for graph loss on graph2.')
     flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
-    flags.DEFINE_float('CenterLossVariable', 5, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('CenterLossVariable', 50, 'Weight for the cluster loss --- CenterLoss .')
 
 
     return flags
@@ -54,13 +53,28 @@ def getSetting():
 
 from sklearn.manifold import TSNE
 
-def tSNEAnanlyse(emb, labels):
+def tSNEAnanlyse(emb, labels, savepath=False):
     labels = np.array(labels) + 2
     print('labels : ', labels)
     print('labels type: ', len(set(labels)))
     X_new = TSNE(learning_rate=100).fit_transform(emb)
     plt.scatter(X_new[:, 0], X_new[:, 1], c=labels, marker='o')
     plt.show()
+
+    if savepath:
+        plt.savefig(savepath)
+
+def sNEComparingAnanlyse(emb, cureentLabels, TureLabels, oldLabels, savepath=False):
+    X_new = TSNE(learning_rate=100).fit_transform(emb)
+    plt.subplot(3,1,1)
+    plt.scatter(X_new[:, 0], X_new[:, 1], c=cureentLabels, marker='o')
+    plt.subplot(3,1,2)
+    plt.scatter(X_new[:, 0], X_new[:, 1], c=TureLabels, marker='o')
+    plt.subplot(3,1,3)
+    plt.scatter(X_new[:, 0], X_new[:, 1], c=oldLabels, marker='o')
+    plt.show()
+    if savepath:
+        plt.savefig(savepath)
 
 
 def PCAAnanlyse(emb, labels):

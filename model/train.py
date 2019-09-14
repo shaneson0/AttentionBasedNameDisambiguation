@@ -1,3 +1,12 @@
+# coding=utf-8
+
+from os.path import abspath, dirname, join
+import sys
+
+PROJ_DIR = join(abspath(dirname(__file__)), '..')
+sys.path.append(PROJ_DIR)
+
+from utils import settings
 from os.path import join
 import codecs
 import tensorflow as tf
@@ -7,8 +16,8 @@ import time
 from model.preprocessing import gen_train_edges, preprocess_graph, normalize_vectors, sparse_to_tuple, construct_feed_dict
 from sklearn.manifold import TSNE
 from finch import FINCH
-
-from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings
+from os.path import abspath, dirname, join
+from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings, sNEComparingAnanlyse
 from utils.inputData import load_local_data
 
 from model import DualGCNGraphFusion, OptimizerDualGCNAutoEncoder
@@ -43,7 +52,6 @@ def NormalizedAdj(adj):
 
 def train(name, needtSNE=False):
     adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
-
 
     n_clusters = len(set(labels))
     OldClusterlabels = Clusterlabels
@@ -91,8 +99,12 @@ def train(name, needtSNE=False):
     for clusterepoch in range(FLAGS.clusterEpochs):
         # tf.reset_default_graph()
 
+        print ('clusterepoch: ', clusterepoch)
+
         model = BuildModel(placeholders, input_feature_dim, num_nodes, name='model%d'%(clusterepoch))
 
+
+        print ('build model end: ')
         # Session
 
         # tf.reset_default_graph()
@@ -112,13 +124,16 @@ def train(name, needtSNE=False):
                                           name='model%d' % (clusterepoch)
                                           )
 
+        print ('optimizer construt end')
+
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
 
         # Centers
-        centers = opt.centers
+        # centers = opt.centers
 
         for epoch in range(FLAGS.epochs):
+            print ('epoch: ', epoch)
 
             # opt.epoch = epoch
             model.epoch = epoch
@@ -134,7 +149,6 @@ def train(name, needtSNE=False):
             # print ('epoch: ', epoch, '， loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
 
         emb = get_embs()
-
         c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
 
         NumberOfCluster = num_clust[0]
@@ -148,16 +162,21 @@ def train(name, needtSNE=False):
             continue
 
         originNumberOfClusterlabels = NumberOfCluster
-        # OldClusterlabels = Clusterlabels
+        OldClusterlabels = Clusterlabels
         Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
+
+        # 假如出现只有一种类别的话，这个要做修改和调整的。
+
+
         prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
-        print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1)
+        print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
 
-        tSNEAnanlyse(emb, labels)
-
-
+        sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
+        # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
+        # tf.reset_default_graph()
 
     emb = get_embs()
+
 
     emb_norm = normalize_vectors(emb)
     clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
@@ -165,7 +184,7 @@ def train(name, needtSNE=False):
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1)
     # lossPrint(range(FLAGS.epochs), loss1s, loss2s, loss3s)
     if needtSNE:
-        tSNEAnanlyse(emb, labels)
+        tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
     tf.reset_default_graph()
     return [prec, rec, f1], num_nodes, n_clusters
 
