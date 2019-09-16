@@ -29,7 +29,7 @@ def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
     flags.DEFINE_integer('epochs', 1500, 'Number of epochs to train.')
-    flags.DEFINE_integer('clusterEpochs', 3, 'Number of epochs to train.')
+    flags.DEFINE_integer('clusterEpochs', 5, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
     flags.DEFINE_float('weight_decay', 0., 'Weight for L2 loss on embedding matrix.')
@@ -40,11 +40,9 @@ def getSetting():
     # flags.DEFINE_integer('features', 1, 'Whether to use features (1) or not (0).')
     flags.DEFINE_integer('is_sparse', 0, 'Whether input features are sparse.')
 
-    flags.DEFINE_float('graph1Variable', 1, 'Weight for graph loss on graph1.')
-    flags.DEFINE_float('graph2Variable', 1 , 'Weight for graph loss on graph2.')
+    flags.DEFINE_float('SoftmaxVariable', 1, 'Weight for softmax.')
     flags.DEFINE_float('KLlossVariable', 0.1, 'Weight for KL loss on graph comparing.')
-    flags.DEFINE_float('CenterLossVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
-
+    flags.DEFINE_float('CenterLossVariable', 0.5, 'Weight for the cluster loss --- CenterLoss .')
 
     return flags
 
@@ -129,7 +127,6 @@ def pairwise_precision_recall_f1(preds, truths):
 
 def cal_f1(prec, rec):
     return 2*prec*rec/(prec+rec)
-
 
 def get_hidden_output(model, inp):
     get_activations = K.function(model.inputs[:1] + [K.learning_phase()], [model.layers[5].get_output_at(0), ])

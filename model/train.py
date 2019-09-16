@@ -23,6 +23,8 @@ from utils.inputData import load_local_data
 
 from model import DualGCNGraphFusion, OptimizerDualGCNAutoEncoder
 
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 
 
 flags = getSetting()
@@ -37,8 +39,8 @@ def AdjPreprocessing(adj):
     adj_train = gen_train_edges(adj)
     return adj_train
 
-def BuildModel(placeholders, input_feature_dim, num_nodes, name):
-    Model = DualGCNGraphFusion(placeholders, input_feature_dim, num_nodes, name=name)
+def BuildModel(placeholders, input_feature_dim, num_nodes, name, num_logits):
+    Model = DualGCNGraphFusion(placeholders, input_feature_dim, num_nodes, name=name, num_logits=num_logits)
     return Model
 
 # def BuildOptimizer()
@@ -55,14 +57,60 @@ def getOriginClusterLabel(originClusterlabels, CurrentClusterLabels, idx):
     OriginLabel = originClusterlabels[idx]
     RelationNewLabels = []
     for i, label in enumerate(originClusterlabels):
-        if label == OriginLabel:
+        if label == OriginLabel and idx != i:
             RelationNewLabels.append(CurrentClusterLabels[i])
+    if len(RelationNewLabels) == 0:
+        return -1
+    print ('RelationNewLabels: ', RelationNewLabels)
     a = np.array(RelationNewLabels)
     counts = np.bincount(a)
     return np.argmax(counts)
 
+def toOneHot(Clusterlabels):
+    le = LabelEncoder()
+    le_clusterlabel = le.fit(Clusterlabels)
+    clusterLabel = le_clusterlabel.transform(Clusterlabels)
+    ohe_clusterlabel = OneHotEncoder(sparse=False).fit(clusterLabel.reshape(-1, 1))
+    Sex_ohe = ohe_clusterlabel.transform(clusterLabel.reshape(-1, 1))
+
+    return Sex_ohe
+
+def getNewClusterLabel(emb, initClusterlabel, NumberOfCluster):
+    Clusterlabels = clustering(emb, num_clusters=NumberOfCluster)
+
+    print ('Clusterlabels: ', Counter(Clusterlabels))
+    print ('initClusterlabel: ', initClusterlabel)
+    # 假如出现只有一种类别的话，这个要做修改和调整的。
+    C = Counter(Clusterlabels)
+    # print (C)
+    for idx, v in C.items():
+        if v == 1:
+            tTable = getOriginClusterLabel(initClusterlabel, Clusterlabels, idx)
+            if tTable == -1:
+                continue
+            print ('idx: ', idx, ', tTable: ', tTable)
+            for tidx, k in enumerate(Clusterlabels):
+                if Clusterlabels[tidx] == idx:
+                    Clusterlabels[tidx] = tTable
+
+            # 删了一个label，后面的label往前移
+            for tidx, k in enumerate(Clusterlabels):
+                if Clusterlabels[tidx] > idx:
+                    Clusterlabels[tidx] = Clusterlabels[tidx] - 1
+            NumberOfCluster = NumberOfCluster - 1
+    # Clusterlabels = clustering(emb, num_clusters=NumberOfCluster)
+
+    return NumberOfCluster, Clusterlabels
+
 def train(name, needtSNE=False):
     adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
+
+
+    initClusterlabel = Clusterlabels
+    oneHotClusterLabels = toOneHot(Clusterlabels)
+    num_logits = len(oneHotClusterLabels[0])
+    # enc.transform([['Female', 1], ['Male', 4]]).toarray()
+    print ('debuging ', oneHotClusterLabels.shape)
 
     originClusterlabels = Clusterlabels
     n_clusters = len(set(labels))
@@ -71,7 +119,6 @@ def train(name, needtSNE=False):
 
     num_nodes = adj.shape[0]
     input_feature_dim = features.shape[1]
-
     adj_norm, adj_label = NormalizedAdj(adj)
     adj_norm2, adj_label2 = NormalizedAdj(adj2)
 
@@ -87,25 +134,27 @@ def train(name, needtSNE=False):
     placeholders = {
         # 'features': tf.sparse_placeholder(tf.float32),
         'features': tf.placeholder(tf.float32, shape=(None, input_feature_dim)),
+        'labels': tf.placeholder(tf.int64, shape=(None), name='labels'),
         'graph1': tf.sparse_placeholder(tf.float32),
         'graph2': tf.sparse_placeholder(tf.float32),
         'graph1_orig': tf.sparse_placeholder(tf.float32),
         'graph2_orig': tf.sparse_placeholder(tf.float32),
         'dropout': tf.placeholder_with_default(0., shape=())
     }
-    pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
-    norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
+    # pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
+    # norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
 
     def get_embs():
         feed_dict.update({placeholders['dropout']: 0})
         emb = sess.run(model.z_3, feed_dict=feed_dict)  # z_mean is better
         return emb
 
-    loss1s = []
-    loss2s = []
-    loss3s = []
+    # loss1s = []
+    # loss2s = []
+    # loss3s = []
 
     n_clusters = len(set(labels))
+
 
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
@@ -113,8 +162,8 @@ def train(name, needtSNE=False):
 
         print ('clusterepoch: ', clusterepoch)
 
-        model = BuildModel(placeholders, input_feature_dim, num_nodes, name='model%d'%(clusterepoch))
-
+        # num_logits
+        model = BuildModel(placeholders, input_feature_dim, num_nodes, name='model%d'%(clusterepoch), num_logits=num_logits)
 
         print ('build model end: ')
         # Session
@@ -122,18 +171,8 @@ def train(name, needtSNE=False):
         # tf.reset_default_graph()
         # sess = tf.InteractiveSession()
 
-        print ('Cluster Label: ', Clusterlabels)
-
-        opt = OptimizerDualGCNAutoEncoder(preds_1=model.reconstructions_1,
-                                          labels_1=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
-                                                                                        validate_indices=False), [-1]),
-                                          preds_2=model.reconstructions_1,
-                                          labels_2=tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph2_orig'],
-                                                                                        validate_indices=False), [-1]),
-                                          model=model,
+        opt = OptimizerDualGCNAutoEncoder(model=model,
                                           num_nodes=num_nodes,
-                                          pos_weight=pos_weight,
-                                          norm=norm,
                                           z_label=Clusterlabels,
                                           name='model%d' % (clusterepoch)
                                           )
@@ -153,15 +192,16 @@ def train(name, needtSNE=False):
             model.epoch = epoch
 
             # Construct feed dictionary
+            # Number of logics and preb
 
-            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders)
+            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels)
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
             # Run single weight update
             outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
-            [Loss, loss1, loss2, loss3, centerloss] = sess.run([opt.cost, opt.loss1, opt.loss2, opt.loss3, opt.centerloss], feed_dict=feed_dict)
+            [Loss, loss3, centerloss] = sess.run([opt.cost, opt.loss3, opt.centerloss], feed_dict=feed_dict)
 
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            print ('epoch: ', epoch, '， loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
+            print ('epoch: ', epoch, '， loss: ', Loss, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
@@ -170,47 +210,29 @@ def train(name, needtSNE=False):
             NumberOfCluster = num_clust[0]
             MaxSpeedDescent = 0
             for idx in range(len(num_clust) - 1):
-                if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
+                # if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
+                if num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
                     NumberOfCluster = num_clust[idx + 1]
                     MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
-            originNumberOfClusterlabels = NumberOfCluster
-
             OldClusterlabels = Clusterlabels
-            Clusterlabels = clustering(emb, num_clusters=originNumberOfClusterlabels)
+            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb, initClusterlabel, NumberOfCluster)
 
-
-            # 假如出现只有一种类别的话，这个要做修改和调整的。
-            C = Counter(Clusterlabels)
-            print (C)
-            for idx,v in C.items():
-                if v == 1:
-                    tTable = getOriginClusterLabel(originClusterlabels, Clusterlabels, idx)
-                    print ('idx: ', idx, ', tTable: ', tTable)
-                    for tidx,k in enumerate(Clusterlabels):
-                        if Clusterlabels[tidx] == idx:
-                            Clusterlabels[tidx] = tTable
-
-                    # 删了一个label，后面的label往前移
-                    for tidx,k in enumerate(Clusterlabels):
-                        if Clusterlabels[tidx] > idx:
-                            Clusterlabels[tidx] = Clusterlabels[tidx] - 1
-
-                    NumberOfCluster = NumberOfCluster - 1
-
-            if NumberOfCluster > originNumberOfClusterlabels:
+            print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels)
+            if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
                 continue
 
+            # 符合不断缩小的要求
             # 重新修改这些参数
+            Clusterlabels = tClusterLabels
             originNumberOfClusterlabels = NumberOfCluster
-
 
             prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
             print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
             Cc = Counter(Clusterlabels)
             print (Cc)
-
-            sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
+            if needtSNE:
+                sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
             # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
             # tf.reset_default_graph()
 
@@ -218,7 +240,7 @@ def train(name, needtSNE=False):
     emb_norm = normalize_vectors(emb)
     clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
-    print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1)
+    print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
     # lossPrint(range(FLAGS.epochs), loss1s, loss2s, loss3s)
     if needtSNE:
         tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
@@ -267,9 +289,9 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    # train('kexin_xu', needtSNE=True)
+    train('kexin_xu', needtSNE=True)
     # test('kexin_xu')
-    train('hongbin_li', needtSNE=True)
+    # train('hongbin_li', needtSNE=)
     # test('hongbin_li')
 
 

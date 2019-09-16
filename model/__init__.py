@@ -15,9 +15,7 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.KLlossVariable = 0.01
         FLAGS.CenterLossVariable = 10
 
-
-    def  __init__(self, preds_1, labels_1, preds_2, labels_2, model, num_nodes, pos_weight, norm, z_label, name):
-
+    def  __init__(self, model, num_nodes, z_label, name):
         self.name = name
 
         self.epoch = 0
@@ -25,12 +23,9 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
         self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
-        # self.centerloss = FLAGS.CenterLossVariable
         self.centerloss = self.centerloss * FLAGS.CenterLossVariable
-        # self.centerloss = self.centerloss * self.getVariable('centerLossVariable', self.tepoch)
-        # self.centerloss = self.centerloss * FLAGS.CenterLossVariable
 
-        self.cost = self.Cost(preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm, self.epoch)
+        self.cost = self.Cost(model.labels, model)
         self.cost += self.centerloss
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
@@ -41,31 +36,22 @@ class OptimizerDualGCNAutoEncoder(object):
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
         # 这个accuracy没啥用
-        self.correct_prediction = tf.equal(tf.cast(tf.greater_equal(tf.sigmoid(preds_1), 0.5), tf.int32),
-                                           tf.cast(labels_1, tf.int32))
-        self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))
+        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(model.y, 1), z_label), tf.float32))
 
     def CenterLoss(self, model, z_label, alpha=1.5, alpha1=1.0):
         # loss, centers, centers_update_op, loss_part1, pair_distance_loss = model.get_island_loss(model.z_3, z_label, alpha, alpha1, len(set(z_label)))
         loss, centers, centers_update_op = model.get_center_loss(model.z_3, z_label, alpha, len(set(z_label)))
         return loss, centers, centers_update_op
 
-    def Cost(self, preds_1, labels_1, preds_2, labels_2, model, pos_weight, norm, epoch):
-        # loss1
-        self.loss1 = FLAGS.graph1Variable * (self.VAEloss(preds_1, labels_1, pos_weight, norm, model.z_mean_1, model.z_log_std_1))
-        # self.loss1 = FLAGS.graph1Variable * (self.VAEloss(preds_1, labels_1, pos_weight, norm, model.z_mean_1, model.z_log_std_1))
+    def Cost(self, labels, model):
 
-        # loss2
-        self.loss2 = FLAGS.graph2Variable * (self.VAEloss(preds_2, labels_2, pos_weight, norm, model.z_mean_2, model.z_log_std_2))
-        # self.loss2 = FLAGS.graph2Variable * (self.VAEloss(preds_2, labels_2, pos_weight, norm, model.z_mean_2, model.z_log_std_2))
+        self.softmax_loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
 
         # KL loss
         self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
-        # self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
-        # self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2))
 
         # return self.loss1 +  self.loss2
-        return self.loss1 +  self.loss2 + self.loss3
+        return  FLAGS.SoftmaxVariable * self.softmax_loss + FLAGS.KLlossVariable * self.loss3
         # return loss3
 
     def SpecialLog(self, y):
@@ -127,9 +113,10 @@ class Model(object):
 
 
 class DualGCNGraphFusion(Model):
-    def __init__(self,  placeholders, num_features, num_nodes, features_nonzero=None, **kwargs):
+    def __init__(self,  placeholders, num_features, num_nodes, num_logits, features_nonzero=None, **kwargs):
         super(DualGCNGraphFusion, self).__init__(**kwargs)
 
+        self.num_logits = num_logits
         self.epoch = 0
         self.inputs = placeholders['features']
         self.input_dim = num_features
@@ -138,6 +125,7 @@ class DualGCNGraphFusion(Model):
         self.graph1 = placeholders['graph1']
         self.graph2 = placeholders['graph2']
         self.dropout = placeholders['dropout']
+        self.labels = placeholders['labels']
         self.build()
 
     def _build(self):
@@ -157,19 +145,6 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_1)
 
-        self.z_log_std_1 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                          output_dim=FLAGS.hidden2,
-                                          adj=self.graph1,
-                                          act=lambda x: x,
-                                          dropout=self.dropout,
-                                          logging=self.logging)(self.hidden_1)
-
-        self.z_1 = self.z_mean_1 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
-
-        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-                                                   act=lambda x: x,
-                                                   # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_1)
 
         # # Second GCN auto-encoder
         self.hidden_2 = GraphConvolution(input_dim=self.input_dim,
@@ -186,23 +161,15 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_2)
 
-        self.z_log_std_2 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                          output_dim=FLAGS.hidden2,
-                                          adj=self.graph2,
-                                          act=lambda x: x,
-                                          dropout=self.dropout,
-                                          logging=self.logging)(self.hidden_2)
-
-        self.z_2 = self.z_mean_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
-
-        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-                                                   act=lambda x: x,
-                                                   # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_2)
 
         # Fusion, 线性的融合，(286 * 64)
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
         self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2)
+
+        # Y
+        self.y = tf.layers.dense(self.z_3, self.num_logits)
+
+        print ('debuging ', self.y)
 
     def get_center_loss(self, features, labels, alpha, num_classes):
         """获取center loss及center的更新op

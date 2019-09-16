@@ -29,18 +29,8 @@ def preprocess_graph(adj):  # use original version, adj not contain diags
     degree_mat_inv_sqrt = sp.diags(np.power(rowsum, -0.5).flatten())
     adj_normalized = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
     return sparse_to_tuple(adj_normalized)
-    #
-    # placeholders = {
-    #     # 'features': tf.sparse_placeholder(tf.float32),
-    #     'features': tf.placeholder(tf.float32, shape=(None, input_feature_dim)),
-    #     'graph1': tf.sparse_placeholder(tf.float32),
-    #     'graph2': tf.sparse_placeholder(tf.float32),
-    #     'graph1_orig': tf.sparse_placeholder(tf.float32),
-    #     'graph2_orig': tf.sparse_placeholder(tf.float32),
-    #     'dropout': tf.placeholder_with_default(0., shape=())
-    # }
 
-def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders):
+def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders, labels):
     # construct feed dictionary
     feed_dict = dict()
     feed_dict.update({placeholders['features']: features})
@@ -48,6 +38,7 @@ def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, pl
     feed_dict.update({placeholders['graph1_orig']: adj})
     feed_dict.update({placeholders['graph2']: adj_normalized2})
     feed_dict.update({placeholders['graph2_orig']: adj2})
+    feed_dict.update({placeholders['labels']: labels})
 
     return feed_dict
 
