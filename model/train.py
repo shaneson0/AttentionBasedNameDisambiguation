@@ -162,6 +162,12 @@ def train(name, needtSNE=False, savefile=True):
     graph1 = getGraphDetail(adj)
     graph2 = getGraphDetail(adj2)
 
+    # construct adj_orig
+    graph1['labels'] = tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
+                                                                           validate_indices=False), [-1])
+    graph2['labels'] = tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph2_orig'],
+                                                                           validate_indices=False), [-1])
+
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
         # tf.reset_default_graph()
