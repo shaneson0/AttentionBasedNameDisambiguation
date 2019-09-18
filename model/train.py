@@ -215,7 +215,8 @@ def train(name, needtSNE=False, savefile=True):
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
-            c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
+            emb_norm = normalize_vectors(emb)
+            c, num_clust, req_c = FINCH(emb_norm, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
 
             NumberOfCluster = num_clust[0]
             MaxSpeedDescent = 0
