@@ -7,6 +7,8 @@ flags = tf.app.flags
 FLAGS = flags.FLAGS
 
 
+
+
 class OptimizerDualGCNAutoEncoder(object):
 
     def initVariable(self):
@@ -158,6 +160,15 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_1)
 
+        self.z_log_std_1 = GraphConvolution(input_dim=FLAGS.hidden1,
+                                          output_dim=FLAGS.hidden2,
+                                          adj=self.adj,
+                                          act=lambda x: x,
+                                          dropout=self.dropout,
+                                          logging=self.logging)(self.hidden1)
+
+        self.z_1 = self.z_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
+
 
         # # Second GCN auto-encoder
         self.hidden_2 = GraphConvolution(input_dim=self.input_dim,
@@ -174,6 +185,16 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_2)
 
+        self.z_log_std_2 = GraphConvolution(input_dim=FLAGS.hidden1,
+                                          output_dim=FLAGS.hidden2,
+                                          adj=self.adj,
+                                          act=lambda x: x,
+                                          dropout=self.dropout,
+                                          logging=self.logging)(self.hidden1)
+
+        self.z_2 = self.z_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
+
+
         # Fusion, 非线性的融合，(286 * 64)
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
         self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
@@ -181,12 +202,12 @@ class DualGCNGraphFusion(Model):
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+                                                   logging=self.logging)(self.z_1)
 
         self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+                                                   logging=self.logging)(self.z_2)
 
         # Y
         self.y = tf.layers.dense(self.z_3, self.num_logits)
