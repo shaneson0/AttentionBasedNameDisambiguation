@@ -162,7 +162,7 @@ class DualGCNGraphFusion(Model):
 
         self.z_log_std_1 = GraphConvolution(input_dim=FLAGS.hidden1,
                                           output_dim=FLAGS.hidden2,
-                                          adj=self.adj,
+                                          adj=self.graph1,
                                           act=lambda x: x,
                                           dropout=self.dropout,
                                           logging=self.logging)(self.hidden1)
@@ -187,7 +187,7 @@ class DualGCNGraphFusion(Model):
 
         self.z_log_std_2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                           output_dim=FLAGS.hidden2,
-                                          adj=self.adj,
+                                          adj=self.graph2,
                                           act=lambda x: x,
                                           dropout=self.dropout,
                                           logging=self.logging)(self.hidden1)
