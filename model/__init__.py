@@ -165,7 +165,7 @@ class DualGCNGraphFusion(Model):
                                           adj=self.graph1,
                                           act=lambda x: x,
                                           dropout=self.dropout,
-                                          logging=self.logging)(self.hidden1)
+                                          logging=self.logging)(self.hidden_1)
 
         self.z_1 = self.z_mean_1 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
 
@@ -190,7 +190,7 @@ class DualGCNGraphFusion(Model):
                                           adj=self.graph2,
                                           act=lambda x: x,
                                           dropout=self.dropout,
-                                          logging=self.logging)(self.hidden1)
+                                          logging=self.logging)(self.hidden_2)
 
         self.z_2 = self.z_mean_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
 
