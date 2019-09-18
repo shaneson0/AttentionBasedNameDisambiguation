@@ -157,7 +157,6 @@ def train(name, needtSNE=False, savefile=True):
     # loss2s = []
     # loss3s = []
 
-
     n_clusters = len(set(labels))
     graph1 = getGraphDetail(adj)
     graph2 = getGraphDetail(adj2)
@@ -216,6 +215,7 @@ def train(name, needtSNE=False, savefile=True):
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
             emb_norm = normalize_vectors(emb)
+            emb_norm = TSNE(learning_rate=100).fit_transform(emb_norm)
             c, num_clust, req_c = FINCH(emb_norm, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
 
             NumberOfCluster = num_clust[0]
@@ -227,7 +227,7 @@ def train(name, needtSNE=False, savefile=True):
                     MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
             OldClusterlabels = Clusterlabels
-            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb, initClusterlabel, NumberOfCluster)
+            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb_norm, initClusterlabel, NumberOfCluster)
 
             print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels)
             if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
