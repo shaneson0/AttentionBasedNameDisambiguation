@@ -44,7 +44,6 @@ def BuildModel(placeholders, input_feature_dim, num_nodes, name, num_logits):
     return Model
 
 # def BuildOptimizer()
-
 def NormalizedAdj(adj):
     adj_train = AdjPreprocessing(adj)
     adj = adj_train
@@ -160,12 +159,10 @@ def train(name, needtSNE=False):
     for clusterepoch in range(FLAGS.clusterEpochs):
         # tf.reset_default_graph()
 
-        print ('clusterepoch: ', clusterepoch)
 
         # num_logits
         model = BuildModel(placeholders, input_feature_dim, num_nodes, name='model%d'%(clusterepoch), num_logits=num_logits)
 
-        print ('build model end: ')
         # Session
 
         # tf.reset_default_graph()
@@ -176,8 +173,6 @@ def train(name, needtSNE=False):
                                           z_label=Clusterlabels,
                                           name='model%d' % (clusterepoch)
                                           )
-
-        print ('optimizer construt end')
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
@@ -288,10 +283,10 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    # main()
-    train('kexin_xu', needtSNE=True)
+    main()
+    # train('kexin_xu', needtSNE=False)
     # test('kexin_xu')
-    # train('hongbin_li', needtSNE=)
+    # train('hongbin_li', needtSNE=False)
     # test('hongbin_li')
 
 

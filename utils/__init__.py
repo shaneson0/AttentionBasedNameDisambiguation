@@ -28,7 +28,7 @@ def lossPrint(x, loss1, loss2, loss3):
 def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
-    flags.DEFINE_integer('epochs', 1500, 'Number of epochs to train.')
+    flags.DEFINE_integer('epochs', 8000, 'Number of epochs to train.')
     flags.DEFINE_integer('clusterEpochs', 5, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
@@ -41,8 +41,8 @@ def getSetting():
     flags.DEFINE_integer('is_sparse', 0, 'Whether input features are sparse.')
 
     flags.DEFINE_float('SoftmaxVariable', 1, 'Weight for softmax.')
-    flags.DEFINE_float('KLlossVariable', 0.1, 'Weight for KL loss on graph comparing.')
-    flags.DEFINE_float('CenterLossVariable', 0.5, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
+    flags.DEFINE_float('CenterLossVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
 
     return flags
 
