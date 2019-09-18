@@ -101,7 +101,7 @@ def getNewClusterLabel(emb, initClusterlabel, NumberOfCluster):
 
     return NumberOfCluster, Clusterlabels
 
-def train(name, needtSNE=False):
+def train(name, needtSNE=False, savefile=True):
     adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
 
 
@@ -227,7 +227,7 @@ def train(name, needtSNE=False):
             Cc = Counter(Clusterlabels)
             print (Cc)
             if needtSNE:
-                sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels)
+                sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels, savepath= join(settings.PIC_DIR,  "%s_%s.png"%(name, clusterepoch)) )
             # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
             # tf.reset_default_graph()
 
@@ -238,7 +238,7 @@ def train(name, needtSNE=False):
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
     # lossPrint(range(FLAGS.epochs), loss1s, loss2s, loss3s)
     if needtSNE:
-        tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
+        tSNEAnanlyse(emb, labels, join(settings.PIC_DIR,  "%s_final.png"%(name)) )
     tf.reset_default_graph()
     return [prec, rec, f1], num_nodes, n_clusters
 
@@ -283,8 +283,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    main()
-    # train('kexin_xu', needtSNE=False)
+    # main()
+    train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
     # train('hongbin_li', needtSNE=False)
     # test('hongbin_li')
