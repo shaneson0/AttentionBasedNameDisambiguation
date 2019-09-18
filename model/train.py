@@ -228,7 +228,7 @@ def train(name, needtSNE=False, savefile=True):
                     MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
             OldClusterlabels = Clusterlabels
-            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb, initClusterlabel, NumberOfCluster)
+            NumberOfCluster, tClusterLabels = getNewClusterLabel(temb, initClusterlabel, NumberOfCluster)
 
             print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels)
             if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
