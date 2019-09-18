@@ -148,12 +148,19 @@ def train(name, needtSNE=False, savefile=True):
         emb = sess.run(model.z_3, feed_dict=feed_dict)  # z_mean is better
         return emb
 
+    def getGraphDetail(adj):
+        pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
+        norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
+        return {'norm': norm, 'pos_weight': pos_weight}
+        # return pos_weight, norm
     # loss1s = []
     # loss2s = []
     # loss3s = []
 
-    n_clusters = len(set(labels))
 
+    n_clusters = len(set(labels))
+    graph1 = getGraphDetail(adj)
+    graph2 = getGraphDetail(adj2)
 
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
@@ -171,7 +178,9 @@ def train(name, needtSNE=False, savefile=True):
         opt = OptimizerDualGCNAutoEncoder(model=model,
                                           num_nodes=num_nodes,
                                           z_label=Clusterlabels,
-                                          name='model%d' % (clusterepoch)
+                                          name='model%d' % (clusterepoch),
+                                          graph1=graph1,
+                                          graph2=graph2
                                           )
 
         sess = tf.Session()
@@ -193,10 +202,10 @@ def train(name, needtSNE=False, savefile=True):
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
             # Run single weight update
             outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
-            [Loss, loss3, centerloss] = sess.run([opt.cost, opt.loss3, opt.centerloss], feed_dict=feed_dict)
+            [Loss, softmax_loss, loss3, centerloss, reconstructloss] = sess.run([opt.cost, opt.softmax_loss, opt.loss3, opt.centerloss, opt.reconstructloss], feed_dict=feed_dict)
 
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            print ('epoch: ', epoch, '， loss: ', Loss, ', loss3: ', loss3, ', centerloss: ', centerloss, ', acc: ', outs[2])
+            print ('epoch: ', epoch, '， loss: ', Loss, ', softmax_loss : ', softmax_loss, ', loss3: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss,  ', acc: ', outs[2])
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()

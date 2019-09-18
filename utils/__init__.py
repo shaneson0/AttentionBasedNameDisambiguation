@@ -43,6 +43,7 @@ def getSetting():
     flags.DEFINE_float('SoftmaxVariable', 1, 'Weight for softmax.')
     flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
     flags.DEFINE_float('CenterLossVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('ReconstructVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
 
     return flags
 

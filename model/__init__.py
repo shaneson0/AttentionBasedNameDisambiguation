@@ -15,7 +15,7 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.KLlossVariable = 0.01
         FLAGS.CenterLossVariable = 10
 
-    def  __init__(self, model, num_nodes, z_label, name):
+    def  __init__(self, model, num_nodes, z_label, name, graph1, graph2):
         self.name = name
 
         self.epoch = 0
@@ -25,8 +25,14 @@ class OptimizerDualGCNAutoEncoder(object):
         self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
         self.centerloss = self.centerloss * FLAGS.CenterLossVariable
 
+        # 计算 reconstructLoss
+        self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], z_label) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], z_label))
+
+
         self.cost = self.Cost(model.labels, model)
         self.cost += self.centerloss
+        self.cost += self.reconstructloss
+
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -43,12 +49,19 @@ class OptimizerDualGCNAutoEncoder(object):
         loss, centers, centers_update_op = model.get_center_loss(model.z_3, z_label, alpha, len(set(z_label)))
         return loss, centers, centers_update_op
 
+    def getReconstructLoss(self, preds_sub , norm, pos_weight, labels):
+        # reconstrcut loss
+        return norm * tf.reduce_mean(
+            tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels, pos_weight=pos_weight))
+
+
     def Cost(self, labels, model):
 
         self.softmax_loss = FLAGS.SoftmaxVariable * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
 
         # KL loss
         self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
+
 
         # return self.loss1 +  self.loss2
         return  self.softmax_loss + self.loss3
@@ -161,10 +174,19 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_2)
 
-
-        # Fusion, 线性的融合，(286 * 64)
+        # Fusion, 非线性的融合，(286 * 64)
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
-        self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2)
+        self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
+
+        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                                   act=lambda x: x,
+                                                   # act=tf.nn.relu,
+                                                   logging=self.logging)(self.z_3)
+
+        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                                   act=lambda x: x,
+                                                   # act=tf.nn.relu,
+                                                   logging=self.logging)(self.z_3)
 
         # Y
         self.y = tf.layers.dense(self.z_3, self.num_logits)
