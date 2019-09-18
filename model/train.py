@@ -152,6 +152,15 @@ def train(name, needtSNE=False, savefile=True):
         pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
         norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
         return {'norm': norm, 'pos_weight': pos_weight}
+
+    from sklearn.metrics.pairwise import euclidean_distances
+    def getFirstRank(emb):
+        X_new = TSNE(learning_rate=100).fit_transform(emb)
+        X_distance = euclidean_distances(X_new)
+        Indexs = np.where(X_distance == np.max(X_distance, axis=1))
+        firstRank = [x[0] for x in Indexs]
+        return firstRank
+
         # return pos_weight, norm
     # loss1s = []
     # loss2s = []
@@ -214,9 +223,10 @@ def train(name, needtSNE=False, savefile=True):
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
-            emb_norm = normalize_vectors(emb)
-            emb_norm = TSNE(learning_rate=100).fit_transform(emb_norm)
-            c, num_clust, req_c = FINCH(emb_norm, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
+            first_rank = getFirstRank(emb)
+            print ('first_rank: ', first_rank)
+
+            c, num_clust, req_c = FINCH(emb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
 
             NumberOfCluster = num_clust[0]
             MaxSpeedDescent = 0
