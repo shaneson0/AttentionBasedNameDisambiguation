@@ -157,7 +157,7 @@ def train(name, needtSNE=False, savefile=True):
     def getFirstRank(emb):
         X_new = TSNE(learning_rate=100).fit_transform(emb)
         X_distance = euclidean_distances(X_new)
-        Indexs = np.where(X_distance == np.max(X_distance, axis=1))
+        Indexs = np.where(X_distance == np.max(X_distance, axis=0))
         firstRank = [x[0] for x in Indexs]
         return firstRank
 
@@ -237,7 +237,7 @@ def train(name, needtSNE=False, savefile=True):
                     MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
 
             OldClusterlabels = Clusterlabels
-            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb_norm, initClusterlabel, NumberOfCluster)
+            NumberOfCluster, tClusterLabels = getNewClusterLabel(emb, initClusterlabel, NumberOfCluster)
 
             print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels)
             if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
