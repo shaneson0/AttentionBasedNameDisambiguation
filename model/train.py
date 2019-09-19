@@ -229,6 +229,7 @@ def train(name, needtSNE=False, savefile=True):
                 score = silhouette_score(emb, TempLabels)
                 print ('nc: ', nc, ', score: ', score)
                 if score > Maxscore:
+                    Maxscore = score
                     tClusterLabels = TempLabels
                     NumberOfCluster = nc
 
