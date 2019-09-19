@@ -214,7 +214,7 @@ def train(name, needtSNE=False, savefile=True):
             [Loss, loss3, centerloss, reconstructloss, L2loss] = sess.run([opt.cost, opt.loss3, opt.centerloss, opt.reconstructloss, opt.L2loss], feed_dict=feed_dict)
 
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            print ('epoch: ', epoch, '， loss: ', Loss, ', KLLoss: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss, ', L2loss: ', L2loss)
+            # print ('epoch: ', epoch, '， loss: ', Loss, ', KLLoss: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss, ', L2loss: ', L2loss)
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
