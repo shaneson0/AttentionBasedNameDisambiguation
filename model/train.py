@@ -197,7 +197,7 @@ def train(name, needtSNE=False, savefile=True):
         # centers = opt.centers
 
         for epoch in range(FLAGS.epochs):
-            print ('epoch: ', epoch)
+            # print ('epoch: ', epoch)
 
             # opt.epoch = epoch
             model.epoch = epoch
