@@ -30,7 +30,7 @@ def preprocess_graph(adj):  # use original version, adj not contain diags
     adj_normalized = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
     return sparse_to_tuple(adj_normalized)
 
-def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders, labels):
+def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, placeholders, labels, epoch):
     # construct feed dictionary
     feed_dict = dict()
     feed_dict.update({placeholders['features']: features})
@@ -39,6 +39,7 @@ def construct_feed_dict(adj_normalized, adj, adj_normalized2, adj2, features, pl
     feed_dict.update({placeholders['graph2']: adj_normalized2})
     feed_dict.update({placeholders['graph2_orig']: adj2})
     feed_dict.update({placeholders['labels']: labels})
+    feed_dict.update({placeholders['epoch']: epoch})
 
     return feed_dict
 

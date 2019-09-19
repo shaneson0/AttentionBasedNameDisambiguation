@@ -3,6 +3,9 @@ import tensorflow as tf
 import numpy as np
 from model.layers import GraphConvolution, InnerProductDecoder
 import itertools
+from tensorflow.contrib.layers import l2_regularizer
+
+
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
@@ -17,6 +20,30 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.KLlossVariable = 0.01
         FLAGS.CenterLossVariable = 10
 
+    def getVariable(self, operationName, epoch=0):
+        propotion = (1.0 * epoch / float(FLAGS.epochs)) * (1.0 * epoch / float(FLAGS.epochs)) * (
+                    1.0 * epoch / float(FLAGS.epochs))
+        if operationName == "graph1Variable":
+            # return FLAGS.graph1Variable
+            return FLAGS.graph1Variable - propotion * FLAGS.graph1Variable
+        elif operationName == "graph2Variable":
+            # return FLAGS.graph2Variable
+            return FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
+        elif operationName == "KLlossVariable":
+            # return FLAGS.KLlossVariable
+            return FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
+        elif operationName == "ReconstructVariable":
+            # return FLAGS.CenterLossVariable
+            return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
+        elif operationName == "CenterLossVariable":
+            # return FLAGS.CenterLossVariable
+            return 1.0 * FLAGS.CenterLossVariable * propotion
+        elif operationName == "SoftmaxVariable":
+            # return FLAGS.CenterLossVariable
+            return 1.0 * FLAGS.SoftmaxVariable * propotion
+        else:
+            return -1
+
     def  __init__(self, model, num_nodes, z_label, name, graph1, graph2):
         self.name = name
 
@@ -25,11 +52,12 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
         self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
-        self.centerloss = self.centerloss * FLAGS.CenterLossVariable
+        # self.centerloss = self.centerloss * FLAGS.CenterLossVariable
+        self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch)
 
         # 计算 reconstructLoss
-        self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
-
+        # self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
 
         self.cost = self.Cost(model.labels, model)
         self.cost += self.centerloss
@@ -44,7 +72,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
         # 这个accuracy没啥用
-        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(model.y, 1), z_label), tf.float32))
+        # self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(model.y, 1), z_label), tf.float32))
 
     def CenterLoss(self, model, z_label, alpha=1.5, alpha1=1.0):
         # loss, centers, centers_update_op, loss_part1, pair_distance_loss = model.get_island_loss(model.z_3, z_label, alpha, alpha1, len(set(z_label)))
@@ -59,15 +87,18 @@ class OptimizerDualGCNAutoEncoder(object):
 
     def Cost(self, labels, model):
 
-        self.softmax_loss = FLAGS.SoftmaxVariable * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
+        # self.softmax_loss = FLAGS.SoftmaxVariable * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
+        # self.softmax_loss = self.getVariable('SoftmaxVariable', model.epoch) * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
+
+        # self.l2_loss
 
         # KL loss
-        self.loss3 = FLAGS.KLlossVariable * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
+        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
 
 
         # return self.loss1 +  self.loss2
-        return  self.softmax_loss + self.loss3
-        # return loss3
+        # return  self.softmax_loss + self.loss3
+        return self.loss3
 
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
@@ -141,6 +172,7 @@ class DualGCNGraphFusion(Model):
         self.graph2 = placeholders['graph2']
         self.dropout = placeholders['dropout']
         self.labels = placeholders['labels']
+        self.epoch = placeholders['epoch']
         self.build()
 
     def _build(self):
@@ -210,9 +242,9 @@ class DualGCNGraphFusion(Model):
                                                    logging=self.logging)(self.z_2)
 
         # Y
-        self.y = tf.layers.dense(self.z_3, self.num_logits)
+        # self.y = tf.layers.dense(self.z_3, self.num_logits)
 
-        print ('debuging ', self.y)
+        # print ('debuging ', self.y)
 
     def get_center_loss(self, features, labels, alpha, num_classes):
         """获取center loss及center的更新op
