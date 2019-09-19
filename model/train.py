@@ -224,7 +224,7 @@ def train(name, needtSNE=False, savefile=True):
             tClusterLabels = []
             Maxscore = -1
             NumberOfCluster = 0
-            for nc in range(1, originNumberOfClusterlabels+1, 1):
+            for nc in range(2, originNumberOfClusterlabels+1, 1):
                 TempLabels = clustering(emb, nc)
                 score = silhouette_score(emb, TempLabels)
                 if score > Maxscore:
