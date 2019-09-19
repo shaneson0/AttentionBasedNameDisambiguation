@@ -222,11 +222,12 @@ def train(name, needtSNE=False, savefile=True):
             from sklearn.metrics import silhouette_score
 
             tClusterLabels = []
-            Maxscore = -1
+            Maxscore = -10000
             NumberOfCluster = 0
             for nc in range(2, originNumberOfClusterlabels+1, 1):
                 TempLabels = clustering(emb, nc)
                 score = silhouette_score(emb, TempLabels)
+                print ('nc: ', nc, ', score: ', score)
                 if score > Maxscore:
                     tClusterLabels = TempLabels
                     NumberOfCluster = nc
