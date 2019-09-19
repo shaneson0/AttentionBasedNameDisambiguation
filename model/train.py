@@ -218,22 +218,20 @@ def train(name, needtSNE=False, savefile=True):
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
-            temb = TSNE(learning_rate=100).fit_transform(emb)
 
-            c, num_clust, req_c = FINCH(temb, initial_rank=None, req_clust=None, distance='euclidean', verbose=True)
+            from sklearn.metrics import silhouette_score
 
-            NumberOfCluster = num_clust[0]
-            MaxSpeedDescent = 0
-            for idx in range(len(num_clust) - 1):
-                # if num_clust[idx + 1] <= originNumberOfClusterlabels and num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
-                if num_clust[idx] - num_clust[idx + 1] > MaxSpeedDescent:
-                    NumberOfCluster = num_clust[idx + 1]
-                    MaxSpeedDescent = num_clust[idx] - num_clust[idx + 1]
+            tClusterLabels = []
+            Maxscore = -1
+            NumberOfCluster = 0
+            for nc in range(1, originNumberOfClusterlabels+1, 1):
+                TempLabels = clustering(emb, nc)
+                score = silhouette_score(emb, TempLabels)
+                if score > Maxscore:
+                    tClusterLabels = TempLabels
+                    NumberOfCluster = nc
 
-            OldClusterlabels = Clusterlabels
-            NumberOfCluster, tClusterLabels = getNewClusterLabel(temb, initClusterlabel, NumberOfCluster)
-
-            print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels)
+            print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels, ', Maxscore: ', Maxscore)
             if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
                 continue
 
