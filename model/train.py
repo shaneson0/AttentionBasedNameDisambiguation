@@ -20,6 +20,7 @@ from finch import FINCH
 from os.path import abspath, dirname, join
 from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings, sNEComparingAnanlyse
 from utils.inputData import load_local_data
+from sklearn.metrics import silhouette_score
 
 from model import DualGCNGraphFusion, OptimizerDualGCNAutoEncoder
 
@@ -218,15 +219,14 @@ def train(name, needtSNE=False, savefile=True):
 
         if clusterepoch != FLAGS.clusterEpochs -1 :
             emb = get_embs()
-
-            from sklearn.metrics import silhouette_score
+            X_new = TSNE(learning_rate=100).fit_transform(emb)
 
             tClusterLabels = []
             Maxscore = -10000
             NumberOfCluster = 0
             for nc in range(2, originNumberOfClusterlabels+1, 1):
-                TempLabels = clustering(emb, nc)
-                score = silhouette_score(emb, TempLabels)
+                TempLabels = clustering(X_new, nc)
+                score = silhouette_score(X_new, TempLabels)
                 print ('nc: ', nc, ', score: ', score)
                 if score > Maxscore:
                     Maxscore = score
