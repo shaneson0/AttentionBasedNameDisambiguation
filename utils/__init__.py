@@ -44,7 +44,7 @@ def getSetting():
     flags.DEFINE_float('KLlossVariable', 0.01, 'Weight for KL loss on graph comparing.')
     flags.DEFINE_float('CenterLossVariable', 0, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('ReconstructVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
-    flags.DEFINE_float('L2Scale', 1, 'Weight for L2 regular')
+    flags.DEFINE_float('L2Scale', 0.1, 'Weight for L2 regular')
 
     return flags
 
