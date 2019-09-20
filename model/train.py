@@ -306,8 +306,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    main()
-    # train('kexin_xu', needtSNE=True, savefile=True)
+    # main()
+    train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
     # train('hongbin_li', needtSNE=True, savefile=True)
     # test('hongbin_li')
