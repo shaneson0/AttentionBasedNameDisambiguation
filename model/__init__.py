@@ -88,7 +88,7 @@ class OptimizerDualGCNAutoEncoder(object):
     def Cost(self, labels, model):
 
         # self.softmax_loss = FLAGS.SoftmaxVariable * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
-        # self.softmax_loss = self.getVariable('SoftmaxVariable', model.epoch) * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
+        self.softmax_loss = self.getVariable('SoftmaxVariable', model.epoch) * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
 
         # self.l2_loss
         self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
@@ -99,7 +99,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # return self.loss1 +  self.loss2
         # return  self.softmax_loss + self.loss3
-        return self.loss3 + self.L2loss
+        return self.loss3 + self.L2loss + self.softmax_loss
 
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
@@ -243,7 +243,7 @@ class DualGCNGraphFusion(Model):
                                                    logging=self.logging)(self.z_2)
 
         # Y
-        # self.y = tf.layers.dense(self.z_3, self.num_logits)
+        self.y = tf.layers.dense(self.z_3, self.num_logits)
 
         # print ('debuging ', self.y)
 

@@ -304,9 +304,9 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    # train('kexin_xu', needtSNE=True, savefile=True)
+    train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
-    train('hongbin_li', needtSNE=True)
+    # train('hongbin_li', needtSNE=True)
     # test('hongbin_li')
 
 
