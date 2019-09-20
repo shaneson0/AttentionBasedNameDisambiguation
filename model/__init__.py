@@ -20,7 +20,7 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.KLlossVariable = 0.01
         FLAGS.CenterLossVariable = 10
 
-    def getVariable(self, operationName, epoch=0):
+    def getVariable(self, operationName, epoch=0, clusterEpoch=1):
         propotion = (1.0 * epoch / float(FLAGS.epochs)) * (1.0 * epoch / float(FLAGS.epochs)) * (
                     1.0 * epoch / float(FLAGS.epochs))
         if operationName == "graph1Variable":
@@ -37,7 +37,7 @@ class OptimizerDualGCNAutoEncoder(object):
             return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
         elif operationName == "CenterLossVariable":
             # return FLAGS.CenterLossVariable
-            return 1.0 * FLAGS.CenterLossVariable * propotion
+            return 1.0 * FLAGS.CenterLossVariable * propotion * (1.0 * clusterEpoch / FLAGS.clusterEpochs)
         elif operationName == "SoftmaxVariable":
             # return FLAGS.CenterLossVariable
             return 1.0 * FLAGS.SoftmaxVariable * propotion
@@ -174,6 +174,7 @@ class DualGCNGraphFusion(Model):
         self.dropout = placeholders['dropout']
         self.labels = placeholders['labels']
         self.epoch = placeholders['epoch']
+        self.clusterEpoch = placeholders['clusterEpoch']
         self.build()
 
     def _build(self):
