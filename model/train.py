@@ -285,7 +285,7 @@ def main():
     cnt = 0
     for name in names:
         print('name : ', name)
-        cur_metric, num_nodes, n_clusters = train(name)
+        cur_metric, num_nodes, n_clusters = train(name, True)
         wf.write('{0},{1},{2},{3:.5f},{4:.5f},{5:.5f}\n'.format(
             name, num_nodes, n_clusters, cur_metric[0], cur_metric[1], cur_metric[2]))
         wf.flush()
@@ -306,8 +306,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    # main()
-    train('kexin_xu', needtSNE=True, savefile=True)
+    main()
+    # train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
     # train('hongbin_li', needtSNE=True, savefile=True)
     # test('hongbin_li')
