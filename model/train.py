@@ -172,6 +172,7 @@ def train(name, needtSNE=False, savefile=True):
 
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
+        print ('cluster epoch: ', clusterepoch)
         # tf.reset_default_graph()
 
 
@@ -217,37 +218,37 @@ def train(name, needtSNE=False, savefile=True):
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
             # print ('epoch: ', epoch, '， loss: ', Loss, ', KLLoss: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss, ', L2loss: ', L2loss)
 
-        if clusterepoch != FLAGS.clusterEpochs -1 :
-            emb = get_embs()
-            X_new = TSNE(learning_rate=100).fit_transform(emb)
+        # if clusterepoch != FLAGS.clusterEpochs -1 :
+        emb = get_embs()
+        X_new = TSNE(learning_rate=100).fit_transform(emb)
 
-            tClusterLabels = []
-            Maxscore = -10000
-            NumberOfCluster = 0
-            for nc in range(2, originNumberOfClusterlabels+1, 1):
-                TempLabels = clustering(X_new, nc)
-                score = silhouette_score(X_new, TempLabels)
-                print ('nc: ', nc, ', score: ', score)
-                if score > Maxscore:
-                    Maxscore = score
-                    tClusterLabels = TempLabels
-                    NumberOfCluster = nc
+        tClusterLabels = []
+        Maxscore = -10000
+        NumberOfCluster = 0
+        for nc in range(2, originNumberOfClusterlabels+1, 1):
+            TempLabels = clustering(X_new, nc)
+            score = silhouette_score(X_new, TempLabels)
+            print ('nc: ', nc, ', score: ', score)
+            if score > Maxscore:
+                Maxscore = score
+                tClusterLabels = TempLabels
+                NumberOfCluster = nc
 
-            print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels, ', Maxscore: ', Maxscore)
-            if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
-                continue
+        print ('NumberOfCluster: ', NumberOfCluster, ', originNumberOfClusterlabels : ', originNumberOfClusterlabels, ', Maxscore: ', Maxscore)
+        if NumberOfCluster < 0 or NumberOfCluster > originNumberOfClusterlabels:
+            continue
 
-            # 符合不断缩小的要求
-            # 重新修改这些参数
-            Clusterlabels = tClusterLabels
-            originNumberOfClusterlabels = NumberOfCluster
+        # 符合不断缩小的要求
+        # 重新修改这些参数
+        Clusterlabels = tClusterLabels
+        originNumberOfClusterlabels = NumberOfCluster
 
-            prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
-            print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
-            Cc = Counter(Clusterlabels)
-            print (Cc)
-            if needtSNE:
-                sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels, savepath= join(settings.PIC_DIR,  "%s_%s.png"%(name, clusterepoch)) )
+        prec, rec, f1 = pairwise_precision_recall_f1(Clusterlabels, labels)
+        print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
+        Cc = Counter(Clusterlabels)
+        print (Cc)
+        if needtSNE:
+            sNEComparingAnanlyse(emb, OldClusterlabels, labels, Clusterlabels, savepath= join(settings.PIC_DIR,  "%s_%s.png"%(name, clusterepoch)) )
             # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
             # tf.reset_default_graph()
 
