@@ -91,7 +91,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.softmax_loss = self.getVariable('SoftmaxVariable', model.epoch) * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
 
         # self.l2_loss
-        self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
+        # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
         self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
@@ -99,7 +99,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # return self.loss1 +  self.loss2
         # return  self.softmax_loss + self.loss3
-        return self.loss3 + self.L2loss
+        return self.loss3
 
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
