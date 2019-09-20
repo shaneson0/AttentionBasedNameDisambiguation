@@ -37,7 +37,7 @@ class OptimizerDualGCNAutoEncoder(object):
             return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
         elif operationName == "CenterLossVariable":
             # return FLAGS.CenterLossVariable
-            return 1.0 * FLAGS.CenterLossVariable * propotion * (1.0 * clusterEpoch / FLAGS.clusterEpochs) * (1.0 * clusterEpoch / FLAGS.clusterEpochs)
+            return 1.0 * FLAGS.CenterLossVariable * propotion * (1.0 * clusterEpoch / FLAGS.clusterEpochs)
         elif operationName == "SoftmaxVariable":
             # return FLAGS.CenterLossVariable
             return 1.0 * FLAGS.SoftmaxVariable * propotion
