@@ -41,7 +41,8 @@ def getSetting():
     flags.DEFINE_integer('is_sparse', 0, 'Whether input features are sparse.')
 
     flags.DEFINE_float('SoftmaxVariable', 0.3, 'Weight for softmax.')
-    flags.DEFINE_float('KLlossVariable', 0.005, 'Weight for KL loss on graph comparing.')
+    # flags.DEFINE_float('KLlossVariable', 0.005, 'Weight for KL loss on graph comparing.')
+    flags.DEFINE_float('KLlossVariable', 0, 'Weight for KL loss on graph comparing.')
     # flags.DEFINE_float('CenterLossVariable', 0.4, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('CenterLossVariable', 0, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('ReconstructVariable', 0.5, 'Weight for the cluster loss --- CenterLoss .')
