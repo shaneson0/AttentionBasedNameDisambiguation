@@ -201,7 +201,6 @@ class DualGCNGraphFusion(Model):
                                           dropout=self.dropout,
                                           logging=self.logging)(self.hidden_1)
 
-        self.z_1 = self.z_mean_1 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
 
 
         # # Second GCN auto-encoder
@@ -226,12 +225,15 @@ class DualGCNGraphFusion(Model):
                                           dropout=self.dropout,
                                           logging=self.logging)(self.hidden_2)
 
-        self.z_2 = self.z_mean_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
 
 
         # Fusion, 非线性的融合，(286 * 64)
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
         self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
+
+        self.z_1 = self.z_3 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
+        self.z_2 = self.z_3 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
+
 
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
