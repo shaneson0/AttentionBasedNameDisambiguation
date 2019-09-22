@@ -59,7 +59,8 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
         self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
         # self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']))
-        self.kl_loss = self.Cost(model.labels, model)
+        # 0.35表示3分图
+        self.kl_loss = (0.35 / num_nodes) * self.Cost(model.labels, model)
 
         self.cost = self.reconstructloss - self.kl_loss
         self.cost += self.centerloss
