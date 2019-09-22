@@ -96,7 +96,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
-        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) + self.kl_divergence(model.z_mean_1, model.z_mean_2))
+        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) )
 
 
         # return self.loss1 +  self.loss2
