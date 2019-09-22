@@ -44,7 +44,7 @@ class OptimizerDualGCNAutoEncoder(object):
         else:
             return -1
 
-    def  __init__(self, model, num_nodes, z_label, name, graph1, graph2):
+    def  __init__(self, model, num_nodes, z_label, name, graph1, _graph2):
         self.name = name
 
         self.epoch = 0
@@ -58,6 +58,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # 计算 reconstructLoss
         # self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
         self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
+        # self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']))
 
         self.cost = self.Cost(model.labels, model)
         self.cost += self.centerloss
@@ -194,12 +195,6 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_1)
 
-        self.z_log_std_1 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                          output_dim=FLAGS.hidden2,
-                                          adj=self.graph1,
-                                          act=lambda x: x,
-                                          dropout=self.dropout,
-                                          logging=self.logging)(self.hidden_1)
 
 
 
@@ -218,32 +213,21 @@ class DualGCNGraphFusion(Model):
                                        dropout=self.dropout,
                                        logging=self.logging)(self.hidden_2)
 
-        self.z_log_std_2 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                          output_dim=FLAGS.hidden2,
-                                          adj=self.graph2,
-                                          act=lambda x: x,
-                                          dropout=self.dropout,
-                                          logging=self.logging)(self.hidden_2)
-
 
 
         # Fusion, 非线性的融合，(286 * 64)
         self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
         self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
 
-        self.z_1 = self.z_3 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_1)  # element-wise
-        self.z_2 = self.z_3 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_log_std_2)  # element-wise
-
-
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_1)
+                                                   logging=self.logging)(self.z_3)
 
         self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_2)
+                                                   logging=self.logging)(self.z_3)
 
         # Y
         self.y = tf.layers.dense(self.z_3, self.num_logits)
