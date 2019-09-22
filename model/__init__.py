@@ -44,7 +44,7 @@ class OptimizerDualGCNAutoEncoder(object):
         else:
             return -1
 
-    def  __init__(self, model, num_nodes, z_label, name, graph1, _graph2):
+    def  __init__(self, model, num_nodes, z_label, name, graph1, graph2):
         self.name = name
 
         self.epoch = 0
