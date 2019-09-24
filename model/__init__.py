@@ -64,7 +64,10 @@ class OptimizerDualGCNAutoEncoder(object):
         self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl)
 
 
-        self.cost = self.reconstructloss + self.centerloss
+        # 计算distribute loss
+        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
+
+        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -96,7 +99,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
-        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_log_std, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) )
+        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
 
         # return self.loss1 +  self.loss2
