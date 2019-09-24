@@ -66,7 +66,8 @@ class OptimizerDualGCNAutoEncoder(object):
 
 
         # 计算distribute loss
-        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
+        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z, model.hidden_1_2) + self.kl_divergence(model.z, model.hidden_2_2) )
+        # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
         self.cost = self.reconstructloss + self.centerloss + self.distributeLoss
 
@@ -100,7 +101,8 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
-        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
+        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z, model.hidden_1_2) + self.kl_divergence(model.z, model.hidden_2_2) )
+        # self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
 
         # return self.loss1 +  self.loss2
