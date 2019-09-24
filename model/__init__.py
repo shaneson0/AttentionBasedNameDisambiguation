@@ -192,7 +192,7 @@ class DualGCNGraphFusion(Model):
                                         logging=self.logging)(self.inputs)
 
         # First GCN auto-encoder
-        self.hidden_1_2 = GraphConvolution(input_dim=self.input_dim,
+        self.hidden_1_2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                         output_dim=FLAGS.hidden2,
                                         adj=self.graph1,
                                         act=tf.nn.relu,
@@ -208,7 +208,7 @@ class DualGCNGraphFusion(Model):
                                         logging=self.logging)(self.inputs)
 
         # # Second GCN auto-encoder
-        self.hidden_2_2 = GraphConvolution(input_dim=self.input_dim,
+        self.hidden_2_2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                         output_dim=FLAGS.hidden2,
                                         adj=self.graph2,
                                         act=tf.nn.relu,
