@@ -29,7 +29,7 @@ def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
     flags.DEFINE_integer('epochs', 8000, 'Number of epochs to train.')
-    flags.DEFINE_integer('clusterEpochs', 1, 'Number of epochs to train.')
+    flags.DEFINE_integer('clusterEpochs', 3, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
     flags.DEFINE_float('weight_decay', 0., 'Weight for L2 loss on embedding matrix.')
