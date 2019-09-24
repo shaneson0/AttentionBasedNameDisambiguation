@@ -216,13 +216,8 @@ class DualGCNGraphFusion(Model):
                                         logging=self.logging)(self.hidden_2_1)
 
         # Fusion, 非线性的融合，(286 * 64)
-        self.z_3_add = tf.add(self.hidden_1_2, self.hidden_2_2)
-        self.z_3 = tf.layers.dense(self.z_3_add , FLAGS.hidden2, activation=tf.tanh)
-
-
-        # Variable layout
-        self.z_3_mean = tf.layers.dense(self.z_3,  FLAGS.hidden2)
-        self.z_3_log_std = tf.layers.dense(self.z_3,  FLAGS.hidden2)
+        self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
+        self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
         self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
 
