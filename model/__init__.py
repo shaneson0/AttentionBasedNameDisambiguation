@@ -235,8 +235,8 @@ class DualGCNGraphFusion(Model):
         # self.b1 = tf.Variable(tf.zeros([1,10]) + 0.1)
         # self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
         # self.z_3_log_std =  0.5 * tf.add(self.log_std_1, self.log_std_2)
-        Inputs1 = tf.concat(self.hidden_1_2, self.hidden_2_2)
-        Inputs2 = tf.concat(self.log_std_1, self.log_std_2)
+        Inputs1 = tf.concat(tf.cast(self.hidden_1_2, tf.float32), tf.cast(self.hidden_2_2, tf.float32))
+        Inputs2 = tf.concat(tf.cast(self.log_std_1, tf.float32), tf.cast(self.log_std_2, tf.float32))
         self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True)
         self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True)
 
