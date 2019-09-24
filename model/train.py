@@ -204,7 +204,8 @@ def train(name, needtSNE=False, savefile=True):
             model.epoch = epoch
 
             # Construct feed dictionary
-            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+            # feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm, adj_label, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
             # Run single weight update
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
