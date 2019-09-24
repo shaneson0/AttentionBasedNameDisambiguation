@@ -228,7 +228,7 @@ class DualGCNGraphFusion(Model):
                                           adj=self.graph2,
                                           act=lambda x: x,
                                           dropout=self.dropout,
-                                          logging=self.logging)(self.hidden_2_2)
+                                          logging=self.logging)(self.hidden_2_1)
 
         # Fusion, 非线性的融合，(286 * 64)
         self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
