@@ -52,19 +52,18 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
         self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
-        # self.centerloss = self.centerloss * FLAGS.CenterLossVariable
         self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch)
 
+
         # 计算 reconstructLoss
-        # self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
-        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
-        # self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']))
-        # 0.35表示3分图
-        self.kl_loss = (0.35 / num_nodes) * self.Cost(model.labels, model)
 
-        self.cost = self.reconstructloss - self.kl_loss
-        self.cost += self.centerloss
+        self.kl = self.kl_loss2(model.z_3_log_std, model.z_3_mean)
+        self.reconstructloss1 =  self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels'])
+        self.reconstructloss2 =  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels'])
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 - 2.0 * self.kl)
 
+
+        self.cost = self.reconstructloss + self.centerloss
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -78,7 +77,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
     def CenterLoss(self, model, z_label, alpha=1.5, alpha1=1.0):
         # loss, centers, centers_update_op, loss_part1, pair_distance_loss = model.get_island_loss(model.z_3, z_label, alpha, alpha1, len(set(z_label)))
-        loss, centers, centers_update_op = model.get_center_loss(model.z_3, z_label, alpha, len(set(z_label)))
+        loss, centers, centers_update_op = model.get_center_loss(model.z, z_label, alpha, len(set(z_label)))
         return loss, centers, centers_update_op
 
     def getReconstructLoss(self, preds_sub , norm, pos_weight, labels):
@@ -96,7 +95,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
-        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) )
+        self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_log_std, model.z_mean_1) + self.kl_divergence(model.z_3, model.z_mean_2) )
 
 
         # return self.loss1 +  self.loss2
@@ -105,6 +104,9 @@ class OptimizerDualGCNAutoEncoder(object):
 
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
+
+    def kl_loss2(self, log_std, mean):
+        return (0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * log_std - tf.square(mean) - tf.square(tf.exp(log_std)), 1))
 
     def kl_divergence(self, p, q):
         # return tf.log(p)
@@ -182,56 +184,63 @@ class DualGCNGraphFusion(Model):
     def _build(self):
 
         # First GCN auto-encoder
-        self.hidden_1 = GraphConvolution(input_dim=self.input_dim,
+        self.hidden_1_1 = GraphConvolution(input_dim=self.input_dim,
                                         output_dim=FLAGS.hidden1,
                                         adj=self.graph1,
                                         act=tf.nn.relu,
                                         dropout=self.dropout,
                                         logging=self.logging)(self.inputs)
 
-        self.z_mean_1 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                       output_dim=FLAGS.hidden2,
-                                       adj=self.graph1,
-                                       act=lambda x: x,
-                                       dropout=self.dropout,
-                                       logging=self.logging)(self.hidden_1)
-
-
-
+        # First GCN auto-encoder
+        self.hidden_1_2 = GraphConvolution(input_dim=self.input_dim,
+                                        output_dim=FLAGS.hidden2,
+                                        adj=self.graph1,
+                                        act=tf.nn.relu,
+                                        dropout=self.dropout,
+                                        logging=self.logging)(self.hidden_1_1)
 
         # # Second GCN auto-encoder
-        self.hidden_2 = GraphConvolution(input_dim=self.input_dim,
+        self.hidden_2_1 = GraphConvolution(input_dim=self.input_dim,
                                         output_dim=FLAGS.hidden1,
                                         adj=self.graph2,
                                         act=tf.nn.relu,
                                         dropout=self.dropout,
                                         logging=self.logging)(self.inputs)
 
-        self.z_mean_2 = GraphConvolution(input_dim=FLAGS.hidden1,
-                                       output_dim=FLAGS.hidden2,
-                                       adj=self.graph2,
-                                       act=lambda x: x,
-                                       dropout=self.dropout,
-                                       logging=self.logging)(self.hidden_2)
-
-
+        # # Second GCN auto-encoder
+        self.hidden_2_2 = GraphConvolution(input_dim=self.input_dim,
+                                        output_dim=FLAGS.hidden2,
+                                        adj=self.graph2,
+                                        act=tf.nn.relu,
+                                        dropout=self.dropout,
+                                        logging=self.logging)(self.hidden_2_1)
 
         # Fusion, 非线性的融合，(286 * 64)
-        self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
-        self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
+        self.z_3_add = tf.add(self.hidden_1_2, self.hidden_2_2)
+        self.z_3 = tf.layers.dense(self.z_3_add , FLAGS.hidden2, activation=tf.tanh)
+
+
+        # Variable layout
+        self.z_3_mean = tf.layers.dense(self.z_3,  FLAGS.hidden2)
+        self.z_3_log_std = tf.layers.dense(self.z_3,  FLAGS.hidden2)
+
+        self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
+
 
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+                                                   logging=self.logging)(self.z)
 
         self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+                                                   logging=self.logging)(self.z)
+
+
 
         # Y
-        self.y = tf.layers.dense(self.z_3, self.num_logits)
+        # self.y = tf.layers.dense(self.z_3, self.num_logits)
 
         # print ('debuging ', self.y)
 

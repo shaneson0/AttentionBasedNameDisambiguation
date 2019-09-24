@@ -200,25 +200,19 @@ def train(name, needtSNE=False, savefile=True):
         # centers = opt.centers
 
         for epoch in range(FLAGS.epochs):
-            # print ('epoch: ', epoch)
 
-            # opt.epoch = epoch
             model.epoch = epoch
 
             # Construct feed dictionary
-            # Number of logics and preb
-
             feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
             # Run single weight update
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
-            # [Loss, softmax_loss, loss3, centerloss, reconstructloss] = sess.run([opt.cost, opt.softmax_loss, opt.loss3, opt.centerloss, opt.reconstructloss], feed_dict=feed_dict)
-            # [Loss, loss3, centerloss, reconstructloss, L2loss] = sess.run([opt.cost, opt.loss3, opt.centerloss, opt.reconstructloss, opt.L2loss], feed_dict=feed_dict)
-            [Loss, loss3, centerloss, reconstructloss] = sess.run([opt.cost, opt.loss3, opt.centerloss, opt.reconstructloss], feed_dict=feed_dict)
 
-            # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            print ('epoch: ', epoch, '， loss: ', Loss, ', KLLoss: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss)
+            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss], feed_dict=feed_dict)
+
+            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', centerloss: ', centerloss)
 
         # if clusterepoch != FLAGS.clusterEpochs -1 :
         emb = get_embs()
