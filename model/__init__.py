@@ -22,29 +22,52 @@ class OptimizerDualGCNAutoEncoder(object):
         FLAGS.CenterLossVariable = 10
 
     def getVariable(self, operationName, epoch=0, clusterEpoch=1):
-        propotion = (1.0 * epoch / float(FLAGS.epochs)) * (1.0 * epoch / float(FLAGS.epochs)) * (
-                    1.0 * epoch / float(FLAGS.epochs))
         if operationName == "graph1Variable":
             # return FLAGS.graph1Variable
-            return FLAGS.graph1Variable - propotion * FLAGS.graph1Variable
+            return FLAGS.graph1Variable
         elif operationName == "graph2Variable":
             # return FLAGS.graph2Variable
-            return FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
+            return FLAGS.graph2Variable
         elif operationName == "KLlossVariable":
             # return FLAGS.KLlossVariable
-            return 1.0 * FLAGS.KLlossVariable * propotion
+            return FLAGS.KLlossVariable
             # return FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
         elif operationName == "ReconstructVariable":
             # return FLAGS.CenterLossVariable
-            return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
+            return FLAGS.ReconstructVariable
         elif operationName == "CenterLossVariable":
             # return FLAGS.CenterLossVariable
-            return 1.0 * FLAGS.CenterLossVariable * propotion * (1.0 * clusterEpoch / FLAGS.clusterEpochs)
+            return  FLAGS.CenterLossVariable
         elif operationName == "SoftmaxVariable":
             # return FLAGS.CenterLossVariable
-            return 1.0 * FLAGS.SoftmaxVariable * propotion
+            return  FLAGS.SoftmaxVariable
         else:
             return -1
+
+    # def getVariable(self, operationName, epoch=0, clusterEpoch=1):
+    #     propotion = (1.0 * epoch / float(FLAGS.epochs)) * (1.0 * epoch / float(FLAGS.epochs)) * (
+    #                 1.0 * epoch / float(FLAGS.epochs))
+    #     if operationName == "graph1Variable":
+    #         # return FLAGS.graph1Variable
+    #         return FLAGS.graph1Variable - propotion * FLAGS.graph1Variable
+    #     elif operationName == "graph2Variable":
+    #         # return FLAGS.graph2Variable
+    #         return FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
+    #     elif operationName == "KLlossVariable":
+    #         # return FLAGS.KLlossVariable
+    #         return 1.0 * FLAGS.KLlossVariable * propotion
+    #         # return FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
+    #     elif operationName == "ReconstructVariable":
+    #         # return FLAGS.CenterLossVariable
+    #         return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
+    #     elif operationName == "CenterLossVariable":
+    #         # return FLAGS.CenterLossVariable
+    #         return 1.0 * FLAGS.CenterLossVariable * propotion * (1.0 * clusterEpoch / FLAGS.clusterEpochs)
+    #     elif operationName == "SoftmaxVariable":
+    #         # return FLAGS.CenterLossVariable
+    #         return 1.0 * FLAGS.SoftmaxVariable * propotion
+    #     else:
+    #         return -1
 
     def  __init__(self, model, num_nodes, z_label, name, graph1, graph2):
         self.name = name
