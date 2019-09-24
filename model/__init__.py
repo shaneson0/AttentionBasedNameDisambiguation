@@ -32,7 +32,8 @@ class OptimizerDualGCNAutoEncoder(object):
             return FLAGS.graph2Variable - propotion * FLAGS.graph2Variable
         elif operationName == "KLlossVariable":
             # return FLAGS.KLlossVariable
-            return FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
+            return 1.0 * FLAGS.KLlossVariable * propotion
+            # return FLAGS.KLlossVariable - propotion * FLAGS.KLlossVariable
         elif operationName == "ReconstructVariable":
             # return FLAGS.CenterLossVariable
             return FLAGS.ReconstructVariable - propotion * FLAGS.ReconstructVariable
