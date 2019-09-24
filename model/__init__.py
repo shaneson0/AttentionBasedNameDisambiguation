@@ -195,9 +195,17 @@ class DualGCNGraphFusion(Model):
         self.hidden_1_2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                         output_dim=FLAGS.hidden2,
                                         adj=self.graph1,
-                                        act=tf.nn.relu,
+                                        act=lambda x: x,
                                         dropout=self.dropout,
                                         logging=self.logging)(self.hidden_1_1)
+
+        self.log_std_1 = GraphConvolution(input_dim=FLAGS.hidden1,
+                                          output_dim=FLAGS.hidden2,
+                                          adj=self.graph1,
+                                          act=lambda x: x,
+                                          dropout=self.dropout,
+                                          logging=self.logging)(self.hidden_1_1)
+
 
         # # Second GCN auto-encoder
         self.hidden_2_1 = GraphConvolution(input_dim=self.input_dim,
@@ -211,13 +219,22 @@ class DualGCNGraphFusion(Model):
         self.hidden_2_2 = GraphConvolution(input_dim=FLAGS.hidden1,
                                         output_dim=FLAGS.hidden2,
                                         adj=self.graph2,
-                                        act=tf.nn.relu,
+                                        act=lambda x: x,
                                         dropout=self.dropout,
                                         logging=self.logging)(self.hidden_2_1)
 
+        self.log_std_2 = GraphConvolution(input_dim=FLAGS.hidden1,
+                                          output_dim=FLAGS.hidden2,
+                                          adj=self.graph2,
+                                          act=lambda x: x,
+                                          dropout=self.dropout,
+                                          logging=self.logging)(self.hidden_2_2)
+
         # Fusion, 非线性的融合，(286 * 64)
         self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
-        self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
+        self.z_3_log_std =  0.5 * tf.add(self.log_std_1, self.log_std_2)
+
+        # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
         self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
 
