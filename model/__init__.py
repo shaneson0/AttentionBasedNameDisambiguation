@@ -60,7 +60,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.kl = self.kl_loss2(model.z_3_log_std, model.z_3_mean)
         self.reconstructloss1 =  self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels'])
         self.reconstructloss2 =  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels'])
-        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 - 2.0 * self.kl)
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl)
 
 
         self.cost = self.reconstructloss + self.centerloss
@@ -106,7 +106,7 @@ class OptimizerDualGCNAutoEncoder(object):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
     def kl_loss2(self, log_std, mean):
-        return (0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * log_std - tf.square(mean) - tf.square(tf.exp(log_std)), 1))
+        return -1.0 *(0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * log_std - tf.square(mean) - tf.square(tf.exp(log_std)), 1))
 
     def kl_divergence(self, p, q):
         # return tf.log(p)
