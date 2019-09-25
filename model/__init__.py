@@ -77,7 +77,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.num_nodes = num_nodes
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
+        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.2)
         self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch, model.clusterEpoch)
 
 
@@ -110,7 +110,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
     def CenterLoss(self, model, z_label, alpha=0.5, alpha1=1.0):
         # loss, centers, centers_update_op, loss_part1, pair_distance_loss = model.get_island_loss(model.z_3, z_label, alpha, alpha1, len(set(z_label)))
-        loss, centers, centers_update_op = model.get_center_loss(model.z_3_mean, z_label, alpha, len(set(z_label)))
+        loss, centers, centers_update_op = model.get_center_loss(model.centerLossLayer, z_label, alpha, len(set(z_label)))
         # loss, centers, centers_update_op = model.get_center_loss(model.z_3_mean, z_label, alpha, len(set(z_label)))
         return loss, centers, centers_update_op
 
@@ -292,7 +292,7 @@ class DualGCNGraphFusion(Model):
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
 
-        # self.centerLossLayer = tf.layers.dense(self.z, units=FLAGS.hidden2, activation=None)
+        self.centerLossLayer = tf.layers.dense(self.z, units=FLAGS.hidden2, activation=tf.nn.relu, kernel_regularizer=l2_regularizer(FLAGS.L2Scale))
 
 
         # Y
