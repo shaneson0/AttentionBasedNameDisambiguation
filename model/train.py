@@ -212,9 +212,9 @@ def train(name, needtSNE=False, savefile=True):
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
-            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss], feed_dict=feed_dict)
+            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, L2loss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.L2loss], feed_dict=feed_dict)
 
-            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss)
+            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss, ',L2loss: ', L2loss)
 
         # if clusterepoch != FLAGS.clusterEpochs -1 :
         emb = get_embs()

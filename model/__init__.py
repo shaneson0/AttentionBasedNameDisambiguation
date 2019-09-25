@@ -93,7 +93,10 @@ class OptimizerDualGCNAutoEncoder(object):
         self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z, model.hidden_1_2) + self.kl_divergence(model.z, model.hidden_2_2) )
         # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
-        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss
+        # self.l2_loss
+        self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
+
+        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.L2loss
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -121,9 +124,6 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # self.softmax_loss = FLAGS.SoftmaxVariable * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
         # self.softmax_loss = self.getVariable('SoftmaxVariable', model.epoch) * tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=model.y))
-
-        # self.l2_loss
-        # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z_3)
 
         # KL loss
         self.loss3 = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z, model.hidden_1_2) + self.kl_divergence(model.z, model.hidden_2_2) )
