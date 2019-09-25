@@ -5,7 +5,7 @@ import numpy as np
 from model.layers import GraphConvolution, InnerProductDecoder
 import itertools
 from tensorflow.contrib.layers import l2_regularizer
-
+import keras
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -94,9 +94,9 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
         # self.l2_loss
-        self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
+        # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
 
-        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.L2loss
+        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -118,7 +118,6 @@ class OptimizerDualGCNAutoEncoder(object):
         # reconstrcut loss
         return norm * tf.reduce_mean(
             tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels, pos_weight=pos_weight))
-
 
     def Cost(self, labels, model):
 
@@ -275,8 +274,8 @@ class DualGCNGraphFusion(Model):
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
         Inputs2 = tf.concat([self.log_std_1, self.log_std_2], axis=1)
 
-        self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True)
-        self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True)
+        self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True, kernel_regularizer=keras.regularizers.l2(FLAGS.L2Scale))
+        self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True, kernel_regularizer=keras.regularizers.l2(FLAGS.L2Scale))
 
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
