@@ -108,7 +108,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # 这个accuracy没啥用
         # self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(model.y, 1), z_label), tf.float32))
 
-    def CenterLoss(self, model, z_label, alpha=1.5, alpha1=1.0):
+    def CenterLoss(self, model, z_label, alpha=0.5, alpha1=1.0):
         # loss, centers, centers_update_op, loss_part1, pair_distance_loss = model.get_island_loss(model.z_3, z_label, alpha, alpha1, len(set(z_label)))
         loss, centers, centers_update_op = model.get_center_loss(model.centerLossLayer, z_label, alpha, len(set(z_label)))
         # loss, centers, centers_update_op = model.get_center_loss(model.z_3_mean, z_label, alpha, len(set(z_label)))
