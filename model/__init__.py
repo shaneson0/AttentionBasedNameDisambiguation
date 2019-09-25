@@ -274,8 +274,8 @@ class DualGCNGraphFusion(Model):
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
         Inputs2 = tf.concat([self.log_std_1, self.log_std_2], axis=1)
 
-        self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True, kernel_regularizer=keras.regularizers.l2(FLAGS.L2Scale))
-        self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True, kernel_regularizer=keras.regularizers.l2(FLAGS.L2Scale))
+        self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True)
+        self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True)
 
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
