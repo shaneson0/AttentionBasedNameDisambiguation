@@ -292,7 +292,7 @@ class DualGCNGraphFusion(Model):
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
 
-        self.centerLossLayer = tf.layers.dense(self.z, units=2, activation=None)
+        self.centerLossLayer = tf.layers.dense(self.z, units=FLAGS.hidden2, activation=None)
 
 
         # Y
