@@ -148,8 +148,8 @@ def train(name, needtSNE=False, savefile=True):
 
     def get_embs():
         feed_dict.update({placeholders['dropout']: 0})
-        # emb = sess.run(model.z_3_mean, feed_dict=feed_dict)  # z_mean is better
-        emb = sess.run(model.centerLossLayer, feed_dict=feed_dict)  # z_mean is better
+        emb = sess.run(model.z_3_mean, feed_dict=feed_dict)  # z_mean is better
+        # emb = sess.run(model.centerLossLayer, feed_dict=feed_dict)  # z_mean is better
         return emb
 
     def getGraphDetail(adj):
