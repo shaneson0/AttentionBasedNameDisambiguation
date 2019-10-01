@@ -151,7 +151,7 @@ class OptimizerDualGCNAutoEncoder(object):
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
-    def kl_divergence(self, pred_subj, y):
+    def kl_divergence(self, p, q):
         return tf.reduce_sum(p * (self.SpecialLog(p) - self.SpecialLog(q)))
 
         # eps = 1e-10
