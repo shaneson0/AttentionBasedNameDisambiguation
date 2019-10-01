@@ -152,7 +152,7 @@ class OptimizerDualGCNAutoEncoder(object):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
     def kl_divergence(self, p, q):
-        return tf.reduce_sum(p * (self.SpecialLog(p) - self.SpecialLog(q)))
+        return tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits=p, labels=q))
 
         # eps = 1e-10
         # y = tf.clip_by_value(y, eps, 1.0 - eps)
