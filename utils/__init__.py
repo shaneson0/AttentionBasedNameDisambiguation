@@ -27,7 +27,7 @@ def lossPrint(x, loss1, loss2, loss3):
 # setting for model
 def getSetting():
     flags = tf.app.flags
-    flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
+    flags.DEFINE_float('DGAE_learning_rate', 0.005, 'Initial learning rate.')
     flags.DEFINE_float('Finetuning_learning_rate', 0.001, 'Initial learning rate.')
     flags.DEFINE_integer('epochs', 8000, 'Number of epochs to train.')
     flags.DEFINE_integer('finetuningEpochs', 8000, 'Number of epochs to train.')
@@ -49,7 +49,7 @@ def getSetting():
     flags.DEFINE_float('finetuningVariable', 0.001, 'fine tune variable')
     # flags.DEFINE_float('CenterLossVariable', 0.4, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('CenterLossVariable', 0.01, 'Weight for the cluster loss --- CenterLoss .')
-    flags.DEFINE_float('ReconstructVariable', 1.5, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('ReconstructVariable', 5, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('L2Scale', 0.001, 'Weight for L2 regular')
 
     return flags
