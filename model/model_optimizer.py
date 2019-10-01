@@ -77,7 +77,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.num_nodes = num_nodes
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        # self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.2)
+        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.2)
         # self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch, model.clusterEpoch)
 
 
@@ -111,8 +111,8 @@ class OptimizerDualGCNAutoEncoder(object):
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
-        # with tf.control_dependencies([self.centers_update_op]):
-        self.opt_op = self.optimizer.minimize(self.cost)
+        with tf.control_dependencies([self.centers_update_op]):
+            self.opt_op = self.optimizer.minimize(self.cost)
 
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
