@@ -177,7 +177,7 @@ class OptimizerDualGCNAutoEncoder(object):
         q **= 2.0
         f = tf.reshape(tf.reduce_sum(q, axis=1), (-1, 1))
         q2 = q / f
-        Sum = K.sum(q2, axis=0)
+        Sum = tf.reduce_sum(q2, axis=0)
         p = q2 / Sum
         return p
 
