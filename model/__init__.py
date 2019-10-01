@@ -12,11 +12,6 @@ FLAGS = flags.FLAGS
 
 
 
-
-
-
-
-
 class Model(object):
     def __init__(self, **kwargs):
         allowed_kwargs = {'name', 'logging'}
@@ -68,6 +63,7 @@ class DualGCNGraphFusion(Model):
         self.labels = placeholders['labels']
         self.epoch = placeholders['epoch']
         self.clusterEpoch = placeholders['clusterEpoch']
+        self.Featureinput = placeholders['Featureinput']
         self.build()
 
     def _build(self):
@@ -309,4 +305,5 @@ class DualGCNGraphFusion(Model):
 
 
         return loss, centers, centers_update_op, loss_part1, pair_distance_loss
+
 

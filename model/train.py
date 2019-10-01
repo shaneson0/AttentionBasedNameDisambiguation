@@ -142,7 +142,8 @@ def train(name, needtSNE=False, savefile=True):
         'graph2_orig': tf.sparse_placeholder(tf.float32),
         'dropout': tf.placeholder_with_default(0., shape=()),
         'epoch': tf.placeholder_with_default(0., shape=()),
-        'clusterEpoch': tf.placeholder_with_default(0., shape=())
+        'clusterEpoch': tf.placeholder_with_default(0., shape=()),
+
     }
     # pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()  # negative edges/pos edges
     # norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.nnz) * 2)
@@ -213,9 +214,21 @@ def train(name, needtSNE=False, savefile=True):
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
-            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, tloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.targetdistributionloss], feed_dict=feed_dict)
+            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss], feed_dict=feed_dict)
 
-            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss, ', tloss: ', tloss)
+            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss)
+
+        # Second cluster epochs
+        for epoch in range(FLAGS.finetuningEpochs):
+            # Construct feed dictionary
+            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+            # feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm, adj_label, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+            feed_dict.update({placeholders['dropout']: FLAGS.dropout})
+            sess.run([opt.optimizer2], feed_dict=feed_dict)
+            [targetdistributionloss] = sess.run([opt.targetdistributionloss], feed_dict=feed_dict)
+            print ('fine tunning epoch:', epoch, ', targetdistributionloss: ', targetdistributionloss)
+
+
 
         # if clusterepoch != FLAGS.clusterEpochs -1 :
         emb = get_embs()

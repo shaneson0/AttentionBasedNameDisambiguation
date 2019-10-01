@@ -12,6 +12,7 @@ import keras
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
+
 class OptimizerDualGCNAutoEncoder(object):
 
     def initVariable(self):
@@ -93,12 +94,17 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
         # Target Distribution Loss
-        self.targetdistributionloss = self.targetDistributionLoss(model.z_3_mean, self.centers)
+        # self.targetdistributionloss = self.targetDistributionLoss(model.z_3_mean, self.centers)
 
         # self.l2_loss
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
 
         self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
+
+        self.targetdistributionloss = self.targetDistributionLoss(model.z_3_mean, self.centers)
+        self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
+        self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
+
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
@@ -135,11 +141,13 @@ class OptimizerDualGCNAutoEncoder(object):
         # return  self.softmax_loss + self.loss3
         return self.loss3
 
-    def SpecialLog(self, y):
-        return tf.log(tf.clip_by_value(y,1e-8,1.0))
+
 
     def kl_loss2(self, log_std, mean):
         return -1.0 *(0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * log_std - tf.square(mean) - tf.square(tf.exp(log_std)), 1))
+
+    def SpecialLog(self, y):
+        return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
     def kl_divergence(self, p, q):
         # return tf.log(p)
@@ -158,6 +166,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # kl = (0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * z_log_std - tf.square(z_mean) - tf.square(tf.exp(z_log_std)), 1))
         cost -= kl
         return cost
+
 
     def targetDistributionLoss(self,  features, centers, freedomAlpha=2.0):
         distributionA = self.tDistribution(features, centers, freedomAlpha)
@@ -182,4 +191,3 @@ class OptimizerDualGCNAutoEncoder(object):
         Sum = tf.reduce_sum(q2, axis=0)
         p = q2 / Sum
         return p
-
