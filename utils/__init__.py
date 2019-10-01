@@ -29,6 +29,7 @@ def getSetting():
     flags = tf.app.flags
     flags.DEFINE_float('DGAE_learning_rate', 0.01, 'Initial learning rate.')
     flags.DEFINE_integer('epochs', 8000, 'Number of epochs to train.')
+    flags.DEFINE_integer('finetuningEpochs', 8000, 'Number of epochs to train.')
     flags.DEFINE_integer('clusterEpochs', 3, 'Number of epochs to train.')
     flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
     flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
@@ -44,6 +45,7 @@ def getSetting():
     # flags.DEFINE_float('KLlossVariable', 0.005, 'Weight for KL loss on graph comparing.')
     # flags.DEFINE_float('KLlossVariable', 0.0001, 'Weight for KL loss on graph comparing.')
     flags.DEFINE_float('KLlossVariable', 0, 'Weight for KL loss on graph comparing.')
+    flags.DEFINE_float('finetuningVariable', 0.0005, 'fine tune variable')
     # flags.DEFINE_float('CenterLossVariable', 0.4, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('CenterLossVariable', 0.001, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('ReconstructVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
