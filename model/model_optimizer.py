@@ -111,8 +111,8 @@ class OptimizerDualGCNAutoEncoder(object):
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
-        with tf.control_dependencies([self.centers_update_op]):
-            self.opt_op = self.optimizer.minimize(self.cost)
+        # with tf.control_dependencies([self.centers_update_op]):
+        self.opt_op = self.optimizer.minimize(self.cost)
 
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
