@@ -145,7 +145,6 @@ class OptimizerDualGCNAutoEncoder(object):
         return self.loss3
 
 
-
     def kl_loss2(self, log_std, mean):
         return -1.0 *(0.5 / self.num_nodes) * tf.reduce_mean(tf.reduce_sum(1 + 2 * log_std - tf.square(mean) - tf.square(tf.exp(log_std)), 1))
 
@@ -153,8 +152,8 @@ class OptimizerDualGCNAutoEncoder(object):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
     def kl_divergence(self, p, q):
-        y = p / q
-        KL = tf.reduce_mean(-tf.nn.softmax_cross_entropy_with_logits(logits=p, labels=y))
+        # y = p / q
+        KL = tf.nn.softmax_cross_entropy_with_logits(logits=p, labels=q)
         return KL
         # return tf.log(p)
         # return self.KLloss(p,q)
