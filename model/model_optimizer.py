@@ -171,8 +171,8 @@ class OptimizerDualGCNAutoEncoder(object):
     def targetDistributionLoss(self,  features, centers, freedomAlpha=2.0):
         distributionA = self.tDistribution(features, centers, freedomAlpha)
         distributionB = self.auxiliaryDistriution(distributionA)
-        return self.kl_divergence(distributionA, distributionB)
-        # return tf.keras.losses.KLDivergence(distributionA, distributionB)
+        # return self.kl_divergence(distributionA, distributionB)
+        return tf.keras.losses.KLDivergence(distributionA, distributionB)
         # return tf.distributions.kl_divergence(distributionA, distributionB)
 
     # 计算t分布
