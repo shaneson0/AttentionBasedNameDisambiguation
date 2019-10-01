@@ -77,8 +77,8 @@ class OptimizerDualGCNAutoEncoder(object):
         self.num_nodes = num_nodes
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.2)
-        self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch, model.clusterEpoch)
+        # self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.2)
+        # self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch, model.clusterEpoch)
 
 
         # 计算 reconstructLoss
@@ -101,7 +101,8 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.l2_loss
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
 
-        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
+        # self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
+        self.cost = self.reconstructloss + self.distributeLoss + self.targetdistributionloss
 
         self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.Finetuning_learning_rate)
         self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
