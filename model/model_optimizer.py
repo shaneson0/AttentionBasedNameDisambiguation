@@ -99,7 +99,7 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.l2_loss
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
 
-        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
+        self.cost = self.reconstructloss + self.centerloss + self.distributeLoss
 
         self.targetdistributionloss = self.targetDistributionLoss(model.z_3_mean, self.centers)
         self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
