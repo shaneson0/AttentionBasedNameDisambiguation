@@ -22,7 +22,8 @@ from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall
 from utils.inputData import load_local_data
 from sklearn.metrics import silhouette_score
 
-from model import DualGCNGraphFusion, OptimizerDualGCNAutoEncoder
+from model import DualGCNGraphFusion
+from model.model_optimizer import OptimizerDualGCNAutoEncoder
 
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
@@ -212,9 +213,9 @@ def train(name, needtSNE=False, savefile=True):
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
-            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss], feed_dict=feed_dict)
+            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, tloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.targetdistributionloss], feed_dict=feed_dict)
 
-            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss)
+            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss, ', tloss: ', tloss)
 
         # if clusterepoch != FLAGS.clusterEpochs -1 :
         emb = get_embs()
