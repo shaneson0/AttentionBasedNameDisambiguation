@@ -63,7 +63,7 @@ class DualGCNGraphFusion(Model):
         self.labels = placeholders['labels']
         self.epoch = placeholders['epoch']
         self.clusterEpoch = placeholders['clusterEpoch']
-        self.Featureinput = placeholders['Featureinput']
+        # self.Featureinput = placeholders['Featureinput']
         self.build()
 
     def _build(self):
