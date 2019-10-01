@@ -219,13 +219,13 @@ def train(name, needtSNE=False, savefile=True):
             print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', distributionLoss: ', distributionLoss, ', centerloss: ', centerloss)
 
         # Second cluster epochs
-        for epoch in range(FLAGS.finetuningEpochs):
-            # Construct feed dictionary
-            feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
-            # feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm, adj_label, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
-            feed_dict.update({placeholders['dropout']: FLAGS.dropout})
-            outs = sess.run([opt.opt_op2, opt.targetdistributionloss], feed_dict=feed_dict)
-            print ('fine tunning epoch:', epoch, ', outs: ', outs)
+        # for epoch in range(FLAGS.finetuningEpochs):
+        #     # Construct feed dictionary
+        #     feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+        #     # feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm, adj_label, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
+        #     feed_dict.update({placeholders['dropout']: FLAGS.dropout})
+        #     outs = sess.run([opt.opt_op2, opt.targetdistributionloss], feed_dict=feed_dict)
+        #     print ('fine tunning epoch:', epoch, ', outs: ', outs)
 
 
 
