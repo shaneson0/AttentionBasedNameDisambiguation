@@ -153,7 +153,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
     def kl_divergence(self, pred_subj, y):
         newY = pred_subj / y
-        crossE = tf.nn.softmax_cross_entropy_with_logits(pred_subj, newY)
+        crossE = tf.nn.softmax_cross_entropy_with_logits(logits=pred_subj, labels=newY)
         accr_subj_test = tf.reduce_mean(-crossE)
         return accr_subj_test
         # y = p / q
