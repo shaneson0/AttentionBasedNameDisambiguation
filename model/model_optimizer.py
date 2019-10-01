@@ -170,12 +170,12 @@ class OptimizerDualGCNAutoEncoder(object):
         expanded_b = tf.expand_dims(centers, 0)
         distances = 1 + tf.square(tf.reduce_sum(tf.squared_difference(expanded_a, expanded_b), 2)) / freedomAlpha
         distances **= -1.0 * (freedomAlpha + 1.0) / 2.0
-        distances = tf.transpose(tf.transpose(distances) / K.sum(distances, axis=1))
+        distances = tf.transpose(tf.transpose(distances) / tf.reduce_sum(distances, axis=1))
         return distances
 
     def auxiliaryDistriution(self, q):
         q **= 2.0
-        f = tf.reshape(K.sum(q, axis=1), (-1, 1))
+        f = tf.reshape(tf.reduce_sum(q, axis=1), (-1, 1))
         q2 = q / f
         Sum = K.sum(q2, axis=0)
         p = q2 / Sum
