@@ -1,4 +1,6 @@
 # coding=utf-8
+
+
 import tensorflow as tf
 import tensorflow.keras as K
 import numpy as np
@@ -6,7 +8,6 @@ from model.layers import GraphConvolution, InnerProductDecoder
 import itertools
 from tensorflow.contrib.layers import l2_regularizer
 import keras
-from tf.keras.losses import KLDivergence
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -161,7 +162,7 @@ class OptimizerDualGCNAutoEncoder(object):
     def targetDistributionLoss(self,  features, centers, freedomAlpha=2.0):
         distributionA = self.tDistribution(features, centers, freedomAlpha)
         distributionB = self.auxiliaryDistriution(distributionA)
-        return KLDivergence(distributionA, distributionB)
+        return tf.distributions.kl_divergence(distributionA, distributionB)
 
     # 计算t分布
     def tDistribution(self, features, centers, freedomAlpha=2.0):
