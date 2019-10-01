@@ -104,6 +104,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.targetdistributionloss = FLAGS.finetuningVariable * (self.targetDistributionLoss(model.z_3_mean, self.centers))
         self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
         self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
+        self.grads_vars2 = self.optimizer2.compute_gradients(self.targetdistributionloss)
 
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
