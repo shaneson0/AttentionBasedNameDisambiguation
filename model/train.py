@@ -224,9 +224,8 @@ def train(name, needtSNE=False, savefile=True):
             feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm2, adj_label2, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
             # feed_dict = construct_feed_dict(adj_norm, adj_label, adj_norm, adj_label, features, placeholders, Clusterlabels, epoch, clusterepoch+1)
             feed_dict.update({placeholders['dropout']: FLAGS.dropout})
-            sess.run([opt.optimizer2], feed_dict=feed_dict)
-            [targetdistributionloss] = sess.run([opt.targetdistributionloss], feed_dict=feed_dict)
-            print ('fine tunning epoch:', epoch, ', targetdistributionloss: ', targetdistributionloss)
+            outs = sess.run([opt.opt_op2, opt.targetdistributionloss], feed_dict=feed_dict)
+            print ('fine tunning epoch:', epoch, ', outs: ', outs)
 
 
 
