@@ -152,8 +152,9 @@ class OptimizerDualGCNAutoEncoder(object):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
     def kl_divergence(self, p, q):
+        return tf.contrib.distributions.kl_divergence(p,q)
         # y = p / q
-        return tf.reduce_sum(tf.multiply(p, self.SpecialLog(p) - self.SpecialLog(q)))
+        # return tf.reduce_sum(tf.multiply(p, self.SpecialLog(p) - self.SpecialLog(q)))
         # return tf.log(p)
         # return self.KLloss(p,q)
         # return tf.abs(tf.reduce_sum(p * (self.SpecialLog(p) - self.SpecialLog(q))))
