@@ -151,8 +151,12 @@ class OptimizerDualGCNAutoEncoder(object):
     def SpecialLog(self, y):
         return tf.log(tf.clip_by_value(y,1e-8,1.0))
 
-    def kl_divergence(self, p, q):
-        return tf.distributions.kl_divergence(p,q)
+    def kl_divergence(self, pred_subj, y):
+        newY = pred_subj / y
+        crossE = tf.nn.softmax_cross_entropy_with_logits(logits=pred_subj, labels=newY)
+        accr_subj_test = tf.reduce_mean(-crossE)
+        return accr_subj_test
+
         # return tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits=p, labels=q))
 
         # eps = 1e-10
