@@ -90,7 +90,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
 
         # 计算distribute loss
-        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z, model.hidden_1_2) + self.kl_divergence(model.z, model.hidden_2_2) )
+        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
         # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
         self.targetdistributionloss = FLAGS.finetuningVariable * (self.targetDistributionLoss(model.z_3_mean, self.centers))
