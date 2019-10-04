@@ -90,7 +90,10 @@ class OptimizerDualGCNAutoEncoder(object):
 
         self.reconstructloss1 =  self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels'])
         self.reconstructloss2 =  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels'])
-        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl + self.kl1 + self.kl2)
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl )
+
+
+
 
 
 
@@ -108,7 +111,7 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
         # self.cost = self.reconstructloss + self.distributeLoss + self.targetdistributionloss
-        self.cost = self.reconstructloss
+        self.cost = self.reconstructloss - self.kl1 - self.kl2
 
         # self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.Finetuning_learning_rate)
         # self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
