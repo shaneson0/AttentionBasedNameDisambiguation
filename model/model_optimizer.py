@@ -83,17 +83,22 @@ class OptimizerDualGCNAutoEncoder(object):
 
         # 计算 reconstructLoss
 
+
         self.kl = self.kl_loss2(model.z_3_log_std, model.z_3_mean)
+        self.kl1 = self.kl_loss2(model.log_std_1, model.hidden_1_2)
+        self.kl2 = self.kl_loss2(model.log_std_2, model.hidden_2_2)
+
         self.reconstructloss1 =  self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels'])
         self.reconstructloss2 =  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels'])
-        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl)
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss1 + self.reconstructloss2 + 2.0 * self.kl + self.kl1 + self.kl2)
+
 
 
         # 计算distribute loss
-        self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
+        # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
         # self.distributeLoss = self.getVariable('KLlossVariable', model.epoch) * (self.kl_divergence(model.z_3_mean, model.hidden_1_2) + self.kl_divergence(model.z_3_mean, model.hidden_2_2) )
 
-        self.targetdistributionloss = FLAGS.finetuningVariable * (self.targetDistributionLoss(model.z_3_mean, self.centers))
+        # self.targetdistributionloss = FLAGS.finetuningVariable * (self.targetDistributionLoss(model.z_3_mean, self.centers))
 
         # Target Distribution Loss
         # self.targetdistributionloss = self.targetDistributionLoss(model.z_3_mean, self.centers)
@@ -102,11 +107,12 @@ class OptimizerDualGCNAutoEncoder(object):
         # self.L2loss = l2_regularizer(scale=FLAGS.L2Scale)(model.z)
 
         # self.cost = self.reconstructloss + self.centerloss + self.distributeLoss + self.targetdistributionloss
-        self.cost = self.reconstructloss + self.distributeLoss + self.targetdistributionloss
+        # self.cost = self.reconstructloss + self.distributeLoss + self.targetdistributionloss
+        self.cost = self.reconstructloss
 
-        self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.Finetuning_learning_rate)
-        self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
-        self.grads_vars2 = self.optimizer2.compute_gradients(self.targetdistributionloss)
+        # self.optimizer2 = tf.train.GradientDescentOptimizer(learning_rate=FLAGS.Finetuning_learning_rate)
+        # self.opt_op2 = self.optimizer2.minimize(self.targetdistributionloss)
+        # self.grads_vars2 = self.optimizer2.compute_gradients(self.targetdistributionloss)
 
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
