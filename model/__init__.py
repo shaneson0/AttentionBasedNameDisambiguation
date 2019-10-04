@@ -134,6 +134,9 @@ class DualGCNGraphFusion(Model):
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
         self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
+        self.z1 = self.hidden_1_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.log_std_1)  # element-wise
+        self.z2 = self.hidden_2_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.log_std_2)  # element-wise
+
 
 
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
@@ -145,6 +148,14 @@ class DualGCNGraphFusion(Model):
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
+        self.reconstructions_3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                                   act=lambda x: x,
+                                                   # act=tf.nn.relu,
+                                                   logging=self.logging)(self.z1)
+        self.reconstructions_4 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                                   act=lambda x: x,
+                                                   # act=tf.nn.relu,
+                                                   logging=self.logging)(self.z2)
 
         # self.centerLossLayer = tf.layers.dense(self.z, units=FLAGS.hidden2, activation=tf.nn.relu, kernel_regularizer=l2_regularizer(FLAGS.L2Scale))
 
