@@ -215,9 +215,9 @@ def train(name, needtSNE=False, savefile=True):
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
             # [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, targetdistributionloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.targetdistributionloss], feed_dict=feed_dict)
-            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss], feed_dict=feed_dict)
+            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss, kl1, kl2] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss, opt.kl1, opt.kl2], feed_dict=feed_dict)
 
-            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', centerloss: ', centerloss)
+            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', centerloss: ', centerloss, ', kl1 : ', kl1, ', kl2: ', kl2)
 
         # Second cluster epochs
         # for epoch in range(FLAGS.finetuningEpochs):
