@@ -77,7 +77,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.num_nodes = num_nodes
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=0.05)
+        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label, alpha=FLAGS.CenterLossVariable)
         self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch, model.clusterEpoch)
 
 
