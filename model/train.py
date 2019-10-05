@@ -252,6 +252,7 @@ def train(name, needtSNE=False, savefile=True):
 
         # 符合不断缩小的要求
         # 重新修改这些参数
+        OldClusterlabels = Clusterlabels
         Clusterlabels = tClusterLabels
         originNumberOfClusterlabels = NumberOfCluster
 
