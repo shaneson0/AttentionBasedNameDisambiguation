@@ -51,7 +51,7 @@ def getSetting():
     flags.DEFINE_float('CenterLossVariable', 0.005, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('ReconstructVariable', 1, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('ReconstructVariable1', 1.0, 'Weight for the cluster loss --- CenterLoss .')
-    flags.DEFINE_float('ReconstructVariable2', 2.0, 'Weight for the cluster loss --- CenterLoss .')
+    flags.DEFINE_float('ReconstructVariable2', 3.0, 'Weight for the cluster loss --- CenterLoss .')
     flags.DEFINE_float('L2Scale', 0.001, 'Weight for L2 regular')
 
     return flags
