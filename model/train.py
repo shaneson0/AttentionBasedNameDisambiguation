@@ -177,8 +177,6 @@ def train(name, needtSNE=False, savefile=True):
                                                                            validate_indices=False), [-1])
 
 
-
-
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
         print ('cluster epoch: ', clusterepoch)
