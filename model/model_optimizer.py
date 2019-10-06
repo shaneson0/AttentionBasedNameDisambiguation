@@ -92,7 +92,7 @@ class OptimizerDualGCNAutoEncoder(object):
         self.reconstructloss2 =  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']) + self.kl
         # self.reconstructloss3 =  self.getReconstructLoss(model.reconstructions_3, graph1['norm'], graph1['pos_weight'], graph1['labels'])
         # self.reconstructloss4 =  self.getReconstructLoss(model.reconstructions_4, graph2['norm'], graph2['pos_weight'], graph2['labels'])
-        self.reconstructloss =   self.reconstructloss2
+        self.reconstructloss =   self.reconstructloss2 + self.reconstructloss1
         # self.reconstructloss2 = self.getVariable('ReconstructVariable', model.epoch) * (self.reconstructloss3 + self.reconstructloss4 +  self.kl1 + self.kl2 )
 
 
