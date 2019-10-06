@@ -120,13 +120,15 @@ class DualGCNGraphFusion(Model):
         # self.b1 = tf.Variable(tf.zeros([1,10]) + 0.1)
         # self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
         # self.z_3_log_std =  0.5 * tf.add(self.log_std_1, self.log_std_2)
-        # self.hidden_1_2 = tf.cast(self.hidden_1_2, dtype=tf.float32)
-        # self.hidden_2_2 = tf.cast(self.hidden_2_2, dtype=tf.float32)
-        self.z_3_mean = tf.concat([self.hidden_1_2, self.hidden_2_2], axis=1)
+        self.hidden_1_2 = tf.cast(self.hidden_1_2, dtype=tf.float32)
+        self.hidden_2_2 = tf.cast(self.hidden_2_2, dtype=tf.float32)
+        # self.z_3_mean = tf.concat([self.hidden_1_2, self.hidden_2_2], axis=1)
+        self.z_3_mean = tf.add([self.hidden_1_1, self.hidden_1_2])
 
         self.log_std_1 = tf.cast(self.log_std_1, dtype=tf.float32)
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
-        self.z_3_log_std = tf.concat([self.log_std_1, self.log_std_2], axis=1)
+        # self.z_3_log_std = tf.concat([self.log_std_1, self.log_std_2], axis=1)
+        self.z_3_log_std = tf.add([self.log_std_1, self.log_std_2])
 
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
