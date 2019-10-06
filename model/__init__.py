@@ -132,15 +132,15 @@ class DualGCNGraphFusion(Model):
 
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
-        self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2 * 2]) * tf.exp(self.z_3_log_std)  # element-wise
+        self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
 
 
-        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2 * 2,
+        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
 
-        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2 * 2,
+        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
