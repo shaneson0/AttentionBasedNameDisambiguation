@@ -120,50 +120,29 @@ class DualGCNGraphFusion(Model):
         # self.b1 = tf.Variable(tf.zeros([1,10]) + 0.1)
         # self.z_3_mean = 0.5 * tf.add(self.hidden_1_2, self.hidden_2_2)
         # self.z_3_log_std =  0.5 * tf.add(self.log_std_1, self.log_std_2)
-        self.hidden_1_2 = tf.cast(self.hidden_1_2, dtype=tf.float32)
-        self.hidden_2_2 = tf.cast(self.hidden_2_2, dtype=tf.float32)
-        Inputs1 = tf.concat([self.hidden_1_2, self.hidden_2_2], axis=1)
+        # self.hidden_1_2 = tf.cast(self.hidden_1_2, dtype=tf.float32)
+        # self.hidden_2_2 = tf.cast(self.hidden_2_2, dtype=tf.float32)
+        self.z_3_mean = tf.concat([self.hidden_1_2, self.hidden_2_2], axis=1)
 
         self.log_std_1 = tf.cast(self.log_std_1, dtype=tf.float32)
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
-        Inputs2 = tf.concat([self.log_std_1, self.log_std_2], axis=1)
-
-        self.z_3_mean = tf.layers.dense(inputs=Inputs1, units=FLAGS.hidden2, use_bias=True)
-        self.z_3_log_std = tf.layers.dense(inputs=Inputs2, units=FLAGS.hidden2, use_bias=True)
+        self.z_3_log_std = tf.concat([self.log_std_1, self.log_std_2], axis=1)
 
         # self.z_3_log_std = tf.layers.dense(self.z_3_mean , FLAGS.hidden2)
 
-        self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.z_3_log_std)  # element-wise
-        # self.z1 = self.hidden_1_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.log_std_1)  # element-wise
-        # self.z2 = self.hidden_2_2 + tf.random_normal([self.n_samples, FLAGS.hidden2]) * tf.exp(self.log_std_2)  # element-wise
+        self.z = self.z_3_mean + tf.random_normal([self.n_samples, FLAGS.hidden2 * 2]) * tf.exp(self.z_3_log_std)  # element-wise
 
 
-
-        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+        self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2 * 2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
 
-        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2 * 2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
                                                    logging=self.logging)(self.z)
-        # self.reconstructions_3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-        #                                            act=lambda x: x,
-        #                                            # act=tf.nn.relu,
-        #                                            logging=self.logging)(self.z1)
-        # self.reconstructions_4 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-        #                                            act=lambda x: x,
-        #                                            # act=tf.nn.relu,
-        #                                            logging=self.logging)(self.z2)
 
-        # self.centerLossLayer = tf.layers.dense(self.z, units=FLAGS.hidden2, activation=tf.nn.relu, kernel_regularizer=l2_regularizer(FLAGS.L2Scale))
-
-
-        # Y
-        # self.y = tf.layers.dense(self.z_3, self.num_logits)
-
-        # print ('debuging ', self.y)
 
     def get_center_loss(self, features, labels, alpha, num_classes):
         """获取center loss及center的更新op

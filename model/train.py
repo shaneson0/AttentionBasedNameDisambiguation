@@ -167,12 +167,17 @@ def train(name, needtSNE=False, savefile=True):
     n_clusters = len(set(labels))
     graph1 = getGraphDetail(adj)
     graph2 = getGraphDetail(adj2)
+    Graph1Labels = []
+    Graph2Labels = []
 
     # construct adj_orig
     graph1['labels'] = tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph1_orig'],
                                                                            validate_indices=False), [-1])
     graph2['labels'] = tf.reshape(tf.sparse_tensor_to_dense(placeholders['graph2_orig'],
                                                                            validate_indices=False), [-1])
+
+
+
 
     # Train model
     for clusterepoch in range(FLAGS.clusterEpochs):
@@ -198,11 +203,14 @@ def train(name, needtSNE=False, savefile=True):
 
         sess = tf.Session()
         sess.run(tf.global_variables_initializer())
+        feed_dict = {}
+
 
         # Centers
         # centers = opt.centers
 
         for epoch in range(FLAGS.epochs):
+            print ("epochs: ", epoch)
 
             model.epoch = epoch
 
@@ -215,9 +223,9 @@ def train(name, needtSNE=False, savefile=True):
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
             # [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, targetdistributionloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.targetdistributionloss], feed_dict=feed_dict)
-            [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss, kl1, kl2] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss, opt.kl1, opt.kl2], feed_dict=feed_dict)
+            # [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss, kl1, kl2] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss, opt.kl1, opt.kl2], feed_dict=feed_dict)
 
-            print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', centerloss: ', centerloss, ', kl1 : ', kl1, ', kl2: ', kl2)
+            # print ('epoch: ', epoch, '， cost: ', cost, ', reconstructloss: ', reconstructloss, ', reconstructloss1: ', reconstructloss1, ', reconstructloss2 : ', reconstructloss2, ',kl : ', kl, ', centerloss: ', centerloss, ', kl1 : ', kl1, ', kl2: ', kl2)
 
         # Second cluster epochs
         # for epoch in range(FLAGS.finetuningEpochs):
@@ -265,14 +273,23 @@ def train(name, needtSNE=False, savefile=True):
             # tSNEAnanlyse(emb, labels, join(settings.PIC_DIR, "%s.png"%(clusterepoch)) )
             # tf.reset_default_graph()
 
+        # ForTest, adj_label, adj_label2
+        Graph1Labels = sess.run(graph1['labels'], feed_dict=feed_dict)
+        Graph2Labels = sess.run(graph2['labels'], feed_dict=feed_dict)
+
     emb = get_embs()
     emb_norm = normalize_vectors(emb)
     clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
     # lossPrint(range(FLAGS.epochs), loss1s, loss2s, loss3s)
+
+
+
     if needtSNE:
         tSNEAnanlyse(emb, labels, join(settings.PIC_DIR,  "%s_final.png"%(name)) )
+        tSNEAnanlyse(features, labels, join(settings.PIC_DIR,  "%s_origin_features.png"%(name)))
+        # tSNEAnanlyse(Graph2Labels, labels, join(settings.PIC_DIR,  "%s_origin2.png"%(name)))
     tf.reset_default_graph()
     return [prec, rec, f1], num_nodes, n_clusters
 
