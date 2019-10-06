@@ -220,8 +220,8 @@ def train(name, needtSNE=False, savefile=True):
             # outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
 
-            [w1, w2] = sess.run([model.w1, model.w2])
-            print ("w1: ", w1, ", w2: ", w2)
+            [w11, w12, w21, w22] = sess.run([model.w11, model.w12, model.w21, model.w22])
+            print ("w11: ", w11, ", w12: ", w12, ", w21: ", w21, ", w22: ", w22)
             # [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, distributionLoss, centerloss, targetdistributionloss] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl,  opt.distributeLoss, opt.centerloss, opt.targetdistributionloss], feed_dict=feed_dict)
             # [cost, reconstructloss, reconstructloss1, reconstructloss2,kl, centerloss, kl1, kl2] = sess.run([opt.cost, opt.reconstructloss, opt.reconstructloss1, opt.reconstructloss2, opt.kl, opt.centerloss, opt.kl1, opt.kl2], feed_dict=feed_dict)
 
