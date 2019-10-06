@@ -37,9 +37,11 @@ class Model(object):
         """ Wrapper for _build() """
         with tf.variable_scope(self.name):
             # create a shared variable
-            self.w1 = tf.Variable(1.0, name='w1')
+            self.w11 = tf.Variable(1.0, name='w11')
+            self.w12 = tf.Variable(1.0, name='w12')
             # create a shared variable
-            self.w2 = tf.Variable(1.0, name='w2')
+            self.w21 = tf.Variable(1.0, name='w21')
+            self.w22 = tf.Variable(1.0, name='w22')
             self._build()
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.name)
         self.vars = {var.name: var for var in variables}
@@ -129,12 +131,12 @@ class DualGCNGraphFusion(Model):
         # self.z_3_mean = tf.concat([self.hidden_1_2, self.hidden_2_2], axis=1)
 
 
-        self.z_3_mean = tf.add(tf.multiply(self.hidden_1_2,self.w1),  self.hidden_2_2)
+        self.z_3_mean = tf.add(tf.multiply(self.hidden_1_2,self.w11),  tf.multiply(self.hidden_2_2, self.w12))
 
         self.log_std_1 = tf.cast(self.log_std_1, dtype=tf.float32)
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
 
-        self.z_3_log_std = tf.add(tf.multiply(self.log_std_1,self.w2),  self.log_std_2)
+        self.z_3_log_std = tf.add(tf.multiply(self.log_std_1,self.w21),  tf.multiply(self.log_std_2,self.w22))
 
 
         # self.z_3_log_std = tf.concat([self.log_std_1, self.log_std_2], axis=1)
