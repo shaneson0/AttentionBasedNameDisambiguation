@@ -134,7 +134,7 @@ class DualGCNGraphFusion(Model):
         self.log_std_1 = tf.cast(self.log_std_1, dtype=tf.float32)
         self.log_std_2 = tf.cast(self.log_std_2, dtype=tf.float32)
 
-        self.z_3_log_std = tf.add(tf.multiply(self.log_std_1,self.w1),  self.log_std_2)
+        self.z_3_log_std = tf.add(tf.multiply(self.log_std_1,self.w2),  self.log_std_2)
 
 
         # self.z_3_log_std = tf.concat([self.log_std_1, self.log_std_2], axis=1)
