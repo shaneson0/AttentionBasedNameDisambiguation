@@ -57,7 +57,8 @@ if __name__ == '__main__':
     name = 'zhigang_zeng'
     # loadData(name)
     # loadFeature(name)
-    loadPAP(name)
+    PAP = loadPAP(name)
+    print (PAP)
 
 
 
