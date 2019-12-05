@@ -16,7 +16,7 @@ def loadFeature(name, idf_threshold=10):
     idx_features_labels = np.genfromtxt(feature, dtype=np.dtype(str))
     print (idx_features_labels)
 
-def loadData(name, idf_threshold=10):
+def loadData(name, idf_threshold=32):
     pass
     # graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
     # PAP = open(join(graph_dir, '{}_PAP.txt'.format(name)), 'w')
