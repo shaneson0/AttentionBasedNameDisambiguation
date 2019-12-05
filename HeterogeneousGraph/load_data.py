@@ -20,17 +20,23 @@ def encode_labels(labels):
     res = [[label, classes_dict[label]] for label in labels]
     return enc.fit_transform(res).toarray()
 
-def loadFeature(name, idf_threshold=IDF_THRESHOLD):
+def getPATH(name, idf_threshold):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
-    featurePath = join(graph_dir, '{}_feature_and_label.txt'.format(name))
+    path = join(graph_dir, '{}_feature_and_label.txt'.format(name))
+    return path
+
+def loadFeature(name, idf_threshold=IDF_THRESHOLD):
+    featurePath = getPATH(name, idf_threshold)
     # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
     idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
     features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
     labels = encode_labels(idx_features_labels[:, -2])
+    return features, labels
 
-
-    print (features)
-    print (labels)
+def loadPAP(name, idf_threshold=IDF_THRESHOLD):
+    PAPPATH = getPATH(name, idf_threshold)
+    PAP = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
+    return PAP
 
 def loadData(name, idf_threshold=32):
     pass
@@ -50,8 +56,8 @@ if __name__ == '__main__':
     # kexin_xu is null
     name = 'zhigang_zeng'
     # loadData(name)
-    loadFeature(name)
-
+    # loadFeature(name)
+    loadPAP(name)
 
 
 
