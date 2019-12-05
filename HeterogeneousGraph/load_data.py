@@ -18,7 +18,7 @@ def encode_labels(labels):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
     res = [[label, classes_dict[label]] for label in labels]
-    return enc.fit_transform(res)
+    return enc.fit_transform(res).toarray()
 
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
