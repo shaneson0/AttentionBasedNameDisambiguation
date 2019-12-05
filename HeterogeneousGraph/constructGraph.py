@@ -31,7 +31,6 @@ def dump_inter_emb():
         name_data = name_to_pubs_test[name]
         embs_input = []
         pids = []
-        # print('name', name, '， name_data： ', name_data)
         for i, aid in enumerate(name_data.keys()):
             if len(name_data[aid]) < 5:  # n_pubs of current author is too small
                 continue
