@@ -17,7 +17,8 @@ def sample_mask(idx, l):
 def encode_labels(labels):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
-    return enc.fit_transform(list(map(lambda x: classes_dict[x], labels))).toarray()
+    res = [[label, classes_dict[label]] for label in labels]
+    return enc.fit_transform(res)
 
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
