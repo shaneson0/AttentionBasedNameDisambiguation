@@ -12,12 +12,22 @@ def sample_mask(idx, l):
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
 
+def encode_labels(labels):
+    classes = set(labels)
+    classes_dict = {c: i for i, c in enumerate(classes)}
+    return list(map(lambda x: classes_dict[x], labels))
+
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
     featurePath = join(graph_dir, '{}_feature_and_label.txt'.format(name))
     # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
     idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
-    print (idx_features_labels)
+    features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
+    labels = encode_labels(idx_features_labels[:, -2])
+
+
+    print (features)
+    print (labels)
 
 def loadData(name, idf_threshold=32):
     pass
