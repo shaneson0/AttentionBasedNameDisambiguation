@@ -20,13 +20,13 @@ def encode_labels(labels):
     res = [[label, classes_dict[label]] for label in labels]
     return enc.fit_transform(res).toarray()
 
-def getPATH(name, idf_threshold):
+def getPATH(name, idf_threshold, filename):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
-    path = join(graph_dir, '{}_feature_and_label.txt'.format(name))
+    path = join(graph_dir, '{}_{}.txt'.format(filename,name))
     return path
 
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
-    featurePath = getPATH(name, idf_threshold)
+    featurePath = getPATH(name, idf_threshold, 'feature_and_label')
     # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
     idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
     features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
@@ -34,7 +34,7 @@ def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     return features, labels
 
 def loadPAP(name, idf_threshold=IDF_THRESHOLD):
-    PAPPATH = getPATH(name, idf_threshold)
+    PAPPATH = getPATH(name, idf_threshold, 'PAP')
     PAP = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
     return PAP
 
