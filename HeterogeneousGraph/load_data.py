@@ -22,7 +22,7 @@ def encode_labels(labels):
 
 def getPATH(name, idf_threshold, filename):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
-    path = join(graph_dir, '{}_{}.txt'.format(filename,name))
+    path = join(graph_dir, '{}_{}.txt'.format(name, filename))
     return path
 
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
