@@ -2,7 +2,9 @@
 import numpy as np
 from os.path import join
 from utils import settings, string_utils
+>>> from sklearn.preprocessing import OneHotEncoder
 
+enc = OneHotEncoder()
 IDF_THRESHOLD = 32  # small data
 # IDF_THRESHOLD = 10
 
@@ -15,7 +17,7 @@ def sample_mask(idx, l):
 def encode_labels(labels):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
-    return list(map(lambda x: classes_dict[x], labels))
+    return enc.transform(list(map(lambda x: classes_dict[x], labels))).toarray()
 
 def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
