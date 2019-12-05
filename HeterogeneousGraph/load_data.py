@@ -34,7 +34,8 @@ def loadData(name, idf_threshold=32):
 
 
 if __name__ == '__main__':
-    name = 'kexin_xu'
+    # kexin_xu is null
+    name = 'zhigang_zeng'
     # loadData(name)
     loadFeature(name)
 
