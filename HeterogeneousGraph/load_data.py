@@ -2,7 +2,7 @@
 import numpy as np
 from os.path import join
 from utils import settings, string_utils
->>> from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 enc = OneHotEncoder()
 IDF_THRESHOLD = 32  # small data
