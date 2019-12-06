@@ -181,6 +181,8 @@ class HAN():
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask
 
+    def getLabel(self, Y):
+        return self.enc.inverse_transform(Y)
 
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask):
 
@@ -374,6 +376,8 @@ class HAN():
                 print ("YY: ", yy)
                 print('xx: {}, yy: {}'.format(xx.shape, yy.shape))
 
+                labels = self.getLabel(yy)
+                print ('labels: ', labels)
 
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
