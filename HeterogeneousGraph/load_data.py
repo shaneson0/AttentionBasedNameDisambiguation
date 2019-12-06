@@ -120,7 +120,11 @@ if __name__ == '__main__':
     print (X_train, X_val, X_test)
 
     han = HAN()
-    han.load_data_dblp(labels, features, PAP, PSP, X_train, X_val, X_test)
+    adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask = han.load_data_dblp(labels, features, PAP, PSP, X_train, X_val, X_test)
+
+
+
+
 
 
 
