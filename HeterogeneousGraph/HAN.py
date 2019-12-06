@@ -2,14 +2,16 @@
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
-
+from sklearn.preprocessing import OneHotEncoder
 import time
 from utils import my_KNN, my_Kmeans  # , my_TSNE, my_Linear
 from models import GAT, HeteGAT, HeteGAT_multi
 from utils import process
-
+from os.path import join
+from utils import settings, string_utils
 # 禁用gpu
 import os
+from sklearn.model_selection import train_test_split
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
 
@@ -33,9 +35,119 @@ residual = False
 nonlinearity = tf.nn.elu
 model = HeteGAT_multi
 
+IDF_THRESHOLD = 32  # small data
+
+
+
 class HAN():
     def __init__(self):
-        pass
+        self.enc = OneHotEncoder()
+
+    def encode_labels(self, labels):
+        classes = set(labels)
+        classes_dict = {c: i for i, c in enumerate(classes)}
+        res = [[label, classes_dict[label]] for label in labels]
+        return self.enc.fit_transform(res).toarray()
+
+    def constructAdj(self, pids):
+        pid2idx = {c: i for i, c in enumerate(pids)}
+        idx2pid = {i: c for i, c in enumerate(pids)}
+
+        LenPids = len(pids)
+        PAP = np.zeros(shape=(LenPids, LenPids))
+        PSP = np.zeros(shape=(LenPids, LenPids))
+        return PAP, PSP, pid2idx, idx2pid
+
+    def constructIdx(self, X):
+        X_train, X_test = train_test_split(X, test_size=0.2, random_state=1)
+        X_train, X_val = train_test_split(X_train, test_size=0.2, random_state=1)
+        return X_train, X_val, X_test
+
+    def getPATH(self, name, idf_threshold, filename):
+        graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
+        path = join(graph_dir, '{}_{}.txt'.format(name, filename))
+        return path
+
+    def loadFeature(self, name, idf_threshold=IDF_THRESHOLD):
+        featurePath = self.getPATH(name, idf_threshold, 'feature_and_label')
+        # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
+        idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
+        features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
+        labels = self.encode_labels(idx_features_labels[:, -2])
+        pids = idx_features_labels[:, 0]
+        return features, labels, pids
+
+    def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
+        PAPPATH = self.getPATH(name, idf_threshold, 'PAP')
+        PAPPath = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
+        for _from, _to in PAPPath:
+            PAP[pid2idx[_from]][pid2idx[_to]] = 1
+            PAP[pid2idx[_to]][pid2idx[_from]] = 1
+        return PAP
+
+    def loadPSP(self, PSP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
+        PSPPATH = self.getPATH(name, idf_threshold, 'PSP')
+        PSPPath = np.genfromtxt(PSPPATH, dtype=np.dtype(str))
+        for _from, _to in PSPPath:
+            PSP[pid2idx[_from]][pid2idx[_to]] = 1
+            PSP[pid2idx[_to]][pid2idx[_from]] = 1
+        return PSP
+
+    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx):
+        rownetworks = [PAP, PSP]
+
+        y = truelabels
+
+        train_mask = self.sample_mask(train_idx, y.shape[0])
+        val_mask = self.sample_mask(val_idx, y.shape[0])
+        test_mask = self.sample_mask(test_idx, y.shape[0])
+
+        y_train = np.zeros(y.shape)
+        y_val = np.zeros(y.shape)
+        y_test = np.zeros(y.shape)
+        y_train[train_mask, :] = y[train_mask, :]
+        y_val[val_mask, :] = y[val_mask, :]
+        y_test[test_mask, :] = y[test_mask, :]
+
+        # return selected_idx, selected_idx_2
+        print('y_train:{}, y_val:{}, y_test:{}, train_idx:{}, val_idx:{}, test_idx:{}'.format(y_train.shape,
+                                                                                              y_val.shape,
+                                                                                              y_test.shape,
+                                                                                              train_idx.shape,
+                                                                                              val_idx.shape,
+                                                                                              test_idx.shape))
+        truefeatures_list = [truefeatures, truefeatures, truefeatures]
+        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask
+
+
+
+    def prepare_and_train(self):
+
+        name = 'zhigang_zeng'
+        # loadData(name)
+        features, labels, pids = self.loadFeature(name)
+        PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
+
+        PAP = self.loadPAP(PAP, pid2idx, name)
+        print (PAP)
+        print (PAP.tolist())
+
+        PSP = self.loadPSP(PSP, pid2idx, name)
+        print (PSP)
+        print (PSP.tolist())
+
+        N = len(pids)
+        X_train, X_val, X_test = self.constructIdx(list(range(N)))
+        print (X_train, X_val, X_test)
+
+
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask = self.load_data_dblp(labels,
+                                                                                                         features, PAP,
+                                                                                                         PSP, X_train,
+                                                                                                         X_val, X_test)
+        self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask)
+
+
 
     def sample_mask(self, idx, l):
         """Create mask."""
