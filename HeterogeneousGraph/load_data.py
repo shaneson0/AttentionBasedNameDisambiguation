@@ -53,6 +53,15 @@ def loadPAP(PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
         PAP[pid2idx[_to]][pid2idx[_from]] = 1
     return PAP
 
+def loadPSP(PSP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
+    PSPPATH = getPATH(name, idf_threshold, 'PSP')
+    PSPPath = np.genfromtxt(PSPPATH, dtype=np.dtype(str))
+    for _from, _to in PSPPath:
+        PSP[pid2idx[_from]][pid2idx[_to]] = 1
+        PSP[pid2idx[_to]][pid2idx[_from]] = 1
+    return PSP
+
+
 def loadData(name, idf_threshold=32):
     pass
     # graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
@@ -77,6 +86,10 @@ if __name__ == '__main__':
     PAP = loadPAP(PAP,pid2idx, name)
     print (PAP)
     print (PAP.tolist())
+
+    PSP = loadPSP(PSP, pid2idx, name)
+    print (PSP)
+    print (PSP.tolist())
 
 
 
