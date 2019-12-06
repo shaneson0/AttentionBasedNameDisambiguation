@@ -4,6 +4,8 @@ from os.path import join
 from utils import settings, string_utils
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
+from HeterogeneousGraph.HAN import HAN
+
 
 enc = OneHotEncoder()
 IDF_THRESHOLD = 32  # small data
@@ -69,17 +71,10 @@ def loadPSP(PSP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
     return PSP
 
 
-def load_data_dblp(truelabels, truefeatures, PAP, PSP):
-    N = truefeatures.shape[0]
+def load_data_dblp(truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx):
     rownetworks = [PAP, PSP]
 
     y = truelabels
-
-
-
-    train_idx = data['train_idx']
-    val_idx = data['val_idx']
-    test_idx = data['test_idx']
 
     train_mask = sample_mask(train_idx, y.shape[0])
     val_mask = sample_mask(val_idx, y.shape[0])
@@ -123,6 +118,9 @@ if __name__ == '__main__':
     N = len(pids)
     X_train, X_val, X_test = constructIdx(list(range(N)))
     print (X_train, X_val, X_test)
+
+    han = HAN()
+    han.load_data_dblp(labels, features, PAP, PSP, X_train, X_val, X_test)
 
 
 
