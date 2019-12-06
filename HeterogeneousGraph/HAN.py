@@ -257,10 +257,13 @@ class HAN():
                 # xx = xx / LA.norm(xx, axis=1)
                 yy = y_test[test_mask]
 
+
+                print ("XX: ", xx)
+                print ("YY: ", yy)
                 print('xx: {}, yy: {}'.format(xx.shape, yy.shape))
 
 
-                my_KNN(xx, yy)
-                my_Kmeans(xx, yy)
+                # my_KNN(xx, yy)
+                # my_Kmeans(xx, yy)
 
                 sess.close()

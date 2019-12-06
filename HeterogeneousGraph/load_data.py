@@ -123,6 +123,9 @@ if __name__ == '__main__':
     adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask = han.load_data_dblp(labels, features, PAP, PSP, X_train, X_val, X_test)
     han.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask)
 
+    clusters_pred = clustering(emb_norm, num_clusters=originNumberOfClusterlabels)
+    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+    print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', originNumberOfClusterlabels)
 
 
 
