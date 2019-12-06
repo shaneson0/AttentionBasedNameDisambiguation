@@ -182,7 +182,9 @@ class HAN():
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask
 
     def getLabel(self, Y):
-        return self.enc.inverse_transform(Y)
+        Tlabels = self.enc.inverse_transform(Y)
+        labels = [T[1] for T in Tlabels]
+        return labels, len(set(labels))
 
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask):
 
@@ -376,8 +378,14 @@ class HAN():
                 print ("YY: ", yy)
                 print('xx: {}, yy: {}'.format(xx.shape, yy.shape))
 
-                labels = self.getLabel(yy)
-                print ('labels: ', labels)
+                labels, numberofLabels = self.getLabel(yy)
+
+                from utils import  clustering, pairwise_precision_recall_f1
+                # print ('labels: ', labels)
+                clusters_pred = clustering(xx, num_clusters=numberofLabels)
+                prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+                print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ',
+                       numberofLabels)
 
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
