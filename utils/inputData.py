@@ -49,6 +49,7 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
 
     labels = encode_labels(idx_features_labels[:, -2])
     Clusterlabels = encode_labels(idx_features_labels[:, -1])
+    Ids = idx_features_labels[:, -1]
 
     # build graph
     adj = buildGraph(join(path, "{}_pubs_network.txt".format(name)), idx_features_labels, features)
@@ -56,7 +57,7 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
 
     # print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
 
-    return adj, adj2, features, labels, Clusterlabels
+    return adj, adj2, features, labels, Clusterlabels, Ids
 
 def loadAuthorSocial():
     AuthorSocial = {}

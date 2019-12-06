@@ -4,7 +4,7 @@ import scipy.sparse as sp
 import tensorflow as tf
 
 import time
-from HeterogeneousGraph.jhyexps import my_KNN, my_Kmeans  # , my_TSNE, my_Linear
+from utils import my_KNN, my_Kmeans  # , my_TSNE, my_Linear
 from models import GAT, HeteGAT, HeteGAT_multi
 from utils import process
 
