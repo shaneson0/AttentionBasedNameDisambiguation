@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     han = HAN()
     adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask = han.load_data_dblp(labels, features, PAP, PSP, X_train, X_val, X_test)
-
+    han.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask)
 
 
 
