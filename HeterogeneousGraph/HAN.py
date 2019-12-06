@@ -1,7 +1,7 @@
 
 import numpy as np
 import scipy.sparse as sp
-from tensorflow import tf
+import tensorflow as tf
 
 import time
 from HeterogeneousGraph.jhyexps import my_KNN, my_Kmeans  # , my_TSNE, my_Linear
