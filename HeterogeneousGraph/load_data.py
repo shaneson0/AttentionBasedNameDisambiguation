@@ -14,7 +14,7 @@ def sample_mask(idx, l):
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
 
-def encode_labels(labels, pids):
+def encode_labels(labels):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
     res = [[label, classes_dict[label]] for label in labels]
@@ -45,9 +45,12 @@ def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     pids = idx_features_labels[:, 0]
     return features, labels, pids
 
-def loadPAP(name, idf_threshold=IDF_THRESHOLD):
+def loadPAP(PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
     PAPPATH = getPATH(name, idf_threshold, 'PAP')
-    PAP = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
+    PAPPath = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
+    for _from, _to in PAPPath:
+        PAP[pid2idx[_from]][pid2idx[_to]] = 1
+        PAP[pid2idx[_to]][pid2idx[_from]] = 1
     return PAP
 
 def loadData(name, idf_threshold=32):
@@ -70,10 +73,10 @@ if __name__ == '__main__':
     # loadData(name)
     features, labels, pids = loadFeature(name)
     PAP, PSP, pid2idx, idx2pid = constructAdj(pids)
+
+    PAP = loadPAP(PAP,pid2idx, name)
     print (PAP)
-    print (PSP)
-    # PAP = loadPAP(name)
-    # print (PAP)
+    print (PAP.tolist())
 
 
 
