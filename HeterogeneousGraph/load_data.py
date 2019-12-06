@@ -14,11 +14,22 @@ def sample_mask(idx, l):
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
 
-def encode_labels(labels):
+def encode_labels(labels, pids):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
     res = [[label, classes_dict[label]] for label in labels]
     return enc.fit_transform(res).toarray()
+
+def constructAdj(pids):
+    pid2idx = {c: i for i, c in enumerate(pids)}
+    idx2pid = {i: c for i, c in enumerate(pids)}
+
+    LenPids = len(pids)
+    PAP = np.zeros(shape=( LenPids, LenPids ))
+    PSP = np.zeros(shape=( LenPids, LenPids ))
+    return PAP, PSP, pid2idx, idx2pid
+
+
 
 def getPATH(name, idf_threshold, filename):
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
@@ -31,7 +42,8 @@ def loadFeature(name, idf_threshold=IDF_THRESHOLD):
     idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
     features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
     labels = encode_labels(idx_features_labels[:, -2])
-    return features, labels
+    pids = idx_features_labels[:, 0]
+    return features, labels, pids
 
 def loadPAP(name, idf_threshold=IDF_THRESHOLD):
     PAPPATH = getPATH(name, idf_threshold, 'PAP')
@@ -56,9 +68,12 @@ if __name__ == '__main__':
     # kexin_xu is nulls
     name = 'zhigang_zeng'
     # loadData(name)
-    # loadFeature(name)
-    PAP = loadPAP(name)
+    features, labels, pids = loadFeature(name)
+    PAP, PSP, pid2idx, idx2pid = constructAdj(pids)
     print (PAP)
+    print (PSP)
+    # PAP = loadPAP(name)
+    # print (PAP)
 
 
 
