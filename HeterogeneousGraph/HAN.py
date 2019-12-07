@@ -121,9 +121,8 @@ class HAN():
 
 
 
-    def prepare_and_train(self):
+    def prepare_and_train(self, name = 'zhigang_zeng'):
 
-        name = 'zhigang_zeng'
         # loadData(name)
         features, labels, pids = self.loadFeature(name)
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
