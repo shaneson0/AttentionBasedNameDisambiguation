@@ -98,17 +98,19 @@ class HAN():
 
         y = truelabels
 
-        y_mask = self.sample_mask(allIdx, y.shape[0])
+        all_mask = self.sample_mask(allIdx, y.shape[0])
         train_mask = self.sample_mask(train_idx, y.shape[0])
         val_mask = self.sample_mask(val_idx, y.shape[0])
         test_mask = self.sample_mask(test_idx, y.shape[0])
 
+        y_all = np.zeros(y.shape)
         y_train = np.zeros(y.shape)
         y_val = np.zeros(y.shape)
         y_test = np.zeros(y.shape)
         y_train[train_mask, :] = y[train_mask, :]
         y_val[val_mask, :] = y[val_mask, :]
         y_test[test_mask, :] = y[test_mask, :]
+        y_all[all_mask, :] = y[all_mask, :]
 
         # return selected_idx, selected_idx_2
         print('y_train:{}, y_val:{}, y_test:{}, train_idx:{}, val_idx:{}, test_idx:{}'.format(y_train.shape,
@@ -118,7 +120,7 @@ class HAN():
                                                                                               val_idx.shape,
                                                                                               test_idx.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
-        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask
+        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
 
@@ -142,11 +144,11 @@ class HAN():
         print (X_train, X_val, X_test)
 
 
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask = self.load_data_dblp(labels,
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,
                                                                                                          features, PAP,
                                                                                                          PSP, X_train,
                                                                                                          X_val, X_test)
-        self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask)
+        self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
 
 
 
@@ -188,7 +190,6 @@ class HAN():
         return labels, len(set(labels))
 
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask):
-
 
         nb_nodes = fea_list[0].shape[0]
         ft_size = fea_list[0].shape[1]
