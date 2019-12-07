@@ -187,7 +187,7 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask):
+    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask):
 
 
         nb_nodes = fea_list[0].shape[0]
@@ -336,19 +336,20 @@ class HAN():
 
                 saver.restore(sess, checkpt_file)
                 print('load model from : {}'.format(checkpt_file))
-                ts_size = fea_list[0].shape[0]
+                all_size = fea_list[0].shape[0]
                 ts_step = 0
                 ts_loss = 0.0
                 ts_acc = 0.0
 
-                while ts_step * batch_size < ts_size:
-                    # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
+                # ts for all data
+
+                while ts_step * batch_size < all_size:
                     fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(ftr_in_list, fea_list)}
                     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
 
                            is_train: False,
                            attn_drop: 0.0,
@@ -367,28 +368,13 @@ class HAN():
                       '; Test accuracy:', ts_acc / ts_step)
 
                 print('start knn, kmean.....')
-                # xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
+                xx = np.expand_dims(jhy_final_embedding, axis=0)[all_mask]
+                yy = y_all[all_mask]
+
+                # from numpy import linalg as LA
                 #
-                # # from numpy import linalg as LA
-                # #
-                # # # xx = xx / LA.norm(xx, axis=1)
-                # yy = y_test[test_mask]
-                print ("try all data")
-                fd1 = {i: d for i, d in zip(ftr_in_list, fea_list)}
-                fd2 = {i: d for i,d in zip(bias_in_list, biases_list)}
-                fd3 = {lbl_in: y_test,
-                       msk_in: test_mask,
-                       is_train: False,
-                       attn_drop: 0.0,
-                       ffd_drop: 0.0}
+                # # xx = xx / LA.norm(xx, axis=1)
 
-
-                fd = fd1
-                fd.update(fd2)
-                fd.update(fd3)
-                jhy_final_embedding = sess.run([final_embedding], feed_dict=fd)
-                xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
-                yy = y_test[test_mask]
 
 
                 print ("check fd")
