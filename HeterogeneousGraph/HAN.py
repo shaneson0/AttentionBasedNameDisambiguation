@@ -367,13 +367,29 @@ class HAN():
                       '; Test accuracy:', ts_acc / ts_step)
 
                 print('start knn, kmean.....')
-                xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
+                # xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
                 #
-                # from numpy import linalg as LA
-                #
-                # # xx = xx / LA.norm(xx, axis=1)
-                yy = y_test[test_mask]
+                # # from numpy import linalg as LA
+                # #
+                # # # xx = xx / LA.norm(xx, axis=1)
+                # yy = y_test[test_mask]
                 print ("try all data")
+                fd1 = {i: d for i, d in zip(ftr_in_list, fea_list)}
+                fd2 = {i: d for i,d in zip(bias_in_list, biases_list)}
+                fd3 = {lbl_in: y_test,
+                       msk_in: test_mask,
+                       is_train: False,
+                       attn_drop: 0.0,
+                       ffd_drop: 0.0}
+
+
+                fd = fd1
+                fd.update(fd2)
+                fd.update(fd3)
+                jhy_final_embedding = sess.run([final_embedding], feed_dict=fd)
+                xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
+                yy = y_test[test_mask]
+
 
                 print ("check fd")
                 print (fd)
