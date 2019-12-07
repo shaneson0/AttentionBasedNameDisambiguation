@@ -93,11 +93,12 @@ class HAN():
             PSP[pid2idx[_to]][pid2idx[_from]] = 1
         return PSP
 
-    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx):
+    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx):
         rownetworks = [PAP, PSP]
 
         y = truelabels
 
+        y_mask = self.sample_mask(allIdx, y.shape[0])
         train_mask = self.sample_mask(train_idx, y.shape[0])
         val_mask = self.sample_mask(val_idx, y.shape[0])
         test_mask = self.sample_mask(test_idx, y.shape[0])
@@ -367,13 +368,15 @@ class HAN():
 
                 print('start knn, kmean.....')
                 xx = np.expand_dims(jhy_final_embedding, axis=0)[test_mask]
-
-                from numpy import linalg as LA
-
-                # xx = xx / LA.norm(xx, axis=1)
+                #
+                # from numpy import linalg as LA
+                #
+                # # xx = xx / LA.norm(xx, axis=1)
                 yy = y_test[test_mask]
+                print ("try all data")
 
-
+                print ("check fd")
+                print (fd)
                 print ("XX: ", xx)
                 print ("YY: ", yy)
                 print('xx: {}, yy: {}'.format(xx.shape, yy.shape))
