@@ -115,6 +115,7 @@ class HAN():
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
         print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
+        print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
