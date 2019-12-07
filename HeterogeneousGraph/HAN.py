@@ -61,7 +61,7 @@ class HAN():
     def constructIdx(self, X):
         X_train, X_test = train_test_split(X, test_size=0.2, random_state=1)
         X_train, X_val = train_test_split(X_train, test_size=0.2, random_state=1)
-        return X_train, X_val, X_test
+        return X_train, X_val, X_test, X
 
     def getPATH(self, name, idf_threshold, filename):
         graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
@@ -140,14 +140,14 @@ class HAN():
         print (PSP.tolist())
 
         N = len(pids)
-        X_train, X_val, X_test = self.constructIdx(list(range(N)))
+        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
         print (X_train, X_val, X_test)
 
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,
                                                                                                          features, PAP,
                                                                                                          PSP, X_train,
-                                                                                                         X_val, X_test)
+                                                                                                         X_val, X_test, Allidx)
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
 
 
