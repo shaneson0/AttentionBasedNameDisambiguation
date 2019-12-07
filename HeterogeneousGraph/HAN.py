@@ -142,7 +142,7 @@ class HAN():
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
-        # self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
+        self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
 
     def sample_mask(self, idx, l):
         """Create mask."""
@@ -170,9 +170,12 @@ class HAN():
         y_train = y_train[np.newaxis]
         y_val = y_val[np.newaxis]
         y_test = y_test[np.newaxis]
+        y_all = y_all[np.newaxis]
+
         train_mask = train_mask[np.newaxis]
         val_mask = val_mask[np.newaxis]
         test_mask = test_mask[np.newaxis]
+        all_mask = all_mask[np.newaxis]
 
         biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
 
@@ -315,8 +318,8 @@ class HAN():
                            for i, d in zip(ftr_in_list, fea_list)}
                     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
 
                     # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
                     #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
