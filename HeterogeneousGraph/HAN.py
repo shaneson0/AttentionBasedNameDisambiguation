@@ -127,16 +127,13 @@ class HAN():
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
 
         PAP = self.loadPAP(PAP, pid2idx, name)
-        print (PAP)
-        print (PAP.tolist())
+
 
         PSP = self.loadPSP(PSP, pid2idx, name)
-        print (PSP)
-        print (PSP.tolist())
 
         N = len(pids)
         X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
-        print (X_train, X_val, X_test)
+
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
