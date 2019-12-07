@@ -143,6 +143,7 @@ class HAN():
         X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
         print (X_train, X_val, X_test)
 
+        #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,
                                                                                                          features, PAP,
