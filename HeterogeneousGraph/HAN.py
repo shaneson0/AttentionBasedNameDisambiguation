@@ -302,20 +302,22 @@ class HAN():
 
                 saver.restore(sess, checkpt_file)
                 print('load model from : {}'.format(checkpt_file))
-                all_size = fea_list[0].shape[0]
+                ts_size = fea_list[0].shape[0]
                 ts_step = 0
                 ts_loss = 0.0
                 ts_acc = 0.0
 
-                # ts for all data
-
-                while ts_step * batch_size < all_size:
+                while ts_step * batch_size < ts_size:
+                    # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
                     fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(ftr_in_list, fea_list)}
                     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+
+                    # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
 
                            is_train: False,
                            attn_drop: 0.0,
