@@ -250,51 +250,50 @@ class HAN():
                         train_acc_avg += acc_tr
                         tr_step += 1
 
-                    vl_step = 0
-                    vl_size = fea_list[0].shape[0]
-                    # =============   val       =================
-                    while vl_step * batch_size < vl_size:
-                        # fd1 = {ftr_in: features[vl_step * batch_size:(vl_step + 1) * batch_size]}
-                        fd1 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
-                               for i, d in zip(ftr_in_list, fea_list)}
-                        fd2 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
-                               for i, d in zip(bias_in_list, biases_list)}
-                        fd3 = {lbl_in: y_val[vl_step * batch_size:(vl_step + 1) * batch_size],
-                               msk_in: val_mask[vl_step * batch_size:(vl_step + 1) * batch_size],
-                               is_train: False,
-                               attn_drop: 0.0,
-                               ffd_drop: 0.0}
-
-                        fd = fd1
-                        fd.update(fd2)
-                        fd.update(fd3)
-                        loss_value_vl, acc_vl = sess.run([loss, accuracy],
-                                                         feed_dict=fd)
-                        val_loss_avg += loss_value_vl
-                        val_acc_avg += acc_vl
-                        vl_step += 1
+                    # vl_step = 0
+                    # vl_size = fea_list[0].shape[0]
+                    # # =============   val       =================
+                    # while vl_step * batch_size < vl_size:
+                    #     # fd1 = {ftr_in: features[vl_step * batch_size:(vl_step + 1) * batch_size]}
+                    #     fd1 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
+                    #            for i, d in zip(ftr_in_list, fea_list)}
+                    #     fd2 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
+                    #            for i, d in zip(bias_in_list, biases_list)}
+                    #     fd3 = {lbl_in: y_val[vl_step * batch_size:(vl_step + 1) * batch_size],
+                    #            msk_in: val_mask[vl_step * batch_size:(vl_step + 1) * batch_size],
+                    #            is_train: False,
+                    #            attn_drop: 0.0,
+                    #            ffd_drop: 0.0}
+                    #
+                    #     fd = fd1
+                    #     fd.update(fd2)
+                    #     fd.update(fd3)
+                    #     loss_value_vl, acc_vl = sess.run([loss, accuracy],
+                    #                                      feed_dict=fd)
+                    #     val_loss_avg += loss_value_vl
+                    #     val_acc_avg += acc_vl
+                    #     vl_step += 1
                     # import pdb; pdb.set_trace()
                     print('Epoch: {}, att_val: {}'.format(epoch, np.mean(att_val_train, axis=0)))
-                    print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f' %
-                          (train_loss_avg / tr_step, train_acc_avg / tr_step,
-                           val_loss_avg / vl_step, val_acc_avg / vl_step))
+                    print('Training: loss = %.5f, acc = %.5f' %
+                          (train_loss_avg / tr_step, train_acc_avg / tr_step))
 
-                    if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
-                        if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
-                            vacc_early_model = val_acc_avg / vl_step
-                            vlss_early_model = val_loss_avg / vl_step
-                            saver.save(sess, checkpt_file)
-                        vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
-                        vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
-                        curr_step = 0
-                    else:
-                        curr_step += 1
-                        if curr_step == patience:
-                            print('Early stop! Min loss: ', vlss_mn,
-                                  ', Max accuracy: ', vacc_mx)
-                            print('Early stop model validation loss: ',
-                                  vlss_early_model, ', accuracy: ', vacc_early_model)
-                            break
+                    # if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
+                    #     if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
+                    #         vacc_early_model = val_acc_avg / vl_step
+                    #         vlss_early_model = val_loss_avg / vl_step
+                    #         saver.save(sess, checkpt_file)
+                    #     vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
+                    #     vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
+                    #     curr_step = 0
+                    # else:
+                    #     curr_step += 1
+                    #     if curr_step == patience:
+                    #         print('Early stop! Min loss: ', vlss_mn,
+                    #               ', Max accuracy: ', vacc_mx)
+                    #         print('Early stop model validation loss: ',
+                    #               vlss_early_model, ', accuracy: ', vacc_early_model)
+                    #         break
 
                     train_loss_avg = 0
                     train_acc_avg = 0
