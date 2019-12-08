@@ -36,7 +36,6 @@ def main():
         metrics[1] = metrics[1] + rec
         metrics[2] = metrics[2] + f1
 
-
         cnt += 1
 
 
