@@ -75,7 +75,7 @@ class HAN():
         features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
         labels = self.encode_labels(idx_features_labels[:, -2])
         pids = idx_features_labels[:, 0]
-        return features, labels, pids
+        return features, labels, pids, idx_features_labels[:, -2]
 
     def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
         PAPPATH = self.getPATH(name, idf_threshold, 'PAP')
@@ -124,7 +124,7 @@ class HAN():
     def prepare_and_train(self, name = 'zhigang_zeng'):
 
         # loadData(name)
-        features, labels, pids = self.loadFeature(name)
+        features, labels, pids, rawlabels = self.loadFeature(name)
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
 
         PAP = self.loadPAP(PAP, pid2idx, name)
@@ -143,7 +143,7 @@ class HAN():
         print (all_mask)
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
         print ("labels: ", labels)
-        print ("set of labels: ", len(set(labels)))
+        print ("set of labels: ", len(set(rawlabels)))
 
     def sample_mask(self, idx, l):
         """Create mask."""
