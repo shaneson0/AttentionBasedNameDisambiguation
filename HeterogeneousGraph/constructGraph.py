@@ -8,7 +8,7 @@ from utils.cache import LMDBClient
 from utils import data_utils, inputData
 from utils import settings, string_utils
 from collections import defaultdict
-from HeterogeneousGraph import IDF_THRESHOLD
+from HeterogeneousGraph import IDF_THRESHOLD, Author_THRESHOLD
 
 IDLength = 24
 
@@ -143,7 +143,7 @@ def genPAPandPSP(idf_threshold=10):
                 Graph1Socials = AuthorSocial[pids_filter[i]]
                 Graph2Socials = AuthorSocial[pids_filter[j]]
                 # 具有两个相同作者才能写入图
-                if CountNumber(Graph1Socials, Graph2Socials) >= 1:
+                if CountNumber(Graph1Socials, Graph2Socials) >= Author_THRESHOLD:
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
 
         wf_network.close()

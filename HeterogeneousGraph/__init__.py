@@ -1,2 +1,3 @@
 
 IDF_THRESHOLD = 10
+Author_THRESHOLD = 2
