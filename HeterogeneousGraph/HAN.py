@@ -142,6 +142,8 @@ class HAN():
         print (test_mask)
         print (all_mask)
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
+        print ("labels: ", labels)
+        print ("set of labels: ", len(set(labels)))
 
     def sample_mask(self, idx, l):
         """Create mask."""
