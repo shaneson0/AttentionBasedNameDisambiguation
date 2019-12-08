@@ -144,7 +144,7 @@ class HAN():
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
