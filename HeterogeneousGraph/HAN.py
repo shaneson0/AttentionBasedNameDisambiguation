@@ -12,6 +12,8 @@ from utils import settings, string_utils
 # 禁用gpu
 import os
 from sklearn.model_selection import train_test_split
+from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings, sNEComparingAnanlyse
+
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
 
@@ -123,6 +125,7 @@ class HAN():
 
     def prepare_and_train(self, name = 'zhigang_zeng'):
 
+        self.name = name
         # loadData(name)
         features, labels, pids, rawlabels = self.loadFeature(name)
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
@@ -158,7 +161,7 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask):
+    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
@@ -375,6 +378,8 @@ class HAN():
                 prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
                 print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
 
+                if needtSNE:
+                    tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "%s_final.png" % (self.name)))
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
 
