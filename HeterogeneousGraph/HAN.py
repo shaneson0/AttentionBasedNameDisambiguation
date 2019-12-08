@@ -142,7 +142,7 @@ class HAN():
         print (test_mask)
         print (all_mask)
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
-        print ("labels: ", labels)
+        print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
 
     def sample_mask(self, idx, l):
@@ -367,7 +367,6 @@ class HAN():
                 labels, numberofLabels = self.getLabel(yy)
 
                 from utils import  clustering, pairwise_precision_recall_f1
-                print ('labels: ', labels)
 
                 clusters_pred = clustering(xx, num_clusters=numberofLabels)
                 prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
