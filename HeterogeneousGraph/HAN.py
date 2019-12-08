@@ -337,14 +337,14 @@ class HAN():
                 #            attn_drop: 0.0,
                 #            ffd_drop: 0.0}
 
-                fd = fd1
-                fd.update(fd2)
-                fd.update(fd3)
-                loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
-                                                                      feed_dict=fd)
-                ts_loss += loss_value_ts
-                ts_acc += acc_ts
-                ts_step += 1
+                    fd = fd1
+                    fd.update(fd2)
+                    fd.update(fd3)
+                    loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
+                                                                          feed_dict=fd)
+                    ts_loss += loss_value_ts
+                    ts_acc += acc_ts
+                    ts_step += 1
 
                 print('Test loss:', ts_loss / ts_step,
                       '; Test accuracy:', ts_acc / ts_step)
