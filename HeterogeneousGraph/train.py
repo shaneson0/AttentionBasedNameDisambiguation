@@ -14,6 +14,10 @@ name = "hongbin_li"
 
 han = HAN()
 
+def testHAN(name):
+    prec, rec, f1 = han.prepare_and_train(name=name)
+    print (prec, rec, f1)
+
 def main():
     names = load_test_names()
     wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
@@ -44,7 +48,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    main()
+    # main()
+    testHAN(name)
 
 
 
