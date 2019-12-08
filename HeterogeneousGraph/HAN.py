@@ -26,7 +26,7 @@ checkpt_file = 'pre_trained/{}/{}_allMP_multi_{}_.ckpt'.format(dataset, dataset,
 print('model: {}'.format(checkpt_file))
 # training params
 batch_size = 1
-nb_epochs = 100
+nb_epochs = 150
 patience = 100
 lr = 0.005  # learning rate
 l2_coef = 0.001  # weight decay
@@ -61,8 +61,8 @@ class HAN():
         return PAP, PSP, pid2idx, idx2pid
 
     def constructIdx(self, X):
-        X_train, X_val = train_test_split(X, test_size=0.2, random_state=1)
-        return X_train, X_val
+        X_train, X_val = train_test_split(X, stratify=X, test_size=0.2, random_state=1)
+        return X_train, X_val, X, X
 
     def getPATH(self, name, idf_threshold, filename):
         graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
@@ -94,27 +94,31 @@ class HAN():
             PSP[pid2idx[_to]][pid2idx[_from]] = 1
         return PSP
 
-    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx):
+    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx):
         rownetworks = [PAP, PSP]
 
         y = truelabels
 
+        all_mask = self.sample_mask(allIdx, y.shape[0])
         train_mask = self.sample_mask(train_idx, y.shape[0])
         val_mask = self.sample_mask(val_idx, y.shape[0])
+        test_mask = self.sample_mask(test_idx, y.shape[0])
 
+        y_all = np.zeros(y.shape)
         y_train = np.zeros(y.shape)
         y_val = np.zeros(y.shape)
+        y_test = np.zeros(y.shape)
         y_train[train_mask, :] = y[train_mask, :]
         y_val[val_mask, :] = y[val_mask, :]
-
+        y_test[test_mask, :] = y[test_mask, :]
+        y_all[all_mask, :] = y[all_mask, :]
 
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
-        # print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
-        # print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
-        # truefeatures_list = [truefeatures, truefeatures, truefeatures]
+        print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
+        print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
-        return rownetworks, truefeatures_list, y_train, y_val, train_mask, val_mask
+        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
 
@@ -131,14 +135,15 @@ class HAN():
         PSP = self.loadPSP(PSP, pid2idx, name)
 
         N = len(pids)
-        X_train, X_val = self.constructIdx(list(range(N)))
+        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
 
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
-        adj_list, fea_list, y_train, y_val,  train_mask, val_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val)
-
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, train_mask, val_mask, needtSNE=True)
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
+        print (test_mask)
+        print (all_mask)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
@@ -155,7 +160,7 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def train(self, adj_list, fea_list, y_train, y_val, train_mask, val_mask, needtSNE=False):
+    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
@@ -169,9 +174,13 @@ class HAN():
         adj_list = [adj[np.newaxis] for adj in adj_list]
         y_train = y_train[np.newaxis]
         y_val = y_val[np.newaxis]
+        y_test = y_test[np.newaxis]
+        y_all = y_all[np.newaxis]
 
         train_mask = train_mask[np.newaxis]
         val_mask = val_mask[np.newaxis]
+        test_mask = test_mask[np.newaxis]
+        all_mask = all_mask[np.newaxis]
 
         biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
 
@@ -250,50 +259,51 @@ class HAN():
                         train_acc_avg += acc_tr
                         tr_step += 1
 
-                    # vl_step = 0
-                    # vl_size = fea_list[0].shape[0]
-                    # # =============   val       =================
-                    # while vl_step * batch_size < vl_size:
-                    #     # fd1 = {ftr_in: features[vl_step * batch_size:(vl_step + 1) * batch_size]}
-                    #     fd1 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
-                    #            for i, d in zip(ftr_in_list, fea_list)}
-                    #     fd2 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
-                    #            for i, d in zip(bias_in_list, biases_list)}
-                    #     fd3 = {lbl_in: y_val[vl_step * batch_size:(vl_step + 1) * batch_size],
-                    #            msk_in: val_mask[vl_step * batch_size:(vl_step + 1) * batch_size],
-                    #            is_train: False,
-                    #            attn_drop: 0.0,
-                    #            ffd_drop: 0.0}
-                    #
-                    #     fd = fd1
-                    #     fd.update(fd2)
-                    #     fd.update(fd3)
-                    #     loss_value_vl, acc_vl = sess.run([loss, accuracy],
-                    #                                      feed_dict=fd)
-                    #     val_loss_avg += loss_value_vl
-                    #     val_acc_avg += acc_vl
-                    #     vl_step += 1
+                    vl_step = 0
+                    vl_size = fea_list[0].shape[0]
+                    # =============   val       =================
+                    while vl_step * batch_size < vl_size:
+                        # fd1 = {ftr_in: features[vl_step * batch_size:(vl_step + 1) * batch_size]}
+                        fd1 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
+                               for i, d in zip(ftr_in_list, fea_list)}
+                        fd2 = {i: d[vl_step * batch_size:(vl_step + 1) * batch_size]
+                               for i, d in zip(bias_in_list, biases_list)}
+                        fd3 = {lbl_in: y_val[vl_step * batch_size:(vl_step + 1) * batch_size],
+                               msk_in: val_mask[vl_step * batch_size:(vl_step + 1) * batch_size],
+                               is_train: False,
+                               attn_drop: 0.0,
+                               ffd_drop: 0.0}
+
+                        fd = fd1
+                        fd.update(fd2)
+                        fd.update(fd3)
+                        loss_value_vl, acc_vl = sess.run([loss, accuracy],
+                                                         feed_dict=fd)
+                        val_loss_avg += loss_value_vl
+                        val_acc_avg += acc_vl
+                        vl_step += 1
                     # import pdb; pdb.set_trace()
                     print('Epoch: {}, att_val: {}'.format(epoch, np.mean(att_val_train, axis=0)))
-                    print('Training: loss = %.5f, acc = %.5f' %
-                          (train_loss_avg / tr_step, train_acc_avg / tr_step))
+                    print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f' %
+                          (train_loss_avg / tr_step, train_acc_avg / tr_step,
+                           val_loss_avg / vl_step, val_acc_avg / vl_step))
 
-                    # if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
-                    #     if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
-                    #         vacc_early_model = val_acc_avg / vl_step
-                    #         vlss_early_model = val_loss_avg / vl_step
-                    #         saver.save(sess, checkpt_file)
-                    #     vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
-                    #     vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
-                    #     curr_step = 0
-                    # else:
-                    #     curr_step += 1
-                    #     if curr_step == patience:
-                    #         print('Early stop! Min loss: ', vlss_mn,
-                    #               ', Max accuracy: ', vacc_mx)
-                    #         print('Early stop model validation loss: ',
-                    #               vlss_early_model, ', accuracy: ', vacc_early_model)
-                    #         break
+                    if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
+                        if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
+                            vacc_early_model = val_acc_avg / vl_step
+                            vlss_early_model = val_loss_avg / vl_step
+                            saver.save(sess, checkpt_file)
+                        vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
+                        vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
+                        curr_step = 0
+                    else:
+                        curr_step += 1
+                        if curr_step == patience:
+                            print('Early stop! Min loss: ', vlss_mn,
+                                  ', Max accuracy: ', vacc_mx)
+                            print('Early stop model validation loss: ',
+                                  vlss_early_model, ', accuracy: ', vacc_early_model)
+                            break
 
                     train_loss_avg = 0
                     train_acc_avg = 0
@@ -312,8 +322,8 @@ class HAN():
                            for i, d in zip(ftr_in_list, fea_list)}
                     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_train[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: train_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
                           is_train: False,
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
@@ -344,8 +354,8 @@ class HAN():
                       '; Test accuracy:', ts_acc / ts_step)
 
                 print('start knn, kmean.....')
-                xx = np.expand_dims(jhy_final_embedding, axis=0)[train_mask]
-                yy = y_train[train_mask]
+                xx = np.expand_dims(jhy_final_embedding, axis=0)[all_mask]
+                yy = y_all[all_mask]
 
                 # from numpy import linalg as LA
                 #
