@@ -35,7 +35,7 @@ residual = False
 nonlinearity = tf.nn.elu
 model = HeteGAT_multi
 
-IDF_THRESHOLD = 32  # small data
+IDF_THRESHOLD = 10  # small data
 
 
 
