@@ -61,9 +61,8 @@ class HAN():
         return PAP, PSP, pid2idx, idx2pid
 
     def constructIdx(self, X):
-        X_train, X_test = train_test_split(X, test_size=0.2, random_state=1)
-        X_train, X_val = train_test_split(X_train, test_size=0.2, random_state=1)
-        return X_train, X_val, X_test, X
+        X_train, X_val = train_test_split(X, test_size=0.2, random_state=1)
+        return X_train, X_val
 
     def getPATH(self, name, idf_threshold, filename):
         graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
@@ -95,31 +94,27 @@ class HAN():
             PSP[pid2idx[_to]][pid2idx[_from]] = 1
         return PSP
 
-    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx):
+    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx):
         rownetworks = [PAP, PSP]
 
         y = truelabels
 
-        all_mask = self.sample_mask(allIdx, y.shape[0])
         train_mask = self.sample_mask(train_idx, y.shape[0])
         val_mask = self.sample_mask(val_idx, y.shape[0])
-        test_mask = self.sample_mask(test_idx, y.shape[0])
 
-        y_all = np.zeros(y.shape)
         y_train = np.zeros(y.shape)
         y_val = np.zeros(y.shape)
-        y_test = np.zeros(y.shape)
         y_train[train_mask, :] = y[train_mask, :]
         y_val[val_mask, :] = y[val_mask, :]
-        y_test[test_mask, :] = y[test_mask, :]
-        y_all[all_mask, :] = y[all_mask, :]
+
 
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
-        print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
-        print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
+        # print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
+        # print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
+        # truefeatures_list = [truefeatures, truefeatures, truefeatures]
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
-        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
+        return rownetworks, truefeatures_list, y_train, y_val, train_mask, val_mask
 
 
 
@@ -136,15 +131,14 @@ class HAN():
         PSP = self.loadPSP(PSP, pid2idx, name)
 
         N = len(pids)
-        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
+        X_train, X_val = self.constructIdx(list(range(N)))
 
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
-        print (test_mask)
-        print (all_mask)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True)
+        adj_list, fea_list, y_train, y_val,  train_mask, val_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val)
+
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, train_mask, val_mask, needtSNE=True)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
@@ -161,7 +155,7 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False):
+    def train(self, adj_list, fea_list, y_train, y_val, train_mask, val_mask, needtSNE=False):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
@@ -175,13 +169,9 @@ class HAN():
         adj_list = [adj[np.newaxis] for adj in adj_list]
         y_train = y_train[np.newaxis]
         y_val = y_val[np.newaxis]
-        y_test = y_test[np.newaxis]
-        y_all = y_all[np.newaxis]
 
         train_mask = train_mask[np.newaxis]
         val_mask = val_mask[np.newaxis]
-        test_mask = test_mask[np.newaxis]
-        all_mask = all_mask[np.newaxis]
 
         biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
 
@@ -323,8 +313,8 @@ class HAN():
                            for i, d in zip(ftr_in_list, fea_list)}
                     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
                            for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                    fd3 = {lbl_in: y_train[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: train_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
                           is_train: False,
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
@@ -355,8 +345,8 @@ class HAN():
                       '; Test accuracy:', ts_acc / ts_step)
 
                 print('start knn, kmean.....')
-                xx = np.expand_dims(jhy_final_embedding, axis=0)[all_mask]
-                yy = y_all[all_mask]
+                xx = np.expand_dims(jhy_final_embedding, axis=0)[train_mask]
+                yy = y_train[train_mask]
 
                 # from numpy import linalg as LA
                 #
