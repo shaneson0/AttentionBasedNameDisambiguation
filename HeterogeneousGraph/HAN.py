@@ -144,6 +144,7 @@ class HAN():
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
+        return
 
     def sample_mask(self, idx, l):
         """Create mask."""
@@ -159,6 +160,7 @@ class HAN():
 
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask):
 
+        prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
         ft_size = fea_list[0].shape[1]
         nb_classes = y_train.shape[1]
@@ -377,3 +379,5 @@ class HAN():
                 # my_Kmeans(xx, yy)
 
                 sess.close()
+
+        return prec, rec, f1
