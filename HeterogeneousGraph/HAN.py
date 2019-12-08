@@ -284,9 +284,9 @@ class HAN():
                         vl_step += 1
                     # import pdb; pdb.set_trace()
                     print('Epoch: {}, att_val: {}'.format(epoch, np.mean(att_val_train, axis=0)))
-                    print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f' %
+                    print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f | vl_step: %d, tr_step: %d' %
                           (train_loss_avg / tr_step, train_acc_avg / tr_step,
-                           val_loss_avg / vl_step, val_acc_avg / vl_step))
+                           val_loss_avg / vl_step, val_acc_avg / vl_step, vl_step, tr_step))
 
                     if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
                         if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
