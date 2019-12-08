@@ -365,13 +365,13 @@ class HAN():
                 labels, numberofLabels = self.getLabel(yy)
 
                 from utils import  clustering, pairwise_precision_recall_f1
-                # print ('labels: ', labels)
+                print ('labels: ', labels)
+
                 clusters_pred = clustering(xx, num_clusters=numberofLabels)
                 prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
-                print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ',
-                       numberofLabels)
+                print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
 
-                # my_KNN(xx, yy)
+                my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
 
                 sess.close()
