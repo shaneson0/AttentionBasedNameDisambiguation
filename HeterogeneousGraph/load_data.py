@@ -8,7 +8,7 @@ from HeterogeneousGraph.HAN import HAN
 
 
 enc = OneHotEncoder()
-IDF_THRESHOLD = 32  # small data
+IDF_THRESHOLD = 10  # small data
 # IDF_THRESHOLD = 10
 
 def sample_mask(idx, l):
