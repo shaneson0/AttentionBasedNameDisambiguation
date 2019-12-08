@@ -311,15 +311,22 @@ class HAN():
                 ts_loss = 0.0
                 ts_acc = 0.0
 
-                while ts_step * batch_size < ts_size:
-                    # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
-                    fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
-                           for i, d in zip(ftr_in_list, fea_list)}
-                    fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
-                           for i, d in zip(bias_in_list, biases_list)}
-                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                # while ts_step * batch_size < ts_size:
+                #     # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
+                #     fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                #            for i, d in zip(ftr_in_list, fea_list)}
+                #     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                #            for i, d in zip(bias_in_list, biases_list)}
+                #     fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                #            msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
 
+                    # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
+                fd1 = {i: d
+                       for i, d in zip(ftr_in_list, fea_list)}
+                fd2 = {i: d
+                       for i, d in zip(bias_in_list, biases_list)}
+                fd3 = {lbl_in: y_all,
+                       msk_in: all_mask,
                     # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
                     #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
 
@@ -327,14 +334,14 @@ class HAN():
                            attn_drop: 0.0,
                            ffd_drop: 0.0}
 
-                    fd = fd1
-                    fd.update(fd2)
-                    fd.update(fd3)
-                    loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
-                                                                          feed_dict=fd)
-                    ts_loss += loss_value_ts
-                    ts_acc += acc_ts
-                    ts_step += 1
+                fd = fd1
+                fd.update(fd2)
+                fd.update(fd3)
+                loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
+                                                                      feed_dict=fd)
+                ts_loss += loss_value_ts
+                ts_acc += acc_ts
+                ts_step += 1
 
                 print('Test loss:', ts_loss / ts_step,
                       '; Test accuracy:', ts_acc / ts_step)
