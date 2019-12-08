@@ -142,7 +142,7 @@ class HAN():
         print (test_mask)
         print (all_mask)
         self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
-        print ("labels: ", rawlabels)
+        # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
 
     def sample_mask(self, idx, l):
@@ -313,28 +313,29 @@ class HAN():
                 ts_loss = 0.0
                 ts_acc = 0.0
 
-                # while ts_step * batch_size < ts_size:
-                #     # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
-                #     fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
-                #            for i, d in zip(ftr_in_list, fea_list)}
-                #     fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
-                #            for i, d in zip(bias_in_list, biases_list)}
-                #     fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
-                #            msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                while ts_step * batch_size < ts_size:
+                    fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                           for i, d in zip(ftr_in_list, fea_list)}
+                    fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                           for i, d in zip(bias_in_list, biases_list)}
+                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                          is_train: False,
+                          attn_drop: 0.0,
+                          ffd_drop: 0.0}
 
-                    # fd1 = {ftr_in: features[ts_step * batch_size:(ts_step + 1) * batch_size]}
-                fd1 = {i: d
-                       for i, d in zip(ftr_in_list, fea_list)}
-                fd2 = {i: d
-                       for i, d in zip(bias_in_list, biases_list)}
-                fd3 = {lbl_in: y_all,
-                       msk_in: all_mask,
-                    # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
-                    #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
-
-                           is_train: False,
-                           attn_drop: 0.0,
-                           ffd_drop: 0.0}
+                # fd1 = {i: d
+                #        for i, d in zip(ftr_in_list, fea_list)}
+                # fd2 = {i: d
+                #        for i, d in zip(bias_in_list, biases_list)}
+                # fd3 = {lbl_in: y_all,
+                #        msk_in: all_mask,
+                #     # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
+                #     #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                #
+                #            is_train: False,
+                #            attn_drop: 0.0,
+                #            ffd_drop: 0.0}
 
                 fd = fd1
                 fd.update(fd2)
@@ -372,7 +373,7 @@ class HAN():
                 prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
                 print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
 
-                my_KNN(xx, yy)
+                # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
 
                 sess.close()
