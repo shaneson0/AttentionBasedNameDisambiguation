@@ -353,7 +353,7 @@ class HAN():
                 print (fd)
                 print ("XX: ", xx)
                 print ("YY: ", yy)
-                print('xx: {}, yy: {}'.format(xx.shape, yy.shape))
+                print('xx: {}, yy: {}, ts_size: {}, ts_step: {}, batch_size: {}'.format(xx.shape, yy.shape, ts_size, ts_step,batch_size))
 
                 labels, numberofLabels = self.getLabel(yy)
 
