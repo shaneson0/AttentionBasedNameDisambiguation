@@ -5,7 +5,7 @@ from HeterogeneousGraph.HAN import HAN
 name = "hongbin_li"
 
 han = HAN()
-han.prepare_and_train()
+han.prepare_and_train(name=name)
 
 
 
