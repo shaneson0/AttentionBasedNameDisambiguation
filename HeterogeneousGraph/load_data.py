@@ -5,10 +5,11 @@ from utils import settings, string_utils
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from HeterogeneousGraph.HAN import HAN
+from HeterogeneousGraph import IDF_THRESHOLD
 
 
 enc = OneHotEncoder()
-IDF_THRESHOLD = 10  # small data
+# IDF_THRESHOLD = 10  # small data
 # IDF_THRESHOLD = 10
 
 def sample_mask(idx, l):

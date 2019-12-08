@@ -24,7 +24,7 @@ checkpt_file = 'pre_trained/{}/{}_allMP_multi_{}_.ckpt'.format(dataset, dataset,
 print('model: {}'.format(checkpt_file))
 # training params
 batch_size = 1
-nb_epochs = 200
+nb_epochs = 500
 patience = 100
 lr = 0.005  # learning rate
 l2_coef = 0.001  # weight decay
@@ -35,7 +35,7 @@ residual = False
 nonlinearity = tf.nn.elu
 model = HeteGAT_multi
 
-IDF_THRESHOLD = 10  # small data
+from HeterogeneousGraph import IDF_THRESHOLD
 
 
 

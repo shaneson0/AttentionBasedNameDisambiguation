@@ -8,10 +8,10 @@ from utils.cache import LMDBClient
 from utils import data_utils, inputData
 from utils import settings, string_utils
 from collections import defaultdict
+from HeterogeneousGraph import IDF_THRESHOLD
 
 IDLength = 24
-IDF_THRESHOLD = 10  # small data
-# IDF_THRESHOLD = 10
+
 
 
 def dump_inter_emb():
