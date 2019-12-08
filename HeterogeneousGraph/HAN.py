@@ -380,6 +380,16 @@ class HAN():
 
                 if needtSNE:
                     tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "%s_final.png" % (self.name)))
+
+                # raw test
+                clusters_pred = clustering(fea_list, num_clusters=numberofLabels)
+                prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+                print ("raw test")
+                print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
+
+                if needtSNE:
+                    tSNEAnanlyse(fea_list, labels, join(settings.PIC_DIR, "HAN", "%s_raw.png" % (self.name)))
+
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
 
