@@ -141,10 +141,10 @@ class HAN():
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
-        self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
-        return
+        return prec, rec, f1
 
     def sample_mask(self, idx, l):
         """Create mask."""
