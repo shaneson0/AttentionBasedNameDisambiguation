@@ -60,8 +60,8 @@ class HAN():
         PSP = np.zeros(shape=(LenPids, LenPids))
         return PAP, PSP, pid2idx, idx2pid
 
-    def constructIdx(self, X):
-        X_train, X_val = train_test_split(X, stratify=X, test_size=0.2, random_state=1)
+    def constructIdx(self, X, labels):
+        X_train, X_val = train_test_split(X, stratify=labels, test_size=0.2, random_state=1)
         return X_train, X_val, X, X
 
     def getPATH(self, name, idf_threshold, filename):
@@ -135,7 +135,7 @@ class HAN():
         PSP = self.loadPSP(PSP, pid2idx, name)
 
         N = len(pids)
-        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)))
+        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
 
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
