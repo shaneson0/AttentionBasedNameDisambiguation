@@ -143,7 +143,7 @@ class HAN():
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True, rawFeature=features)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
@@ -160,7 +160,7 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False):
+    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False, rawFeature=[]):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
@@ -379,7 +379,7 @@ class HAN():
 
                 if needtSNE:
                     tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "%s_final.png" % (self.name)))
-                    tSNEAnanlyse(fea_list[0], labels, join(settings.PIC_DIR, "HAN", "%s_features.png" % (self.name)))
+                    tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "%s_features.png" % (self.name)))
                     tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "%s_result_label.png" % (self.name)))
 
 
