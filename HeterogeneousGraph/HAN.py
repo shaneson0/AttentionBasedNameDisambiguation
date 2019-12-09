@@ -379,6 +379,8 @@ class HAN():
 
                 if needtSNE:
                     tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "%s_final.png" % (self.name)))
+                    tSNEAnanlyse(fea_list[0], labels, join(settings.PIC_DIR, "HAN", "%s_features.png" % (self.name)))
+                    tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "%s_result_label.png" % (self.name)))
 
 
                 # my_KNN(xx, yy)
