@@ -151,8 +151,6 @@ def genPAPandPSP(idf_threshold=10):
         wf_network.close()
 
 
-def
-
 
 
 if __name__ == '__main__':
