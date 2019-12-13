@@ -94,7 +94,9 @@ def genPAPandPSP(idf_threshold=10):
         shuffle(pids)
 
         for pid in pids:
-            cur_pub_emb = lc_inter.get(pid)
+            # use raw feature rather than Triplet Loss
+            cur_pub_emb = lc_feature.get(pid)
+            # cur_pub_emb = lc_inter.get(pid)
             if cur_pub_emb is not None:
                 cur_pub_emb = list(map(str, cur_pub_emb))
                 pids_set.add(pid)
@@ -147,6 +149,11 @@ def genPAPandPSP(idf_threshold=10):
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
 
         wf_network.close()
+
+
+def
+
+
 
 if __name__ == '__main__':
     # test_prepare_local_data('hongbin_li')
