@@ -378,9 +378,9 @@ class HAN():
                 print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
 
                 if needtSNE:
-                    tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "%s_final.png" % (self.name)))
-                    tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "%s_features.png" % (self.name)))
-                    tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "%s_result_label.png" % (self.name)))
+                    tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_final.png" % (self.name)))
+                    tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_features.png" % (self.name)))
+                    tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
 
 
                 # my_KNN(xx, yy)
