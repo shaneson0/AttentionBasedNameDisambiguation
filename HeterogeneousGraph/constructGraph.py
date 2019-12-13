@@ -69,6 +69,8 @@ def genPAPandPSP(idf_threshold=10):
 
     name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
     idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
+    raw_word2vec = 'author_100.emb.weighted'
+    lc_emb = LMDBClient(raw_word2vec)
     INTER_LMDB_NAME = 'author_triplets.emb'
     lc_inter = LMDBClient(INTER_LMDB_NAME)
     LMDB_AUTHOR_FEATURE = "pub_authors.feature"
@@ -95,7 +97,7 @@ def genPAPandPSP(idf_threshold=10):
 
         for pid in pids:
             # use raw feature rather than Triplet Loss
-            cur_pub_emb = lc_feature.get(pid)
+            cur_pub_emb = lc_emb.get(pid)
             # cur_pub_emb = lc_inter.get(pid)
             if cur_pub_emb is not None:
                 cur_pub_emb = list(map(str, cur_pub_emb))
