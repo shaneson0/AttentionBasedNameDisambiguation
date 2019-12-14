@@ -254,13 +254,18 @@ class HAN():
 
             # de
             # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
-            print ("final_embedding: checkout", final_embedding)
-            print ("logits: checkout", logits)
+
+            # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
 
             # cal masked_loss
             log_resh = tf.reshape(logits, [-1, nb_classes])
             lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
             msk_resh = tf.reshape(msk_in, [-1])
+
+            print ("final_embedding: checkout", final_embedding)
+            print ("logits: checkout", logits)
+            print ("log_resh: checkout", log_resh)
+
             loss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
