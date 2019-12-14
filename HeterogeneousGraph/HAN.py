@@ -252,7 +252,10 @@ class HAN():
                                                                hid_units=hid_units, n_heads=n_heads,
                                                                residual=residual, activation=nonlinearity)
 
+            # de
+            # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
             print ("final_embedding: checkout", final_embedding)
+            print ("logits: checkout", logits)
 
             # cal masked_loss
             log_resh = tf.reshape(logits, [-1, nb_classes])
