@@ -160,6 +160,49 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
+    def checkGraph(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False, rawFeature=[]):
+
+        prec, rec, f1 = 0.0, 0.0, 0.0
+        nb_nodes = fea_list[0].shape[0]
+        ft_size = fea_list[0].shape[1]
+        nb_classes = y_train.shape[1]
+
+        # adj = adj.todense()
+
+        # features = features[np.newaxis]  # [1, nb_node, ft_size]
+        fea_list = [fea[np.newaxis] for fea in fea_list]
+        adj_list = [adj[np.newaxis] for adj in adj_list]
+
+
+        biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
+
+        print('build graph...')
+        with tf.Graph().as_default():
+            with tf.name_scope('input'):
+                ftr_in_list = [tf.placeholder(dtype=tf.float32,
+                                              shape=(batch_size, nb_nodes, ft_size),
+                                              name='ftr_in_{}'.format(i))
+                               for i in range(len(fea_list))]
+                bias_in_list = [tf.placeholder(dtype=tf.float32,
+                                               shape=(batch_size, nb_nodes, nb_nodes),
+                                               name='bias_in_{}'.format(i))
+                                for i in range(len(biases_list))]
+                lbl_in = tf.placeholder(dtype=tf.int32, shape=(
+                    batch_size, nb_nodes, nb_classes), name='lbl_in')
+                msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes),
+                                        name='msk_in')
+                attn_drop = tf.placeholder(dtype=tf.float32, shape=(), name='attn_drop')
+                ffd_drop = tf.placeholder(dtype=tf.float32, shape=(), name='ffd_drop')
+                is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
+            # forward
+            logits, final_embedding, att_val = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
+                                                               attn_drop, ffd_drop,
+                                                               bias_mat_list=bias_in_list,
+                                                               hid_units=hid_units, n_heads=n_heads,
+                                                               residual=residual, activation=nonlinearity)
+        return logits, final_embedding, att_val
+
+
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False, rawFeature=[]):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
@@ -208,6 +251,8 @@ class HAN():
                                                                bias_mat_list=bias_in_list,
                                                                hid_units=hid_units, n_heads=n_heads,
                                                                residual=residual, activation=nonlinearity)
+
+            print ("final_embedding: checkout", final_embedding)
 
             # cal masked_loss
             log_resh = tf.reshape(logits, [-1, nb_classes])
@@ -328,19 +373,6 @@ class HAN():
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
 
-                # fd1 = {i: d
-                #        for i, d in zip(ftr_in_list, fea_list)}
-                # fd2 = {i: d
-                #        for i, d in zip(bias_in_list, biases_list)}
-                # fd3 = {lbl_in: y_all,
-                #        msk_in: all_mask,
-                #     # fd3 = {lbl_in: y_test[ts_step * batch_size:(ts_step + 1) * batch_size],
-                #     #        msk_in: test_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
-                #
-                #            is_train: False,
-                #            attn_drop: 0.0,
-                #            ffd_drop: 0.0}
-
                     fd = fd1
                     fd.update(fd2)
                     fd.update(fd3)
@@ -361,8 +393,6 @@ class HAN():
                 #
                 # # xx = xx / LA.norm(xx, axis=1)
 
-
-
                 print ("check fd")
                 print (fd)
                 print ("XX: ", xx)
@@ -382,10 +412,12 @@ class HAN():
                     tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_features.png" % (self.name)))
                     tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
 
-
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
 
                 sess.close()
 
         return prec, rec, f1
+
+if __name__ == '__main__':
+    pass
