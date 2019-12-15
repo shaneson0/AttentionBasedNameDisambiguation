@@ -267,6 +267,8 @@ class HAN():
             print ("final_embedding: checkout", final_embedding)
             print ("logits: checkout", logits)
             print ("log_resh: checkout", log_resh)
+            print ("ftr_resh: ", ftr_resh)
+            print ("lab_resh: ", lab_resh)
 
             loss = OSM_CAA_Loss()
             osm_loss = loss.forward
