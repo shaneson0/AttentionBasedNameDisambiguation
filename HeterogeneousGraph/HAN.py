@@ -5,7 +5,7 @@ import tensorflow as tf
 from sklearn.preprocessing import OneHotEncoder
 import time
 from utils import my_KNN, my_Kmeans  # , my_TSNE, my_Linear
-from models import GAT, HeteGAT, HeteGAT_multi
+from models import GAT, HeteGAT, HeteGAT_multi, OSM_CAA_Loss
 from utils import process
 from os.path import join
 from utils import settings, string_utils
@@ -245,6 +245,7 @@ class HAN():
                 attn_drop = tf.placeholder(dtype=tf.float32, shape=(), name='attn_drop')
                 ffd_drop = tf.placeholder(dtype=tf.float32, shape=(), name='ffd_drop')
                 is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
+
             # forward
             logits, final_embedding, att_val = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
                                                                attn_drop, ffd_drop,
@@ -258,6 +259,7 @@ class HAN():
             # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
 
             # cal masked_loss
+            ftr_resh = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='ftr_resh')
             log_resh = tf.reshape(logits, [-1, nb_classes])
             lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
             msk_resh = tf.reshape(msk_in, [-1])
@@ -266,7 +268,13 @@ class HAN():
             print ("logits: checkout", logits)
             print ("log_resh: checkout", log_resh)
 
-            loss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
+            loss = OSM_CAA_Loss()
+            osm_loss = loss.forward
+
+            osmLoss = osm_loss(ftr_resh, lab_resh, log_resh)
+            SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
+            loss = SoftMaxloss + osmLoss
+
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
             train_op = model.training(loss, lr, l2_coef)
