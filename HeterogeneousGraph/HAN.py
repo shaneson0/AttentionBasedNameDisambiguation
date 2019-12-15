@@ -269,9 +269,16 @@ class HAN():
             print ("log_resh: checkout", log_resh)
             print ("ftr_resh: ", ftr_resh)
             print ("lab_resh: ", lab_resh)
+            print ("batch_size, nb_nodes, nb_classes, ft_size", batch_size, nb_nodes, nb_classes, ft_size)
 
             loss = OSM_CAA_Loss()
             osm_loss = loss.forward
+
+            # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
+            # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
+            # log_resh: checkout Tensor("Reshape:0", shape=(286, 30), dtype=float32)
+            # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
+            # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
             osmLoss = osm_loss(ftr_resh, lab_resh, log_resh)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
