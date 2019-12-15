@@ -271,7 +271,7 @@ class HAN():
             print ("lab_resh: ", lab_resh)
             print ("batch_size, nb_nodes, nb_classes, ft_size", batch_size, nb_nodes, nb_classes, ft_size)
 
-            loss = OSM_CAA_Loss()
+            loss = OSM_CAA_Loss(batch_size=nb_nodes)
             osm_loss = loss.forward
 
             # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
