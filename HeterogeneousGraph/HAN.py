@@ -31,8 +31,8 @@ patience = 100
 lr = 0.005  # learning rate
 l2_coef = 0.001  # weight decay
 # numbers of hidden units per each attention head in each layer
-hid_units = [8]
-n_heads = [8, 1]  # additional entry for the output layer
+hid_units = [10]
+n_heads = [10, 1]  # additional entry for the output layer
 residual = False
 nonlinearity = tf.nn.elu
 model = HeteGAT_multi
