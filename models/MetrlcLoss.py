@@ -75,3 +75,6 @@ if __name__ == '__main__':
 
     loss_val = osm_loss(x, labels, embd)
     sess.run(loss_val)
+
+
+

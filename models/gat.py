@@ -58,6 +58,7 @@ class HeteGAT_multi(BaseGAttN):
             embed_list.append(tf.expand_dims(tf.squeeze(h_1), axis=1))
 
         multi_embed = tf.concat(embed_list, axis=1)
+        print ("multi_embed: ", multi_embed, ", mp_att_size: ", mp_att_size)
         final_embed, att_val = layers.SimpleAttLayer(multi_embed, mp_att_size,
                                                      time_major=False,
                                                      return_alphas=True)
