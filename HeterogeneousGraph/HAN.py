@@ -200,6 +200,7 @@ class HAN():
                                                                attn_drop, ffd_drop,
                                                                bias_mat_list=bias_in_list,
                                                                hid_units=hid_units, n_heads=n_heads,
+                                                               mp_att_size=200,
                                                                residual=residual, activation=nonlinearity)
         return logits, final_embedding, att_val
 
