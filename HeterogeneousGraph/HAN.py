@@ -284,7 +284,7 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss = osm_loss(ftr_resh, lab_list, log_resh)
+            osmLoss = osm_loss(ftr_resh, lab_list, final_embedding)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = SoftMaxloss + osmLoss
 
