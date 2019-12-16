@@ -9,7 +9,7 @@ from models import GAT, HeteGAT, HeteGAT_multi, OSM_CAA_Loss
 from utils import process
 from os.path import join
 from utils import settings, string_utils
-# 禁用gpu
+
 import os
 from sklearn.model_selection import train_test_split
 from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings, sNEComparingAnanlyse
@@ -113,6 +113,7 @@ class HAN():
         y_test[test_mask, :] = y[test_mask, :]
         y_all[all_mask, :] = y[all_mask, :]
 
+
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
         print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
@@ -137,12 +138,12 @@ class HAN():
         N = len(pids)
         X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
 
-
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
+        print (y_all)
         prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True, rawFeature=features)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
@@ -253,16 +254,18 @@ class HAN():
                                                                hid_units=hid_units, n_heads=n_heads,
                                                                residual=residual, activation=nonlinearity)
 
-            # de
+
             # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
 
             # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
 
             # cal masked_loss
+            lab_list = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ), name='lab_list')
             ftr_resh = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='ftr_resh')
             log_resh = tf.reshape(logits, [-1, nb_classes])
             lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
             msk_resh = tf.reshape(msk_in, [-1])
+
 
             print ("final_embedding: checkout", final_embedding)
             print ("logits: checkout", logits)
@@ -280,7 +283,7 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss = osm_loss(ftr_resh, lab_resh, log_resh)
+            osmLoss = osm_loss(ftr_resh, lab_list, log_resh)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = SoftMaxloss + osmLoss
 
