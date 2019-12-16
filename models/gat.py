@@ -34,7 +34,7 @@ class GAT(BaseGAttN):
 class HeteGAT_multi(BaseGAttN):
     def inference(inputs_list, nb_classes, nb_nodes, training, attn_drop, ffd_drop,
                   bias_mat_list, hid_units, n_heads, activation=tf.nn.elu, residual=False,
-                  mp_att_size=128):
+                  mp_att_size=200):
         embed_list = []
         for inputs, bias_mat in zip(inputs_list, bias_mat_list):
             attns = []
