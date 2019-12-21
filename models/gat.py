@@ -42,14 +42,6 @@ class HeteGAT_multi(BaseGAttN):
                                   initializer=tf.constant_initializer(0), trainable=False)
         labels = tf.reshape(labels, [-1])
 
-        # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
-        print ("====== getCenters =====")
-        print ("labels:", labels)
-        print ("final_embed: ", final_embed)
-        print ("centers: ", centers)
-        print ("====== getCenters =====")
-
-
         centers = tf.scatter_add(centers, labels, final_embed)
 
         # appear_times
@@ -58,6 +50,15 @@ class HeteGAT_multi(BaseGAttN):
 
 
         appear_times = tf.cast(tf.reshape(appear_times, [-1, 1]), 'float32')
+
+        # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
+        print ("====== getCenters =====")
+        print ("labels:", labels)
+        print ("final_embed: ", final_embed)
+        print ("centers: ", centers)
+        print ("appear_times: ", appear_times)
+        print ("====== getCenters =====")
+
 
         centers = tf.scatter_div(centers, labels, appear_times)
 
