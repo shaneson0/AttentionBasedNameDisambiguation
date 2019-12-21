@@ -34,8 +34,10 @@ class GAT(BaseGAttN):
 class HeteGAT_multi(BaseGAttN):
 
     def getCenters(num_classes, feature_size, labels, features):
-        centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32,
-                                  initializer=tf.constant_initializer(0), trainable=False)
+
+        centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
+
+        # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
         centers = tf.scatter_add(centers, labels, features)
 
 
