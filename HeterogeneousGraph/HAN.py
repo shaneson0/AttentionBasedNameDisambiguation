@@ -293,7 +293,8 @@ class HAN():
 
             osmLoss = osm_loss(final_embedding, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
-            loss = SoftMaxloss + osmLoss
+            # loss = SoftMaxloss + osmLoss
+            loss = SoftMaxloss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
