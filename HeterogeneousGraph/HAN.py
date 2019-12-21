@@ -132,26 +132,28 @@ class HAN():
         self.name = name
         # loadData(name)
         features, labels, pids, rawlabels = self.loadFeature(name)
-        PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
+        print ("rawlabes: ", rawlabels)
 
-        PAP = self.loadPAP(PAP, pid2idx, name)
-
-
-        PSP = self.loadPSP(PSP, pid2idx, name)
-
-        N = len(pids)
-        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
-
-        #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
-
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
-        print (test_mask)
-        print (all_mask)
-        print (y_all)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=features)
-        # print ("labels: ", rawlabels)
-        print ("set of labels: ", len(set(rawlabels)))
-        return prec, rec, f1
+        # PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
+        #
+        # PAP = self.loadPAP(PAP, pid2idx, name)
+        #
+        #
+        # PSP = self.loadPSP(PSP, pid2idx, name)
+        #
+        # N = len(pids)
+        # X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
+        #
+        # #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
+        #
+        # adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
+        # print (test_mask)
+        # print (all_mask)
+        # print (y_all)
+        # prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=features)
+        # # print ("labels: ", rawlabels)
+        # print ("set of labels: ", len(set(rawlabels)))
+        # return prec, rec, f1
 
     def sample_mask(self, idx, l):
         """Create mask."""
