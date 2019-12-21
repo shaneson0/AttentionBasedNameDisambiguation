@@ -40,14 +40,19 @@ class HeteGAT_multi(BaseGAttN):
         #test
         centers = tf.get_variable('centers', [num_classes, feature_size], dtype=tf.float32,
                                   initializer=tf.constant_initializer(0), trainable=False)
-        labels = tf.reshape(labels, [-1])
+        centers_count = tf.get_variable('centers_count', [num_classes, 1], dtype=tf.float32,
+                                  initializer=tf.constant_initializer(0), trainable=False)
 
-        centers = tf.scatter_add(centers, labels, final_embed)
+        labels = tf.reshape(labels, [-1])
 
         # appear_times
         unique_label, unique_idx, unique_count = tf.unique_with_counts(labels)
         appear_times = tf.gather(unique_count, unique_idx)
         appear_times = tf.reshape(appear_times, [-1, 1])
+        appear_times = tf.cast((1 + appear_times), tf.float32)
+
+        centers = tf.scatter_add(centers, labels, final_embed)
+        centers_count = tf.scatter_add(centers_count, labels, appear_times)
 
         # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
         print ("====== getCenters =====")
@@ -55,9 +60,10 @@ class HeteGAT_multi(BaseGAttN):
         print ("final_embed: ", final_embed)
         print ("centers: ", centers)
         print ("appear_times: ", appear_times)
+        print ("centers_count: ", centers_count)
         print ("====== getCenters =====")
 
-        centers = centers / tf.cast((1 + appear_times), tf.float32)
+        centers = centers / centers_count
 
         return centers
 
