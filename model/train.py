@@ -103,7 +103,7 @@ def getNewClusterLabel(emb, initClusterlabel, NumberOfCluster):
     return NumberOfCluster, Clusterlabels
 
 def train(name, needtSNE=False, savefile=True):
-    adj, adj2, features, labels, Clusterlabels = load_local_data(name=name)
+    adj, adj2, features, labels, Clusterlabels, Ids = load_local_data(name=name)
 
 
     initClusterlabel = Clusterlabels
@@ -148,7 +148,7 @@ def train(name, needtSNE=False, savefile=True):
 
     def get_embs():
         feed_dict.update({placeholders['dropout']: 0})
-        emb = sess.run(model.z_3, feed_dict=feed_dict)  # z_mean is better
+        emb = sess.run(model.z_mean_1, feed_dict=feed_dict)  # z_mean is better
         return emb
 
     def getGraphDetail(adj):
@@ -215,10 +215,10 @@ def train(name, needtSNE=False, savefile=True):
             outs = sess.run([opt.opt_op, opt.cost], feed_dict=feed_dict)
             # [Loss, softmax_loss, loss3, centerloss, reconstructloss] = sess.run([opt.cost, opt.softmax_loss, opt.loss3, opt.centerloss, opt.reconstructloss], feed_dict=feed_dict)
             # [Loss, loss3, centerloss, reconstructloss, L2loss] = sess.run([opt.cost, opt.loss3, opt.centerloss, opt.reconstructloss, opt.L2loss], feed_dict=feed_dict)
-            [Loss, loss3, centerloss, reconstructloss] = sess.run([opt.cost, opt.loss3, opt.centerloss, opt.reconstructloss], feed_dict=feed_dict)
+            [Loss, reconstructloss] = sess.run([opt.cost, opt.reconstructloss], feed_dict=feed_dict)
 
             # print ('loss: ', Loss, ', loss1: ', loss1, ', loss2: ', loss2 ,', centerloss: ', centerloss, ', acc: ', outs[2])
-            print ('epoch: ', epoch, '， loss: ', Loss, ', KLLoss: ', loss3, ', centerloss: ', centerloss, ', reconstructloss : ', reconstructloss)
+            print ('epoch: ', epoch, '， loss: ', Loss, ', reconstructloss : ', reconstructloss)
 
         # if clusterepoch != FLAGS.clusterEpochs -1 :
         emb = get_embs()
@@ -307,9 +307,9 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    # train('kexin_xu', needtSNE=True, savefile=True)
+    train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
-    train('hongbin_li', needtSNE=True, savefile=True)
+    # train('hongbin_li', needtSNE=True, savefile=True)
     # test('hongbin_li')
 
 

@@ -51,25 +51,26 @@ class OptimizerDualGCNAutoEncoder(object):
         self.num_nodes = num_nodes
 
         # 计算 Loss = loss1 + loss2 + KL-loss + island loss
-        self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
+        # self.centerloss, self.centers, self.centers_update_op = self.CenterLoss(model, z_label)
         # self.centerloss = self.centerloss * FLAGS.CenterLossVariable
-        self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch)
+        # self.centerloss = self.centerloss * self.getVariable('CenterLossVariable', model.epoch)
 
         # 计算 reconstructLoss
         # self.reconstructloss = FLAGS.ReconstructVariable * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
-        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
+        # self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']) +  self.getReconstructLoss(model.reconstructions_2, graph2['norm'], graph2['pos_weight'], graph2['labels']))
+        self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']))
         # self.reconstructloss = self.getVariable('ReconstructVariable', model.epoch) * (self.getReconstructLoss(model.reconstructions_1, graph1['norm'], graph1['pos_weight'], graph1['labels']))
         # 0.35表示3分图
-        self.kl_loss = (0.35 / num_nodes) * self.Cost(model.labels, model)
+        # self.kl_loss = (0.35 / num_nodes) * self.Cost(model.labels, model)
 
-        self.cost = self.reconstructloss - self.kl_loss
-        self.cost += self.centerloss
+        self.cost = self.reconstructloss
+        # self.cost += self.centerloss
 
 
         self.optimizer = tf.train.AdagradOptimizer(learning_rate=FLAGS.DGAE_learning_rate)
 
-        with tf.control_dependencies([self.centers_update_op]):
-            self.opt_op = self.optimizer.minimize(self.cost)
+        # with tf.control_dependencies([self.centers_update_op]):
+        self.opt_op = self.optimizer.minimize(self.cost)
 
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
@@ -217,21 +218,23 @@ class DualGCNGraphFusion(Model):
 
 
         # Fusion, 非线性的融合，(286 * 64)
-        self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
-        self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
+        # self.z_3_temp = tf.add(self.z_mean_1, self.z_mean_2)
+        # self.z_3 = tf.layers.dense(self.z_3_temp , FLAGS.hidden2, activation=tf.tanh)
+
+
 
         self.reconstructions_1 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                                    act=lambda x: x,
                                                    # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+                                                   logging=self.logging)(self.z_mean_1)
 
-        self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-                                                   act=lambda x: x,
-                                                   # act=tf.nn.relu,
-                                                   logging=self.logging)(self.z_3)
+        # self.reconstructions_2 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+        #                                            act=lambda x: x,
+        #                                            # act=tf.nn.relu,
+        #                                            logging=self.logging)(self.z_3)
 
         # Y
-        self.y = tf.layers.dense(self.z_3, self.num_logits)
+        # self.y = tf.layers.dense(self.z_3, self.num_logits)
 
         # print ('debuging ', self.y)
 
