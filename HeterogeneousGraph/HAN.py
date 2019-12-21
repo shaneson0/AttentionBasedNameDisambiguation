@@ -49,7 +49,7 @@ class HAN():
         classes = set(labels)
         classes_dict = {c: i for i, c in enumerate(classes)}
         res = [[label, classes_dict[label]] for label in labels]
-        return self.enc.fit_transform(res).toarray(), list(classes_dict.keys())
+        return self.enc.fit_transform(res).toarray(), labels
 
     def constructAdj(self, pids):
         pid2idx = {c: i for i, c in enumerate(pids)}
