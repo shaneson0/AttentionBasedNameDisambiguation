@@ -113,9 +113,9 @@ class HAN():
         y_test[test_mask, :] = y[test_mask, :]
         y_all[all_mask, :] = y[all_mask, :]
 
-        raw_y_train = rawlabels[train_mask, :]
-        raw_y_val = rawlabels[val_mask, :]
-        raw_y_test = rawlabels[test_mask, :]
+        # raw_y_train = rawlabels[train_mask, :]
+        # raw_y_val = rawlabels[val_mask, :]
+        # raw_y_test = rawlabels[test_mask, :]
 
 
         # return selected_idx, selected_idx_2
@@ -123,7 +123,7 @@ class HAN():
         print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
         print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
-        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, raw_y_train, raw_y_val, raw_y_test, rawlabels
+        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
 
@@ -144,7 +144,7 @@ class HAN():
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, raw_y_train, raw_y_val, raw_y_test, rawlabels = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
         print (y_all)
