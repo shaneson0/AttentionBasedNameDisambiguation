@@ -35,7 +35,11 @@ class HeteGAT_multi(BaseGAttN):
 
     def getCenters(num_classes, feature_size, labels, final_embed):
 
-        centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
+        # centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
+        #test
+        centers = tf.get_variable('centers', [num_classes, feature_size], dtype=tf.float32,
+                                  initializer=tf.constant_initializer(0), trainable=False)
+
         labels = tf.reshape(labels, [-1])
 
         # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
