@@ -237,6 +237,7 @@ class HAN():
         print('build graph...')
         with tf.Graph().as_default():
             with tf.name_scope('input'):
+                metric_ftr_in = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='metric_ftr_in')
                 ftr_in_list = [tf.placeholder(dtype=tf.float32,
                                               shape=(batch_size, nb_nodes, ft_size),
                                               name='ftr_in_{}'.format(i))
@@ -291,7 +292,7 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
+            osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = SoftMaxloss + osmLoss
             # loss = SoftMaxloss
@@ -329,6 +330,7 @@ class HAN():
                                for i, d in zip(bias_in_list, biases_list)}
                         fd3 = {lbl_in: y_train[tr_step * batch_size:(tr_step + 1) * batch_size],
                                msk_in: train_mask[tr_step * batch_size:(tr_step + 1) * batch_size],
+                               metric_ftr_in: fea_list,
                                is_train: True,
                                attn_drop: 0.6,
                                ffd_drop: 0.6}
