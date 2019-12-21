@@ -31,9 +31,9 @@ class OSM_CAA_Loss():
 
         #         r = tf.reduce_sum(x*x, 1)
         #         r = tf.reshape(r, [-1, 1])
-        dist1 = r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r)
-        dist = tf.math.sqrt(dist1)
-        dist = self.safe_divisor(dist)
+        dist = self.safe_divisor(r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r))
+        dist = self.safe_divisor(tf.math.sqrt(dist))
+
         # dist = tf.clip_by_value(dist2, clip_value_min=tf.constant(1e-12),
         #                         clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
 
