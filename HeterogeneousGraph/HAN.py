@@ -76,7 +76,7 @@ class HAN():
         features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
         labels = self.encode_labels(idx_features_labels[:, -2])
         pids = idx_features_labels[:, 0]
-        return features, labels, pids, idx_features_labels[:, -2]
+        return features, labels, pids, labels
 
     def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
         PAPPATH = self.getPATH(name, idf_threshold, 'PAP')
