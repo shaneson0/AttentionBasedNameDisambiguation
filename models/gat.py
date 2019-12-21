@@ -33,12 +33,12 @@ class GAT(BaseGAttN):
 
 class HeteGAT_multi(BaseGAttN):
 
-    def getCenters(num_classes, feature_size, labels, features):
+    def getCenters(num_classes, feature_size, labels, final_embed):
 
         centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
 
         # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
-        centers = tf.scatter_add(centers, labels, features)
+        centers = tf.scatter_add(centers, labels, final_embed)
 
 
         # appear_times
@@ -85,7 +85,7 @@ class HeteGAT_multi(BaseGAttN):
         # feature_size, labels, features
         # num_classes, feature_size, labels, features
 
-        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, labels, features)
+        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, labels, final_embed)
 
         out = []
         for i in range(n_heads[-1]):
