@@ -38,10 +38,9 @@ class HeteGAT_multi(BaseGAttN):
         # this is wrong
         # centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
         #test
-        centers = tf.get_variable('centers', [num_classes, feature_size], dtype=tf.float32,
-                                  initializer=tf.constant_initializer(0), trainable=False)
-        centers_count = tf.get_variable('centers_count', [num_classes, 1], dtype=tf.float32,
-                                  initializer=tf.constant_initializer(0), trainable=False)
+        centers = tf.Variable(tf.zeros([num_classes, feature_size]))
+        centers_count = tf.Variable(tf.zeros([num_classes, feature_size]))
+
 
         labels = tf.reshape(labels, [-1])
 
