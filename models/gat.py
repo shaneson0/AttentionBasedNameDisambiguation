@@ -49,7 +49,7 @@ class HeteGAT_multi(BaseGAttN):
         return centers
 
     def inference(inputs_list, nb_classes, nb_nodes, training, attn_drop, ffd_drop,
-                  bias_mat_list, hid_units, n_heads, features, activation=tf.nn.elu, residual=False,
+                  bias_mat_list, hid_units, n_heads, features, labels, activation=tf.nn.elu, residual=False,
                   mp_att_size=200, feature_size=100):
         # tests
         mp_att_size = 200
@@ -81,7 +81,9 @@ class HeteGAT_multi(BaseGAttN):
                                                      time_major=False,
                                                      return_alphas=True)
         # feature_size, labels, features
-        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, features)
+        # num_classes, feature_size, labels, features
+
+        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, labels, features)
 
         out = []
         for i in range(n_heads[-1]):
