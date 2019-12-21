@@ -15,7 +15,8 @@ class OSM_CAA_Loss():
         self.n = batch_size
 
     def safe_divisor(self, x):
-        return tf.where(tf.logical_and(tf.less(x, 1e-6), tf.greater_equal(x, 0)), 1e-6 * tf.ones_like(x), x)
+        return  tf.clip_by_value(x, clip_value_min=tf.constant(1e-12),
+                                clip_value_max=tf.constant(1e12))
 
     def forward(self, x, labels, embd):
         '''
