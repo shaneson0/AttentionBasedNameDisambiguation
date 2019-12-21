@@ -293,8 +293,8 @@ class HAN():
 
             osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
-            # loss = SoftMaxloss + osmLoss
-            loss = SoftMaxloss
+            loss = SoftMaxloss + osmLoss
+            # loss = SoftMaxloss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
@@ -338,13 +338,10 @@ class HAN():
                         _, loss_value_tr, acc_tr, att_val_train = sess.run([train_op, loss, accuracy, att_val],
                                                                            feed_dict=fd)
 
-                        osmLoss_value, test_centers_emb, test_checkvalue = sess.run([osmLoss, centers_embed, checkvalue], feed_dict=fd)
-
                         train_loss_avg += loss_value_tr
                         train_acc_avg += acc_tr
                         tr_step += 1
 
-                    print ("osmLoss_value: ", osmLoss_value, ", test_centers_emb: ", test_centers_emb, ", test_checkvalue: ", test_checkvalue)
 
                     vl_step = 0
                     vl_size = fea_list[0].shape[0]

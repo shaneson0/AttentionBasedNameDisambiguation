@@ -148,8 +148,8 @@ class HeteGAT_no_coef(BaseGAttN):
                                                   residual=residual))
                 h_1 = tf.concat(attns, axis=-1)
             embed_list.append(tf.expand_dims(tf.squeeze(h_1), axis=1))
-        # att for metapath
-        # prepare shape for SimpleAttLayer
+
+
         # print('att for mp')
         multi_embed = tf.concat(embed_list, axis=1)
         final_embed, att_val = layers.SimpleAttLayer(multi_embed, mp_att_size,
