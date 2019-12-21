@@ -32,9 +32,25 @@ class GAT(BaseGAttN):
         return logits
 
 class HeteGAT_multi(BaseGAttN):
+
+    def getCenters(num_classes, feature_size, labels, features):
+        centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32,
+                                  initializer=tf.constant_initializer(0), trainable=False)
+        centers = tf.scatter_add(centers, labels, features)
+
+
+        # appear_times
+        unique_label, unique_idx, unique_count = tf.unique_with_counts(labels)
+        appear_times = tf.gather(unique_count, unique_idx)
+        appear_times = tf.reshape(appear_times, [-1, 1])
+
+        centers = tf.scatter_div(centers, labels, appear_times)
+
+        return centers
+
     def inference(inputs_list, nb_classes, nb_nodes, training, attn_drop, ffd_drop,
-                  bias_mat_list, hid_units, n_heads, activation=tf.nn.elu, residual=False,
-                  mp_att_size=200):
+                  bias_mat_list, hid_units, n_heads, features, activation=tf.nn.elu, residual=False,
+                  mp_att_size=200, feature_size=100):
         # tests
         mp_att_size = 200
         embed_list = []
@@ -64,11 +80,14 @@ class HeteGAT_multi(BaseGAttN):
         final_embed, att_val = layers.SimpleAttLayer(multi_embed, mp_att_size,
                                                      time_major=False,
                                                      return_alphas=True)
+        # feature_size, labels, features
+        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, features)
 
         out = []
         for i in range(n_heads[-1]):
       
             out.append(tf.layers.dense(final_embed, nb_classes, activation=None))
+
         #     out.append(layers.attn_head(h_1, bias_mat=bias_mat,
         #                                 out_sz=nb_classes, activation=lambda x: x,
         #                                 in_drop=ffd_drop, coef_drop=attn_drop, residual=False))
@@ -77,7 +96,7 @@ class HeteGAT_multi(BaseGAttN):
         print('de')
 
         logits = tf.expand_dims(logits, axis=0)
-        return logits, final_embed, att_val
+        return logits, final_embed, att_val, centers_embed
 
 class HeteGAT_no_coef(BaseGAttN):
     def inference(inputs, nb_classes, nb_nodes, training, attn_drop, ffd_drop,

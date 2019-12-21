@@ -94,7 +94,7 @@ class HAN():
             PSP[pid2idx[_to]][pid2idx[_from]] = 1
         return PSP
 
-    def load_data_dblp(self, truelabels, rawlabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx):
+    def load_data_dblp(self, truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx):
         rownetworks = [PAP, PSP]
 
         y = truelabels
@@ -113,17 +113,13 @@ class HAN():
         y_test[test_mask, :] = y[test_mask, :]
         y_all[all_mask, :] = y[all_mask, :]
 
-        raw_y_train = rawlabels[train_mask, :]
-        raw_y_val = rawlabels[val_mask, :]
-        raw_y_test = rawlabels[test_mask, :]
-
 
         # return selected_idx, selected_idx_2
         # y_train:(235, 10), y_val:(235, 10), y_test:(235, 10)
         print('y_train:{}, y_val:{}, y_test:{}, y_all: {}'.format(y_train.shape,y_val.shape,y_test.shape, y_all.shape))
         print('train_mask:{}, val_mask:{}, test_mask:{}, all_mask: {}'.format(train_mask.shape,val_mask.shape,test_mask.shape, all_mask.shape))
         truefeatures_list = [truefeatures, truefeatures, truefeatures]
-        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, raw_y_train, raw_y_val, raw_y_test, rawlabels
+        return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
 
@@ -144,11 +140,11 @@ class HAN():
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, raw_y_train, raw_y_val, raw_y_test, rawlabels = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
         print (y_all)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=features)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=True, rawFeature=features)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
@@ -209,7 +205,7 @@ class HAN():
         return logits, final_embedding, att_val
 
 
-    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=False, rawFeature=[]):
+    def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False, rawFeature=[]):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
@@ -253,11 +249,11 @@ class HAN():
                 is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
 
             # forward
-            logits, final_embedding, att_val, centers_embed = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
+            logits, final_embedding, att_val = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
                                                                attn_drop, ffd_drop,
                                                                bias_mat_list=bias_in_list,
-                                                               hid_units=hid_units, n_heads=n_heads, features=fea_list,
-                                                               residual=residual, activation=nonlinearity, feature_size=ft_size)
+                                                               hid_units=hid_units, n_heads=n_heads,
+                                                               residual=residual, activation=nonlinearity)
 
 
             # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
@@ -265,8 +261,8 @@ class HAN():
             # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
 
             # cal masked_loss
-            # lab_list = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ), name='lab_list')
-            # ftr_resh = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='ftr_resh')
+            lab_list = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ), name='lab_list')
+            ftr_resh = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='ftr_resh')
             log_resh = tf.reshape(logits, [-1, nb_classes])
             lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
             msk_resh = tf.reshape(msk_in, [-1])
@@ -275,10 +271,8 @@ class HAN():
             print ("final_embedding: checkout", final_embedding)
             print ("logits: checkout", logits)
             print ("log_resh: checkout", log_resh)
-            # print ("ftr_resh: ", ftr_resh)
+            print ("ftr_resh: ", ftr_resh)
             print ("lab_resh: ", lab_resh)
-            print ("fea_list: ", fea_list)
-            print ("centers_embed: ", centers_embed)
             print ("batch_size, nb_nodes, nb_classes, ft_size", batch_size, nb_nodes, nb_classes, ft_size)
 
             loss = OSM_CAA_Loss(batch_size=nb_nodes)
@@ -290,7 +284,7 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss = osm_loss(fea_list, rawlabels, centers_embed)
+            osmLoss = osm_loss(ftr_resh, lab_list, final_embedding)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = SoftMaxloss + osmLoss
 
