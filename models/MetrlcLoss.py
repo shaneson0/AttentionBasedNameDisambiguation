@@ -14,6 +14,9 @@ class OSM_CAA_Loss():
         self.osm_sigma = 0.8  # \sigma OSM (0.8) as mentioned in paper
         self.n = batch_size
 
+    def safe_divisor(self, x):
+        return tf.where(tf.logical_and(tf.less(x, 1e-6), tf.greater_equal(x, 0)), 1e-6 * tf.ones_like(x), x)
+
     def forward(self, x, labels, embd):
         '''
         x : feature vector : (n x d)
@@ -30,6 +33,7 @@ class OSM_CAA_Loss():
         #         r = tf.reshape(r, [-1, 1])
         dist1 = r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r)
         dist = tf.math.sqrt(dist1)
+        dist = self.safe_divisor(dist)
         # dist = tf.clip_by_value(dist2, clip_value_min=tf.constant(1e-12),
         #                         clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
 
