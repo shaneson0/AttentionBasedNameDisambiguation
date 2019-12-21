@@ -75,9 +75,9 @@ class HAN():
         # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
         idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
         features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
-        labels = self.encode_labels(idx_features_labels[:, -2])
+        labels, rawlabels = self.encode_labels(idx_features_labels[:, -2])
         pids = idx_features_labels[:, 0]
-        return features, labels, pids, labels
+        return features, labels, pids, rawlabels
 
     def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
         PAPPATH = self.getPATH(name, idf_threshold, 'PAP')
