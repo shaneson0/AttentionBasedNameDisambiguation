@@ -40,7 +40,7 @@ class HeteGAT_multi(BaseGAttN):
         #test
         centers = tf.Variable(tf.zeros([num_classes, feature_size]), name='centers')
         centers_count = tf.Variable(tf.zeros([num_classes, 1]), name='centers_count')
-
+        centers_count = centers_count + 1
 
         labels = tf.reshape(labels, [-1])
 
@@ -48,7 +48,7 @@ class HeteGAT_multi(BaseGAttN):
         unique_label, unique_idx, unique_count = tf.unique_with_counts(labels)
         appear_times = tf.gather(unique_count, unique_idx)
         appear_times = tf.reshape(appear_times, [-1, 1])
-        appear_times = tf.cast((1 + appear_times), tf.float32)
+        appear_times = tf.cast(appear_times, tf.float32)
 
         centers = tf.scatter_add(centers, labels, final_embed)
         centers_count = tf.scatter_add(centers_count, labels, appear_times)
