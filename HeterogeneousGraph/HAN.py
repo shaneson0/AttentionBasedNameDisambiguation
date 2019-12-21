@@ -256,7 +256,7 @@ class HAN():
             logits, final_embedding, att_val, centers_embed = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
                                                                attn_drop, ffd_drop,
                                                                bias_mat_list=bias_in_list,
-                                                               hid_units=hid_units, n_heads=n_heads, features=fea_list,
+                                                               hid_units=hid_units, n_heads=n_heads, features=fea_list, labels=rawlabels,
                                                                residual=residual, activation=nonlinearity, feature_size=ft_size)
 
 
