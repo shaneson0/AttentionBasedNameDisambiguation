@@ -419,7 +419,7 @@ class HAN():
                            for i, d in zip(bias_in_list, biases_list)}
                     fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
                            msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           # metric_ftr_in: rawFeature,
+                           metric_ftr_in: rawFeature,
                           is_train: False,
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
