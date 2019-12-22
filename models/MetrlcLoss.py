@@ -48,8 +48,8 @@ class OSM_CAA_Loss():
         W_P = W_P * (1 - tf.eye(n))
         W_N = W_N * (1 - tf.eye(n))
 
-        L_P = tf.reduce_sum(W_P)
-        L_N = tf.reduce_sum(W_N)
+        L_P = tf.reduce_mean(W_P)
+        L_N = tf.reduce_mean(W_N)
 
         L = (1 - self.l) * L_P + self.l * L_N
 
