@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import numpy as np
 import scipy.sparse as sp
 import tensorflow as tf
@@ -295,6 +295,7 @@ class HAN():
             osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             # loss = SoftMaxloss + osmLoss
+            # 为什么loss会固定
             loss = osmLoss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
