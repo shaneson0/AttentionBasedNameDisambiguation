@@ -28,7 +28,7 @@ print('model: {}'.format(checkpt_file))
 batch_size = 1
 nb_epochs = 1000
 patience = 100
-lr = 0.05  # learning rate
+lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
 # numbers of hidden units per each attention head in each layer
 hid_units = [10]
