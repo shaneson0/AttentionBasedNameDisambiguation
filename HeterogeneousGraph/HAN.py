@@ -219,7 +219,8 @@ class HAN():
         prec, rec, f1 = 0.0, 0.0, 0.0
         nb_nodes = fea_list[0].shape[0]
         ft_size = fea_list[0].shape[1]
-        nb_classes = y_train.shape[1]
+        # nb_classes = y_train.shape[1]
+        nb_classes = len(set(rawlabels))
 
         # adj = adj.todense()
 
