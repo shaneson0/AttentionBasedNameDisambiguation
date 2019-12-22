@@ -30,23 +30,9 @@ class OSM_CAA_Loss():
 
         print ("r: ", r)
 
-        #         r = tf.reduce_sum(x*x, 1)
-        #         r = tf.reshape(r, [-1, 1])
-        dist = self.safe_divisor(r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r))
-        dist = self.safe_divisor(tf.math.sqrt(dist))
-
-        # dist = tf.clip_by_value(dist2, clip_value_min=tf.constant(1e-12),
-        #                         clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
-
         p_mask = tf.cast(tf.equal(labels[:, tf.newaxis], labels[tf.newaxis, :]), tf.float32)
         n_mask = 1 - p_mask
 
-        S = tf.exp(-1 * dist / (self.osm_sigma * self.osm_sigma))
-        S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),
-                              clip_value_max=tf.constant(1e12))
-        S = S * p_mask
-        S_ = S_ * n_mask
-        S = S + S_
 
         embd = tf.math.l2_normalize(embd, 0)
         denom = tf.reduce_sum(tf.exp(tf.matmul(x, embd)), 1)
@@ -56,18 +42,18 @@ class OSM_CAA_Loss():
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
         A = tf.math.minimum(temp, tf.transpose(temp))
 
-        W = S * A
+        W =  A
         W_P = W * p_mask
         W_N = W * n_mask
         W_P = W_P * (1 - tf.eye(n))
         W_N = W_N * (1 - tf.eye(n))
 
-        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
-        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
+        L_P = tf.reduce_sum(W_P)
+        L_N = tf.reduce_sum(W_N)
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, [tf.reduce_sum(W_P * tf.pow(dist, 2)), (2 * tf.reduce_sum(W_P)), tf.reduce_sum(W_N * tf.pow(S_, 2)), (2 * tf.reduce_sum(W_N)), tf.reduce_sum(embd)]
+        return L, [L_P, L_N]
 
 if __name__ == '__main__':
     sess = tf.Session()
