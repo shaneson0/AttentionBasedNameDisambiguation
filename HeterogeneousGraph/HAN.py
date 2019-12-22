@@ -300,7 +300,8 @@ class HAN():
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             # loss = SoftMaxloss + osmLoss
             # 为什么loss会固定
-            loss = osmLoss
+            # loss = osmLoss
+            loss = SoftMaxloss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
