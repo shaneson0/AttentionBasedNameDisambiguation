@@ -419,7 +419,6 @@ class HAN():
                            for i, d in zip(bias_in_list, biases_list)}
                     fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
                            msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
-                           metric_ftr_in: rawFeature,
                           is_train: False,
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
@@ -427,10 +426,8 @@ class HAN():
                     fd = fd1
                     fd.update(fd2)
                     fd.update(fd3)
-                    loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
-                                                                          feed_dict=fd)
-                    ts_loss += loss_value_ts
-                    ts_acc += acc_ts
+                    jhy_final_embedding = sess.run([final_embedding],feed_dict=fd)
+
                     ts_step += 1
 
                 print('Test loss:', ts_loss / ts_step,
