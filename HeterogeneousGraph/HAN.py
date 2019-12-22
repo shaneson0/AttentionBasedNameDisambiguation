@@ -132,7 +132,7 @@ class HAN():
 
         self.name = name
         # loadData(name)
-        features, labels, pids, rawlabels = self.loadFeature(name)
+        rawFeatures, labels, pids, rawlabels = self.loadFeature(name)
         print ("rawlabes: ", rawlabels)
 
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
@@ -145,11 +145,11 @@ class HAN():
 
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  features, PAP, PSP, X_train, X_val, X_test, Allidx)
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
         print (test_mask)
         print (all_mask)
         print (y_all)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=features)
+        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
         # print ("labels: ", rawlabels)
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
@@ -330,7 +330,7 @@ class HAN():
                                for i, d in zip(bias_in_list, biases_list)}
                         fd3 = {lbl_in: y_train[tr_step * batch_size:(tr_step + 1) * batch_size],
                                msk_in: train_mask[tr_step * batch_size:(tr_step + 1) * batch_size],
-                               metric_ftr_in: fea_list,
+                               metric_ftr_in: rawFeature,
                                is_train: True,
                                attn_drop: 0.6,
                                ffd_drop: 0.6}
@@ -356,6 +356,7 @@ class HAN():
                                for i, d in zip(bias_in_list, biases_list)}
                         fd3 = {lbl_in: y_val[vl_step * batch_size:(vl_step + 1) * batch_size],
                                msk_in: val_mask[vl_step * batch_size:(vl_step + 1) * batch_size],
+                               metric_ftr_in: rawFeature,
                                is_train: False,
                                attn_drop: 0.0,
                                ffd_drop: 0.0}
@@ -410,6 +411,7 @@ class HAN():
                            for i, d in zip(bias_in_list, biases_list)}
                     fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
                            msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           metric_ftr_in: rawFeature,
                           is_train: False,
                           attn_drop: 0.0,
                           ffd_drop: 0.0}
