@@ -26,7 +26,7 @@ checkpt_file = 'pre_trained/{}/{}_allMP_multi_{}_.ckpt'.format(dataset, dataset,
 print('model: {}'.format(checkpt_file))
 # training params
 batch_size = 1
-nb_epochs = 5000
+nb_epochs = 1000
 patience = 100
 lr = 0.05  # learning rate
 l2_coef = 0.0001  # weight decay
@@ -300,7 +300,7 @@ class HAN():
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             # loss = SoftMaxloss + osmLoss
             # 为什么loss会固定
-            loss = 10.0 * osmLoss
+            loss = osmLoss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
