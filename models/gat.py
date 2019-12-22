@@ -35,6 +35,9 @@ class HeteGAT_multi(BaseGAttN):
 
     def getCenters(num_classes, feature_size, labels, final_embed):
 
+        #INF
+        INF = 99999
+
         # this is wrong
         # centers = tf.zeros(shape=[num_classes, feature_size], dtype=tf.float32)
         #test
@@ -52,7 +55,7 @@ class HeteGAT_multi(BaseGAttN):
 
         centers = tf.scatter_add(centers, labels, final_embed)
         centers_count = tf.scatter_add(centers_count, labels, appear_times)
-        centers_count = tf.clip_by_value(centers_count, clip_value_min=tf.constant(1))
+        centers_count = tf.clip_by_value(centers_count, clip_value_min=tf.constant(1), clip_value_max=tf.constant(INF))
         # centers_count = tf.reciprocal(centers_count)
 
         # centers = tf.get_variable( shape=[num_classes, feature_size], dtype=tf.float32, initializer=tf.constant_initializer(0), trainable=False)
