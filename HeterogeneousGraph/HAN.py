@@ -383,27 +383,28 @@ class HAN():
                           (train_loss_avg / tr_step, train_acc_avg / tr_step,
                            val_loss_avg / vl_step, val_acc_avg / vl_step, vl_step, tr_step))
 
-                    if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
-                        if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
-                            vacc_early_model = val_acc_avg / vl_step
-                            vlss_early_model = val_loss_avg / vl_step
-                            saver.save(sess, checkpt_file)
-                        vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
-                        vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
-                        curr_step = 0
-                    else:
-                        curr_step += 1
-                        if curr_step == patience:
-                            print('Early stop! Min loss: ', vlss_mn,
-                                  ', Max accuracy: ', vacc_mx)
-                            print('Early stop model validation loss: ',
-                                  vlss_early_model, ', accuracy: ', vacc_early_model)
-                            break
+                    # if val_acc_avg / vl_step >= vacc_mx or val_loss_avg / vl_step <= vlss_mn:
+                    #     if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
+                    #         vacc_early_model = val_acc_avg / vl_step
+                    #         vlss_early_model = val_loss_avg / vl_step
+                    #         saver.save(sess, checkpt_file)
+                    #     vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
+                    #     vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
+                    #     curr_step = 0
+                    # else:
+                    #     curr_step += 1
+                    #     if curr_step == patience:
+                    #         print('Early stop! Min loss: ', vlss_mn,
+                    #               ', Max accuracy: ', vacc_mx)
+                    #         print('Early stop model validation loss: ',
+                    #               vlss_early_model, ', accuracy: ', vacc_early_model)
+                    #         break
 
                     train_loss_avg = 0
                     train_acc_avg = 0
                     val_loss_avg = 0
                     val_acc_avg = 0
+                saver.save(sess, checkpt_file)
 
                 saver.restore(sess, checkpt_file)
                 print('load model from : {}'.format(checkpt_file))
