@@ -47,6 +47,7 @@ class HAN():
 
     def encode_labels(self, labels):
         classes = set(labels)
+        print ("the number of class:" , len(classes))
         classes_dict = {c: i for i, c in enumerate(classes)}
         res = [[label, classes_dict[label]] for label in labels]
         rawlabels = [classes_dict[label] for label in labels]
@@ -160,7 +161,6 @@ class HAN():
         mask = np.zeros(l)
         mask[idx] = 1
         return np.array(mask, dtype=np.bool)
-
 
 
 
