@@ -67,7 +67,7 @@ class OSM_CAA_Loss():
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, [tf.reduce_sum(W_P * tf.pow(dist, 2)), (2 * tf.reduce_sum(W_P)), tf.reduce_sum(W_N * tf.pow(S_, 2)), (2 * tf.reduce_sum(W_N))]
+        return L, [tf.reduce_sum(W_P * tf.pow(dist, 2)), (2 * tf.reduce_sum(W_P)), tf.reduce_sum(W_N * tf.pow(S_, 2)), (2 * tf.reduce_sum(W_N)), tf.reduce_sum(embd)]
 
 if __name__ == '__main__':
     sess = tf.Session()
