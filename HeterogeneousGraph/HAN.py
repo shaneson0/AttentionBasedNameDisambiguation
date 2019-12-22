@@ -134,7 +134,6 @@ class HAN():
         self.name = name
         # loadData(name)
         rawFeatures, labels, pids, rawlabels = self.loadFeature(name)
-        print (len(set(labels)))
         # print ("rawlabes: ", rawlabels)
         #
         # PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
