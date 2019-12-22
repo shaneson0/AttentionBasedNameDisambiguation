@@ -7,7 +7,7 @@ import  numpy as np
 # https://arxiv.org/pdf/1811.01459v2.pdf
 
 class OSM_CAA_Loss():
-    def __init__(self, alpha=1.2, l=0.5, use_gpu=True, batch_size=32):
+    def __init__(self, alpha=1.2, l=0.5, use_gpu=True, batch_size=32, beta=0.5):
         self.use_gpu = use_gpu
         self.alpha = 1.2  # margin of weighted contrastive loss, as mentioned in the paper
         self.l = 0.5  # hyperparameter controlling weights of positive set and the negative set
@@ -67,7 +67,7 @@ class OSM_CAA_Loss():
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, tf.reduce_sum(denom)
+        return L, L_P
 
 if __name__ == '__main__':
     sess = tf.Session()
