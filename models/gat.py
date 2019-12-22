@@ -107,7 +107,7 @@ class HeteGAT_multi(BaseGAttN):
         # feature_size, labels, features
         # num_classes, feature_size, labels, features
 
-        centers_embed = HeteGAT_multi.getCenters(nb_classes, feature_size, labels, final_embed)
+        centers_embed = HeteGAT_multi.getCenters(len(set(labels)), feature_size, labels, final_embed)
         centers_embed = tf.transpose(centers_embed)
 
         out = []
