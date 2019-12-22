@@ -340,7 +340,7 @@ class HAN():
                         fd.update(fd3)
                         _, loss_value_tr, acc_tr, att_val_train = sess.run([train_op, loss, accuracy, att_val],
                                                                            feed_dict=fd)
-                        test_check_value = sess.run([checkvalue], feed_dict=fd)
+                        test_check_value = sess.run(checkvalue, feed_dict=fd)
                         print ("test_check_value: ", test_check_value)
 
                         train_loss_avg += loss_value_tr
