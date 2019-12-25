@@ -100,8 +100,11 @@ class OSM_CAA_Loss():
         # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
         # L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
         # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
-        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
-        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
+        # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
+        # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
+        L_P = tf.reduce_sum(W_P) / 2
+        L_N = tf.reduce_sum(W_N) / 2
+
 
         L = (1 - self.l) * L_P + self.l * L_N
 
