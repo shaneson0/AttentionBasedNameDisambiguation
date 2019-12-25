@@ -309,7 +309,7 @@ class HAN():
             # optimzie
             train_op = model.training(loss, lr, l2_coef)
 
-            saver = tf.train.Saver()
+            # saver = tf.train.Saver()
 
             init_op = tf.group(tf.global_variables_initializer(),
                                tf.local_variables_initializer())
@@ -389,7 +389,7 @@ class HAN():
                         if val_acc_avg / vl_step >= vacc_mx and val_loss_avg / vl_step <= vlss_mn:
                             vacc_early_model = val_acc_avg / vl_step
                             vlss_early_model = val_loss_avg / vl_step
-                            saver.save(sess, checkpt_file)
+                            # saver.save(sess, checkpt_file)
                         vacc_mx = np.max((val_acc_avg / vl_step, vacc_mx))
                         vlss_mn = np.min((val_loss_avg / vl_step, vlss_mn))
                         curr_step = 0
@@ -408,7 +408,7 @@ class HAN():
                     val_acc_avg = 0
                 # saver.save(sess, checkpt_file)
 
-                saver.restore(sess, checkpt_file)
+                # saver.restore(sess, checkpt_file)
                 print('load model from : {}'.format(checkpt_file))
                 ts_size = fea_list[0].shape[0]
                 ts_step = 0
