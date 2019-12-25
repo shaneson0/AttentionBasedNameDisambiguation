@@ -41,7 +41,9 @@ class OSM_CAA_Loss():
             nb = tf.reshape(nb, [1, -1])
 
             # return pairwise euclidead difference matrix
-            D = tf.sqrt(tf.maximum(na - 2 * tf.matmul(A, B, False, True) + nb, 0.0))
+            C = tf.maximum(na - 2 * tf.matmul(A, B, False, True) + nb, 0.0)
+            C = self.safe_divisor(C)
+            D = tf.sqrt(C)
         return D
 
     def forward(self, x, labels, embd):
