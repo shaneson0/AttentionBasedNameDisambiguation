@@ -49,6 +49,7 @@ class OSM_CAA_Loss():
     def EuclideanDistance(self, A, B):
         C = tf.reduce_sum(tf.square(A - B), 1)
         C = self.safe_divisor(C)
+        C = tf.reshape(C, [-1,1])
         return tf.sqrt(C)
 
     def forward(self, x, labels, embd):
