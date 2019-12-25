@@ -50,7 +50,33 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    testHAN(name)
+    # testHAN(name)
+    names = load_test_names()
+    wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
+    wf.write('name,precision,recall,f1\n')
+    macro_prec, macro_rec, macro_f1, count = 0.0, 0.0, 0.0, 0.0
+    for name in names:
+
+        prec, rec, f1 = han.prepare_and_train(name=name)
+        print('name : ', name, 'prec, rec, f1: ', prec, rec, f1)
+        # cur_metric, num_nodes, n_clusters = train(name, True)
+        wf.write('{0},{1:.5f},{2:.5f},{3:.5f}\n'.format(
+            name, prec, rec, f1))
+        wf.flush()
+        macro_prec += prec
+        macro_rec += rec
+        macro_f1 += f1
+        count += 1
+
+        break
+
+    macro_prec /= count
+    macro_rec /= count
+    macro_f1 /= count
+
+    wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}\n'.format(
+        macro_prec, macro_rec, macro_f1))
+    wf.close()
 
 
 
