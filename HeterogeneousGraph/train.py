@@ -19,7 +19,9 @@ han = HAN()
 
 def testHAN(name):
     prec, rec, f1 = han.prepare_and_train(name=name)
+    print ("name: ", name)
     return prec, rec, f1
+
     # print (prec, rec, f1)
 
 def main():
