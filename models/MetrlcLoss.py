@@ -86,7 +86,7 @@ class OSM_CAA_Loss():
         num = tf.exp(tf.reduce_sum(PointDistance, 1))
 
 
-        atten_class = 1.0 - num / denom
+        atten_class = num / denom
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
         A = tf.math.maximum(temp, tf.transpose(temp))
 
