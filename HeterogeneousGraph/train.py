@@ -53,7 +53,7 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    name = "hongbin_li"
+    # name = "hongbin_li"
     testHAN(name)
     # names = load_test_names()
     # wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
