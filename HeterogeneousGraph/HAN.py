@@ -288,8 +288,8 @@ class HAN():
             print ("centers_embed: ", centers_embed)
             print ("batch_size, nb_nodes, nb_classes, ft_size", batch_size, nb_nodes, nb_classes, ft_size)
 
-            loss = OSM_CAA_Loss(batch_size=nb_nodes)
-            osm_loss = loss.forward
+            osm_caa_loss = OSM_CAA_Loss(batch_size=nb_nodes)
+            osm_loss = osm_caa_loss.forward
 
             # final_embedding: checkout Tensor("Sum:0", shape=(286, 64), dtype=float32)
             # logits: checkout Tensor("ExpandDims_3:0", shape=(1, 286, 30), dtype=float32)
@@ -300,10 +300,10 @@ class HAN():
             osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
             # osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
-            loss = osmLoss
+            # loss = osmLoss
             # 为什么loss会固定
             # loss = osmLoss
-            # loss = SoftMaxloss
+            loss = SoftMaxloss
 
             accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
             # optimzie
