@@ -12,6 +12,7 @@ def load_test_names():
 # name="kexin_xu"
 name = "hongbin_li"
 # hongbin_li
+# hongbin_li
 
 han = HAN()
 
@@ -50,7 +51,7 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    testHAN("hongbin_li")
+    testHAN(name)
     # names = load_test_names()
     # wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
     # wf.write('name,precision,recall,f1\n')
