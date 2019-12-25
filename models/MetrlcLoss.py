@@ -65,6 +65,8 @@ class OSM_CAA_Loss():
         # history reason
         embd = tf.transpose(embd)
         embd = tf.math.l2_normalize(embd, 0)
+        print ("X: ", x)
+        print ("embd: ", embd)
         CenterDistance = self.pairwise_dist(x, embd) # x: (n,d), embed(c,d), CenterDistance(n,m)
         denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
         # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
