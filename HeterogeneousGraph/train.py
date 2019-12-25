@@ -11,6 +11,7 @@ def load_test_names():
 
 # name="kexin_xu"
 name = "hongbin_li"
+# hongbin_li
 
 han = HAN()
 
@@ -48,8 +49,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    main()
-    # testHAN(name)
+    # main()
+    testHAN(name)
 
 
 
