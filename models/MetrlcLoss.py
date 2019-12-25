@@ -47,7 +47,7 @@ class OSM_CAA_Loss():
         return D
 
     def EuclideanDistance(self, A, B):
-        C = tf.reduce_sum(tf.square(A - B), 2)
+        C = tf.reduce_sum(tf.square(A - B), 1)
         C = self.safe_divisor(C)
         return tf.sqrt(C)
 
