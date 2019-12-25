@@ -25,8 +25,9 @@ def main():
     metrics = np.zeros(3)
     cnt = 0
     for name in names:
-        print('name : ', name)
+
         prec, rec, f1 = han.prepare_and_train(name=name)
+        print('name : ', name, 'prec, rec, f1: ', prec, rec, f1)
         # cur_metric, num_nodes, n_clusters = train(name, True)
         wf.write('{0},{1:.5f},{2:.5f},{3:.5f}\n'.format(
             name, prec, rec, f1))
