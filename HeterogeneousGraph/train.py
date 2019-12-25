@@ -10,10 +10,8 @@ def load_test_names():
     return data_utils.load_json(settings.DATA_DIR, 'test_name_list2.json')
 
 # name="kexin_xu"
-# name = "hongbin_li"
 name = "hongbin_li"
-# hongbin_li
-# hongbin_li
+
 
 han = HAN()
 
