@@ -88,7 +88,7 @@ class OSM_CAA_Loss():
 
         atten_class = num / denom
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
-        A = tf.math.minimum(temp, tf.transpose(temp))
+        A = tf.math.maximum(temp, tf.transpose(temp))
 
         W =  A
         W_P = W * p_mask
@@ -96,14 +96,16 @@ class OSM_CAA_Loss():
         W_P = W_P * (1 - tf.eye(n))
         W_N = W_N * (1 - tf.eye(n))
 
-        L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
+        # L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
         # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
-        L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
+        # L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
         # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
+        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
+        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, [denom, num]
+        return L, [num, denom]
 
 if __name__ == '__main__':
     sess = tf.Session()
