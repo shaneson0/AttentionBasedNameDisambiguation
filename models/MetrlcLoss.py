@@ -75,7 +75,7 @@ class OSM_CAA_Loss():
         denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
         # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
         PointDistance = self.pairwise_dist(x, tf.transpose(tf.gather(embd, labels, axis=1)))
-        num = tf.exp(tf.reduce_sum(PointDistance, 1))
+        num = tf.exp(PointDistance, 1)
 
 
         atten_class = num / denom
@@ -95,7 +95,7 @@ class OSM_CAA_Loss():
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, [denom, PointDistance]
+        return L, [denom, num]
 
 if __name__ == '__main__':
     sess = tf.Session()
