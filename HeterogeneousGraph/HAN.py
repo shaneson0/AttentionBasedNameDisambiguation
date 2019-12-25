@@ -26,7 +26,7 @@ checkpt_file = 'pre_trained/{}/{}_allMP_multi_{}_.ckpt'.format(dataset, dataset,
 print('model: {}'.format(checkpt_file))
 # training params
 batch_size = 1
-nb_epochs = 500
+nb_epochs = 150
 patience = 100
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
