@@ -28,8 +28,8 @@ class OSM_CAA_Loss():
           D,    [m,n] matrix of pairwise distances
         """
 
-        print ("A: ", x)
-        print ("B: ", embd)
+        print ("A: ", A)
+        print ("B: ", B)
 
         with tf.variable_scope('pairwise_dist'):
             # squared norms of each row in A and B
