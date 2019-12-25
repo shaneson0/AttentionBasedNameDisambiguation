@@ -27,7 +27,7 @@ print('model: {}'.format(checkpt_file))
 # training params
 batch_size = 1
 nb_epochs = 500
-patience = 100
+patience = 500
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
 # numbers of hidden units per each attention head in each layer
@@ -297,7 +297,8 @@ class HAN():
             # ftr_resh:  Tensor("ftr_resh:0", shape=(286, 100), dtype=float32)
             # lab_resh:  Tensor("Reshape_1:0", shape=(286, 30), dtype=int32)
 
-            osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
+            osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
+            # osmLoss, checkvalue = osm_loss(metric_ftr_in, rawlabels, centers_embed)
             SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
             loss = osmLoss
             # 为什么loss会固定
@@ -440,9 +441,6 @@ class HAN():
 
 
                 print ("check fd")
-                print (fd)
-                print ("XX: ", xx)
-                print ("YY: ", yy)
                 print('xx: {}, yy: {}, ts_size: {}, ts_step: {}, batch_size: {}'.format(xx.shape, yy.shape, ts_size, ts_step,batch_size))
 
                 labels, numberofLabels = self.getLabel(yy)
