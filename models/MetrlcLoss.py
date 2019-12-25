@@ -79,7 +79,7 @@ class OSM_CAA_Loss():
         CenterDistance = self.pairwise_dist(x, tf.transpose(embd)) # x: (n,d), embed(c,d), CenterDistance(n,m)
         denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
         # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
-        PointDistance = self.EuclideanDistance(x , tf.transpose(tf.gather(embd, labels, axis=1), axis=1))
+        PointDistance = self.EuclideanDistance(x , tf.transpose(tf.gather(embd, labels, axis=1)))
         # PointDistance = x * tf.transpose(tf.gather(embd, labels, axis=1))
         print ("PointDistance: ", PointDistance)
         num = tf.exp(tf.reduce_sum(PointDistance, 1))
