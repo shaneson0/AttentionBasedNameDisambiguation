@@ -18,6 +18,28 @@ class OSM_CAA_Loss():
         return  tf.clip_by_value(x, clip_value_min=tf.constant(1e-12),
                                 clip_value_max=tf.constant(1e12))
 
+    def pairwise_dist(self, A, B):
+        """
+        Computes pairwise distances between each elements of A and each elements of B.
+        Args:
+          A,    [m,d] matrix
+          B,    [n,d] matrix
+        Returns:
+          D,    [m,n] matrix of pairwise distances
+        """
+        with tf.variable_scope('pairwise_dist'):
+            # squared norms of each row in A and B
+            na = tf.reduce_sum(tf.square(A), 1)
+            nb = tf.reduce_sum(tf.square(B), 1)
+
+            # na as a row and nb as a co"lumn vectors
+            na = tf.reshape(na, [-1, 1])
+            nb = tf.reshape(nb, [1, -1])
+
+            # return pairwise euclidead difference matrix
+            D = tf.sqrt(tf.maximum(na - 2 * tf.matmul(A, B, False, True) + nb, 0.0))
+        return D
+
     def forward(self, x, labels, embd):
         '''
         x : feature vector : (n x d)
@@ -38,12 +60,17 @@ class OSM_CAA_Loss():
         p_mask = tf.cast(tf.equal(labels[:, tf.newaxis], labels[tf.newaxis, :]), tf.float32)
         n_mask = 1 - p_mask
 
-        S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),
-                              clip_value_max=tf.constant(1e12))
+        S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),clip_value_max=tf.constant(1e12))
 
+        # history reason
+        embd = tf.transpose(embd)
         embd = tf.math.l2_normalize(embd, 0)
-        denom = tf.reduce_sum(tf.exp(tf.matmul(x, embd)), 1)
-        num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
+        CenterDistance = self.pairwise_dist(x, embd) # x: (n,d), embed(c,d), CenterDistance(n,m)
+        denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
+        # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
+        PointDistance = self.pairwise_dist(x, tf.transpose(tf.gather(embd, labels, axis=1)))
+        num = tf.exp(tf.reduce_sum(PointDistance, 1))
+
 
         atten_class = num / denom
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
