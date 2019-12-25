@@ -67,10 +67,9 @@ class OSM_CAA_Loss():
         S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),clip_value_max=tf.constant(1e12))
 
         # history reason
-        embd = tf.transpose(embd)
         embd = tf.math.l2_normalize(embd, 0)
 
-        CenterDistance = self.pairwise_dist(x, embd) # x: (n,d), embed(c,d), CenterDistance(n,m)
+        CenterDistance = self.pairwise_dist(x, tf.transpose(embd)) # x: (n,d), embed(c,d), CenterDistance(n,m)
         denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
         # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
         PointDistance = self.pairwise_dist(x, tf.transpose(tf.gather(embd, labels, axis=1)))
