@@ -27,6 +27,10 @@ class OSM_CAA_Loss():
         Returns:
           D,    [m,n] matrix of pairwise distances
         """
+
+        print ("A: ", x)
+        print ("B: ", embd)
+
         with tf.variable_scope('pairwise_dist'):
             # squared norms of each row in A and B
             na = tf.reduce_sum(tf.square(A), 1)
@@ -65,8 +69,7 @@ class OSM_CAA_Loss():
         # history reason
         embd = tf.transpose(embd)
         embd = tf.math.l2_normalize(embd, 0)
-        print ("X: ", x)
-        print ("embd: ", embd)
+
         CenterDistance = self.pairwise_dist(x, embd) # x: (n,d), embed(c,d), CenterDistance(n,m)
         denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
         # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
