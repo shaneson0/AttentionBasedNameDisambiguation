@@ -134,7 +134,9 @@ class HeteGAT_multi(BaseGAttN):
         print('de')
 
         logits = tf.expand_dims(logits, axis=0)
-        return logits, final_embed, att_val, centers_embed
+        test_final_embeed = tf.reduce_sum(MetricInputs,0)
+        return logits, test_final_embeed, att_val, centers_embed
+        # return logits, final_embed, att_val, centers_embed
 
 class HeteGAT_no_coef(BaseGAttN):
     def inference(inputs, nb_classes, nb_nodes, training, attn_drop, ffd_drop,
