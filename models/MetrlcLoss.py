@@ -108,7 +108,7 @@ class OSM_CAA_Loss():
 
         L = (1 - self.l) * L_P + self.l * L_N
 
-        return L, [A]
+        return L, [L_P, L_N]
 
 if __name__ == '__main__':
     sess = tf.Session()
