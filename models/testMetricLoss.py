@@ -3,7 +3,8 @@ from HeterogeneousGraph import HAN
 name = "hongbin_li"
 
 han = HAN.HAN()
-res = han.loadFeature(name)
+features, labels, pids, rawlabels = han.loadFeature(name)
 
-print ("res: ", res)
+print ("res: ", features)
+
 
