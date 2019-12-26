@@ -94,7 +94,7 @@ train_op = training(loss,lr, l2_coef)
 
 with tf.Session() as sess:
     fd = {ftr_input: features}
-    train_op, loss = sess.run([train_op, loss])
+    train_op, loss = sess.run([train_op, loss], feed_dict=fd)
     print ("train_op, loss: ", train_op, loss)
 
 
