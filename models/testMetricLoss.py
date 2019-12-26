@@ -103,7 +103,7 @@ with tf.Session() as sess:
         print ("epoch: {} loss: {}, checkvalue: {}".format(epoch, losscheck, value2))
         epoch += 1
 
-    embedding = sess.run([final_embed])
+    embedding = sess.run([final_embed], feed_dict=fd)
 
     from utils import clustering, pairwise_precision_recall_f1
 
