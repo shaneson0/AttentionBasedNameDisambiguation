@@ -113,7 +113,7 @@ with tf.Session() as sess:
     from utils import clustering, pairwise_precision_recall_f1
 
     clusters_pred = clustering(embedding, num_clusters=nb_class)
-    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, rawlabels)
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', nb_class)
 
     tSNEAnanlyse(embedding, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
