@@ -93,14 +93,16 @@ loss, checkvalue = GetLoss(final_embed, nb_nodes=nb_node, centers_embed=centers)
 train_op = training(loss,lr, l2_coef)
 init_op = tf.group(tf.global_variables_initializer(),
                    tf.local_variables_initializer())
-
+epoch = 0
 with tf.Session() as sess:
     sess.run(init_op)
     fd = {ftr_input: features}
-    for epoch in epochs:
+    while epoch < epochs:
         train_op, loss, checkvalue = sess.run([train_op, loss, checkvalue], feed_dict=fd)
+        print ("loss: ", loss, checkvalue)
+        epoch += 1
 
-    print ("loss: ", loss, checkvalue)
+
 
 
 
