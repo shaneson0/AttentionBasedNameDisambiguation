@@ -107,6 +107,7 @@ with tf.Session() as sess:
 
     print ("final_embed: ", final_embed)
     embedding = sess.run([final_embed], feed_dict=fd)
+    embedding = embedding[0]
     print ("embedding: ", embedding)
 
     from utils import clustering, pairwise_precision_recall_f1
