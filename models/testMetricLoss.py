@@ -7,7 +7,7 @@ from os.path import join
 name = "hongbin_li"
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
-epochs = 500
+epochs = 300
 
 han = HAN.HAN()
 features, labels, pids, rawlabels = han.loadFeature(name)
