@@ -98,8 +98,8 @@ with tf.Session() as sess:
     sess.run(init_op)
     fd = {ftr_input: features}
     while epoch < epochs:
-        train_op, loss, checkvalue = sess.run([train_op, loss, checkvalue], feed_dict=fd)
-        print ("loss: ", loss, checkvalue)
+        _, losscheck, value2 = sess.run([train_op, loss, checkvalue], feed_dict=fd)
+        print ("loss: ", losscheck, value2)
         epoch += 1
 
 
