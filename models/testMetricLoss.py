@@ -98,7 +98,7 @@ with tf.Session() as sess:
     sess.run(init_op)
     fd = {ftr_input: features}
     train_op, loss, checkvalue = sess.run([train_op, loss, checkvalue], feed_dict=fd)
-    print ("train_op, loss: ", train_op, loss, checkvalue)
+    print ("loss: ", loss, checkvalue)
 
 
 
