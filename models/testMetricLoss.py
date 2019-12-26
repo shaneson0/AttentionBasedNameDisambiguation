@@ -91,8 +91,11 @@ ftr_input, final_embed = buildModel(nb_node, feature_size)
 centers = getCenters(nb_class, feature_size, rawlabels, final_embed)
 loss = GetLoss(final_embed, nb_nodes=nb_node, centers_embed=centers)
 train_op = training(loss,lr, l2_coef)
+init_op = tf.group(tf.global_variables_initializer(),
+                   tf.local_variables_initializer())
 
 with tf.Session() as sess:
+    sess.run(init_op)
     fd = {ftr_input: features}
     train_op, loss = sess.run([train_op, loss], feed_dict=fd)
     print ("train_op, loss: ", train_op, loss)
