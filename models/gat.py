@@ -75,6 +75,15 @@ class HeteGAT_multi(BaseGAttN):
     def inference(inputs_list, nb_classes, nb_nodes, training, attn_drop, ffd_drop,
                   bias_mat_list, hid_units, n_heads, features, labels, activation=tf.nn.elu, residual=False,
                   mp_att_size=200, feature_size=100):
+
+        #Metric Learning
+        temp = inputs_list[0]
+        temp2 = tf.reduce_any(temp, 0)
+        MetricInputs = tf.layers.dense(temp2, feature_size, activation=tf.nn.sigmoid)
+        ExpendMetricInputs = tf.expand_dims(MetricInputs, 0)
+        print ("ExpendMetricInputs: check :", ExpendMetricInputs)
+        inputs_list = [ExpendMetricInputs]
+
         # tests
         mp_att_size = 200
         embed_list = []
