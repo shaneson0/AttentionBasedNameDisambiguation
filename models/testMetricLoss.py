@@ -22,7 +22,7 @@ def buildModel(nb_node, feature_size):
     ftr_input = tf.placeholder("float", shape=(nb_node, feature_size))
     D1 = tf.layers.dense(ftr_input, 8, activation=tf.nn.sigmoid)
     D2 =  tf.layers.dense(D1, 8, activation=tf.nn.sigmoid)
-    D3 =  tf.layers.dense(D2, 8, activation=tf.nn.sigmoid)
+    D3 =  tf.layers.dense(D2, feature_size, activation=tf.nn.sigmoid)
     return ftr_input, D3
 
 
