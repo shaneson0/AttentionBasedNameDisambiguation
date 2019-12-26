@@ -308,7 +308,7 @@ class HAN():
             # optimzie
             train_op = model.training(loss, lr, l2_coef)
 
-            checkpt_file = 'pre_trained/{}/{}/{}_allMP_multi_{}_.ckpt'.format(dataset, dataset, self.name, featype)
+            checkpt_file = 'pre_trained/{}/{}/{}/_allMP_multi_{}_.ckpt'.format(dataset, dataset, self.name, featype)
             print('model: {}'.format(checkpt_file))
             saver = tf.train.Saver()
 
