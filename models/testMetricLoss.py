@@ -18,11 +18,11 @@ print ("res: ", features)
 print ("n_nodes: ", features.shape[0])
 
 
-def buildModel():
-    ftr_input = tf.placeholder("float", [None, 100])
-    D1 = tf.layers.dense(ftr_input, 100, activation=tf.nn.sigmoid)
-    D2 =  tf.layers.dense(D1, 100, activation=tf.nn.sigmoid)
-    D3 =  tf.layers.dense(D2, 100, activation=tf.nn.sigmoid)
+def buildModel(nb_node, feature_size):
+    ftr_input = tf.placeholder("float", shape=(nb_node, feature_size))
+    D1 = tf.layers.dense(ftr_input, feature_size, activation=tf.nn.sigmoid)
+    D2 =  tf.layers.dense(D1, feature_size, activation=tf.nn.sigmoid)
+    D3 =  tf.layers.dense(D2, feature_size, activation=tf.nn.sigmoid)
     return ftr_input, D3
 
 
