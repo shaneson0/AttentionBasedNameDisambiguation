@@ -415,7 +415,8 @@ class HAN():
                     train_acc_avg = 0
                     val_loss_avg = 0
                     val_acc_avg = 0
-
+                # check save
+                saver.save(sess, checkpt_file)
 
                 saver.restore(sess, checkpt_file)
                 print('load model from : {}'.format(checkpt_file))
