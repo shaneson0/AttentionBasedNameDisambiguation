@@ -20,7 +20,7 @@ print ("n_nodes: ", features.shape[0])
 
 
 def buildModel(nb_node, feature_size):
-    ftr_input = tf.placeholder("float", shape=(nb_node, feature_size))
+    ftr_input = tf.placeholder("float", shape=(feature_size))
     D1 = tf.layers.dense(ftr_input, 8, activation=tf.nn.sigmoid)
     D2 =  tf.layers.dense(D1, 8, activation=tf.nn.sigmoid)
     D3 =  tf.layers.dense(D2, feature_size, activation=tf.nn.sigmoid)
@@ -113,7 +113,7 @@ with tf.Session() as sess:
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', nb_class)
 
-    tSNEAnanlyse(embedding[0], labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
+    tSNEAnanlyse(embedding, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
     tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_features.png" % (name)))
 
     # my_KNN(xx, yy)
