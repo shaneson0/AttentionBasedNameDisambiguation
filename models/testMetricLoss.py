@@ -6,6 +6,7 @@ from models.MetrlcLoss import OSM_CAA_Loss
 name = "hongbin_li"
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
+epochs = 500
 
 han = HAN.HAN()
 features, labels, pids, rawlabels = han.loadFeature(name)
@@ -22,7 +23,7 @@ def buildModel():
     D1 = tf.layers.dense(ftr_input, 100, activation=tf.nn.sigmoid)
     D2 =  tf.layers.dense(D1, 100, activation=tf.nn.sigmoid)
     D3 =  tf.layers.dense(D2, 100, activation=tf.nn.sigmoid)
-    return D3
+    return ftr_input, D3
 
 
 def getCenters(num_classes, feature_size, labels, final_embed):
@@ -86,10 +87,17 @@ def training(loss, lr, l2_coef):
     return train_op
 
 
-final_embed = buildModel()
+ftr_input, final_embed = buildModel()
 centers = getCenters(nb_class, feature_size, rawlabels, final_embed)
 loss = GetLoss(final_embed, nb_nodes=nb_node, centers_embed=centers)
 train_op = training(loss,lr, l2_coef)
+
+with tf.Session() as sess:
+    fd = {ftr_input: features}
+    train_op, loss = sess.run([train_op, loss])
+    print ("train_op, loss: ", train_op, loss)
+
+
 
 
 
