@@ -160,6 +160,12 @@ class HAN():
         mask[idx] = 1
         return np.array(mask, dtype=np.bool)
 
+    def mkdir(self, path):
+
+        folder = os.path.exists(path)
+
+        if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+            os.makedirs(path)  # makedirs 创建文件时如果路径不存在会创建这个路径
 
 
 
@@ -308,7 +314,9 @@ class HAN():
             # optimzie
             train_op = model.training(loss, lr, l2_coef)
 
-            checkpt_file = 'pre_trained/{}/{}/{}/_allMP_multi_{}_.ckpt'.format(dataset, dataset, self.name, featype)
+            Path = 'pre_trained/{}/{}/{}'.format(dataset, dataset, self.name)
+            self.mkdir(Path)
+            checkpt_file = '{}/allMP_multi_{}_.ckpt'.format(Path, featype)
             print('model: {}'.format(checkpt_file))
             saver = tf.train.Saver()
 
