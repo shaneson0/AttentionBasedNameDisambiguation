@@ -97,7 +97,9 @@ init_op = tf.group(tf.global_variables_initializer(),
 with tf.Session() as sess:
     sess.run(init_op)
     fd = {ftr_input: features}
-    train_op, loss, checkvalue = sess.run([train_op, loss, checkvalue], feed_dict=fd)
+    for epoch in epochs:
+        train_op, loss, checkvalue = sess.run([train_op, loss, checkvalue], feed_dict=fd)
+
     print ("loss: ", loss, checkvalue)
 
 
