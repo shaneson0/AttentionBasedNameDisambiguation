@@ -51,6 +51,7 @@ def getCenters(num_classes, feature_size, labels, final_embed):
 
     # centers = centers * centers_count
     centers = centers / centers_count
+    centers = tf.transpose(centers)
 
     return centers
 
