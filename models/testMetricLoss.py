@@ -1,7 +1,8 @@
 from HeterogeneousGraph import HAN
 import tensorflow as tf
 from models.MetrlcLoss import OSM_CAA_Loss
-
+from utils import getSetting, PCAAnanlyse, clustering, pairwise_precision_recall_f1, lossPrint, tSNEAnanlyse, settings, sNEComparingAnanlyse
+from os.path import join
 
 name = "hongbin_li"
 lr = 0.01  # learning rate
@@ -99,9 +100,24 @@ with tf.Session() as sess:
     fd = {ftr_input: features}
     while epoch < epochs:
         _, losscheck, value2 = sess.run([train_op, loss, checkvalue], feed_dict=fd)
-        print ("loss: ", losscheck, value2)
+        print ("epoch: {} loss: {}, checkvalue: {}".format(epoch, losscheck, value2))
         epoch += 1
 
+    embedding = sess.run([final_embed])
+
+    from utils import clustering, pairwise_precision_recall_f1
+
+    clusters_pred = clustering(embedding, num_clusters=nb_class)
+    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+    print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', nb_class)
+
+    tSNEAnanlyse(embedding, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
+    tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_features.png" % (name)))
+
+    # my_KNN(xx, yy)
+    # my_Kmeans(xx, yy)
+
+    sess.close()
 
 
 
