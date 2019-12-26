@@ -175,50 +175,6 @@ class HAN():
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
 
-    def checkGraph(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, needtSNE=False, rawFeature=[]):
-
-        prec, rec, f1 = 0.0, 0.0, 0.0
-        nb_nodes = fea_list[0].shape[0]
-        ft_size = fea_list[0].shape[1]
-        nb_classes = y_train.shape[1]
-
-        # adj = adj.todense()
-
-        # features = features[np.newaxis]  # [1, nb_node, ft_size]
-        fea_list = [fea[np.newaxis] for fea in fea_list]
-        adj_list = [adj[np.newaxis] for adj in adj_list]
-
-
-        biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
-
-        print('build graph...')
-        with tf.Graph().as_default():
-            with tf.name_scope('input'):
-                ftr_in_list = [tf.placeholder(dtype=tf.float32,
-                                              shape=(batch_size, nb_nodes, ft_size),
-                                              name='ftr_in_{}'.format(i))
-                               for i in range(len(fea_list))]
-                bias_in_list = [tf.placeholder(dtype=tf.float32,
-                                               shape=(batch_size, nb_nodes, nb_nodes),
-                                               name='bias_in_{}'.format(i))
-                                for i in range(len(biases_list))]
-                lbl_in = tf.placeholder(dtype=tf.int32, shape=(
-                    batch_size, nb_nodes, nb_classes), name='lbl_in')
-                msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes),
-                                        name='msk_in')
-                attn_drop = tf.placeholder(dtype=tf.float32, shape=(), name='attn_drop')
-                ffd_drop = tf.placeholder(dtype=tf.float32, shape=(), name='ffd_drop')
-                is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
-            # forward
-            logits, final_embedding, att_val = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
-                                                               attn_drop, ffd_drop,
-                                                               bias_mat_list=bias_in_list,
-                                                               hid_units=hid_units, n_heads=n_heads,
-                                                               mp_att_size=200,
-                                                               residual=residual, activation=nonlinearity)
-        return logits, final_embedding, att_val
-
-
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=False, rawFeature=[]):
 
         prec, rec, f1 = 0.0, 0.0, 0.0
@@ -265,7 +221,7 @@ class HAN():
                 is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
 
             # forward
-            logits, final_embedding, att_val, centers_embed = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
+            logits, final_embedding, att_val, centers_embed, test_final_embeed = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
                                                                attn_drop, ffd_drop,
                                                                bias_mat_list=bias_in_list,
                                                                hid_units=hid_units, n_heads=n_heads, features=fea_list, labels=rawlabels,
@@ -440,13 +396,14 @@ class HAN():
                     fd = fd1
                     fd.update(fd2)
                     fd.update(fd3)
-                    loss_value_ts, acc_ts, jhy_final_embedding = sess.run([loss, accuracy, final_embedding],
+                    loss_value_ts, acc_ts, jhy_final_embedding, test_final_embeed_check = sess.run([loss, accuracy, final_embedding, test_final_embeed],
                                                                           feed_dict=fd)
                     ts_loss += loss_value_ts
                     ts_acc += acc_ts
                     ts_step += 1
 
                 xx = np.expand_dims(jhy_final_embedding, axis=0)[all_mask]
+                xx2 = np.expand_dims(test_final_embeed_check, axis=0)[all_mask]
                 yy = y_all[all_mask]
 
 
@@ -457,13 +414,14 @@ class HAN():
 
                 from utils import  clustering, pairwise_precision_recall_f1
 
-                clusters_pred = clustering(xx, num_clusters=numberofLabels)
+                clusters_pred = clustering(xx2, num_clusters=numberofLabels)
                 prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
                 print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
 
                 if needtSNE:
                     tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_final.png" % (self.name)))
                     tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_features.png" % (self.name)))
+                    tSNEAnanlyse(xx2, labels, join(settings.PIC_DIR, "HAN", "xx2_%s_features.png" % (self.name)))
                     tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
 
                 # my_KNN(xx, yy)
