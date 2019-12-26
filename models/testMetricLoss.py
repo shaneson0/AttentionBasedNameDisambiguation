@@ -113,7 +113,7 @@ with tf.Session() as sess:
     prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
     print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', nb_class)
 
-    tSNEAnanlyse(embedding, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
+    tSNEAnanlyse(embedding[0], labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_final.png" % (name)))
     tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "PureMetricLoss", "%s_features.png" % (name)))
 
     # my_KNN(xx, yy)
