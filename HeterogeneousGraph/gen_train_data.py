@@ -58,7 +58,7 @@ class DataGenerator:
                 pids_set.add(pid)
                 wf_content.write('{}\t'.format(pid))
                 wf_content.write('\t'.join(cur_pub_emb))
-                wf_content.write('\t{}'.format(pids2label[pid]))
+                wf_content.write('\t{}\n'.format(pids2label[pid]))
         wf_content.close()
 
         print ("pass2")
