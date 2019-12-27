@@ -92,7 +92,7 @@ class OSM_CAA_Loss():
 
         atten_class = 1 - num / denom
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
-        NegtiveA = tf.math.maximum(temp, tf.transpose(temp))
+        NegtiveA = tf.math.minimum(temp, tf.transpose(temp))
 
 
         W_P = PositiveA * p_mask
