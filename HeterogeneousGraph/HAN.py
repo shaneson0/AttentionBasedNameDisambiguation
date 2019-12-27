@@ -61,8 +61,8 @@ class HAN():
         PSP = np.zeros(shape=(LenPids, LenPids))
         return PAP, PSP, pid2idx, idx2pid
 
-    def constructIdx(self, X, labels):
-        X_train, X_val = train_test_split(X, stratify=labels, test_size=0.2, random_state=1)
+    def constructIdx(self, X, _labels):
+        X_train, X_val = train_test_split(X, test_size=0.2, random_state=1)
         return X_train, X_val, X, X
 
     def getPATH(self, name, idf_threshold, filename):
