@@ -41,10 +41,11 @@ class DataGenerator:
         # generate content
         wf_content = open(join(graph_dir, '{}_feature_and_label.txt'.format(authorName)), 'w')
         for i, aid in enumerate(cur_person_dict):
-            pids = cur_person_dict[aid]
+            personPids = cur_person_dict[aid]
+            # aid:  5b5433f4e1cd8e4e15183583 , pids:  ['5b5433f6e1cd8e4e151dee05-1', '5b5433f4e1cd8e4e1517fb4b-2', '5b5433efe1cd8e4e150c9f1b-0']
             print ("aid: ", aid, ", pids: ", pids)
-            for pid in pids:
-                pids2label[pid] = aid
+            for pid in personPids:
+                pids2label[str(pid)] = str(aid)
                 pids.append(pid)
         shuffle(pids)
 
