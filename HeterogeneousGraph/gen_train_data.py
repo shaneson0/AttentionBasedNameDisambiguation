@@ -16,8 +16,6 @@ class DataGenerator:
     def prepare_data(self):
         self.name2pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')  # for test
         self.name2pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
-        print ("self.name2pubs_train :", self.name2pubs_train )
-        print ("self.name2pubs_test: ", self.name2pubs_test )
         self.names_train = self.name2pubs_train.keys()
         self.names_test = self.name2pubs_test.keys()
         assert not set(self.names_train).intersection(set(self.names_test))
@@ -38,7 +36,7 @@ class DataGenerator:
         pids = []
         pids2label = {}
 
-        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}-{}'.format(idf_threshold,authorName))
+        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}'.format(idf_threshold))
         # generate content
         wf_content = open(join(graph_dir, '{}_feature_and_label.txt'.format(authorName)), 'w')
         for i, aid in enumerate(cur_person_dict):
