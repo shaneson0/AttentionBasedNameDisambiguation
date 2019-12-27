@@ -46,6 +46,7 @@ class DataGenerator:
                 pids.append(pid)
         shuffle(pids)
 
+        print ("pass1")
         for pid in pids:
             # use raw feature rather than Triplet Loss
             cur_pub_emb = lc_emb.get(pid)
@@ -58,6 +59,7 @@ class DataGenerator:
                 wf_content.write('\t{}'.format(pids2label[pid]))
         wf_content.close()
 
+        print ("pass2")
         # generate network1
         pids_filter = list(pids_set)
         n_pubs = len(pids_filter)
@@ -88,6 +90,7 @@ class DataGenerator:
 
             return res
 
+        print ("pass3")
         wf_network = open(join(graph_dir, '{}_PSP.txt'.format(authorName)), 'w')
 
         for i in range(n_pubs-1):
