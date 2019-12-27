@@ -36,11 +36,13 @@ class DataGenerator:
         pids = []
         pids2label = {}
 
+        print ("pass0")
         graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}'.format(idf_threshold))
         # generate content
         wf_content = open(join(graph_dir, '{}_feature_and_label.txt'.format(authorName)), 'w')
         for i, aid in enumerate(cur_person_dict):
             pids = cur_person_dict[aid]
+            print ("aid: ", aid, ", pids: ", pids)
             for pid in pids:
                 pids2label[pid] = aid
                 pids.append(pid)
