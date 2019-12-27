@@ -13,8 +13,6 @@ name="kexin_xu"
 # name = "hongbin_li"
 
 
-
-
 def testHAN(name):
     han = HAN()
     prec, rec, f1 = han.prepare_and_train(name=name)
