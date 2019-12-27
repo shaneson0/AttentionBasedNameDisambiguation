@@ -38,7 +38,7 @@ class DataGenerator:
         pids = []
         pids2label = {}
 
-        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork', authorName , 'graph-{}'.format(idf_threshold))
+        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}-{}'.format(idf_threshold,authorName))
         # generate content
         wf_content = open(join(graph_dir, '{}_feature_and_label.txt'.format(authorName)), 'w')
         for i, aid in enumerate(cur_person_dict):
