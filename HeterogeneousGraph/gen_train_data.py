@@ -8,7 +8,7 @@ from HeterogeneousGraph import IDF_THRESHOLD, Author_THRESHOLD
 
 class DataGenerator:
     pids_train = []
-    AuthorSocial =
+    AuthorSocial = None
     def __init__(self):
         self.AuthorSocial = inputData.loadAuthorSocial()
 
