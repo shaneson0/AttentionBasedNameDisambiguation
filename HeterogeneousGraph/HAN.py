@@ -66,7 +66,9 @@ class HAN():
         return X_train, X_val, X, X
 
     def getPATH(self, name, idf_threshold, filename):
-        graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
+        # graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}'.format(idf_threshold))
+        # graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
+        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork', 'graph-{}'.format(idf_threshold))
         path = join(graph_dir, '{}_{}.txt'.format(name, filename))
         return path
 
