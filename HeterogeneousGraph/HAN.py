@@ -76,8 +76,8 @@ class HAN():
         featurePath = self.getPATH(name, idf_threshold, 'feature_and_label')
         # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
         idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
-        features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
-        labels, rawlabels = self.encode_labels(idx_features_labels[:, -2])
+        features = np.array(idx_features_labels[:, 1:-1], dtype=np.float32)  # sparse?
+        labels, rawlabels = self.encode_labels(idx_features_labels[:, -1])
         pids = idx_features_labels[:, 0]
         return features, labels, pids, rawlabels
 
