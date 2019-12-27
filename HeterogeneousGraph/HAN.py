@@ -25,7 +25,7 @@ featype = 'fea'
 
 # training params
 batch_size = 1
-nb_epochs = 600
+nb_epochs = 300
 patience = 100
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
