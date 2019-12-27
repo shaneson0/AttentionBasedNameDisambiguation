@@ -47,7 +47,6 @@ class DataGenerator:
             for pid in personPids:
                 pids2label[str(pid)] = str(aid)
                 pids.append(pid)
-        shuffle(pids)
 
         print ("pass1")
         for pid in pids:
