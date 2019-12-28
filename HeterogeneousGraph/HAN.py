@@ -76,7 +76,7 @@ class HAN():
 
     def loadFeature(self, name, idf_threshold=IDF_THRESHOLD, ispretrain=True):
         EndIndex = -1
-        if ispretrain:
+        if ispretrain is False:
             EndIndex = -2
         featurePath = self.getPATH(name, idf_threshold, 'feature_and_label', ispretrain)
         # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
