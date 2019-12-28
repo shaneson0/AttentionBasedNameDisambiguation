@@ -90,9 +90,12 @@ class OSM_CAA_Loss():
         temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
         A = tf.math.maximum(temp, tf.transpose(temp))
 
+        atten_class = 1.0 - num / denom
+        temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
+        NegtiveA = tf.math.maximum(temp, tf.transpose(temp))
 
         W_P = A * p_mask
-        W_N = A * n_mask
+        W_N = NegtiveA * n_mask
         # W_P = p_mask
         # W_N = n_mask
         # improve the effect of attention
