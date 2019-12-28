@@ -83,7 +83,7 @@ class OSM_CAA_Loss():
         PointDistance = self.EuclideanDistance(x , tf.transpose(tf.gather(embd, labels, axis=1)))
         # PointDistance = x * tf.transpose(tf.gather(embd, labels, axis=1))
         print ("PointDistance: ", PointDistance)
-        num = tf.exp(PointDistance)
+        num = tf.exp(tf.reduce_sum(PointDistance,1))
 
 
         atten_class = num / denom
@@ -95,8 +95,9 @@ class OSM_CAA_Loss():
         W_N = A * n_mask
         # W_P = p_mask
         # W_N = n_mask
-        W_P = W_P * (1 - tf.eye(n))
-        W_N = W_N * (1 - tf.eye(n))
+        # improve the effect of attention
+        W_P = W_P * (1 - tf.eye(n)) * 10.0
+        W_N = W_N * (1 - tf.eye(n)) * 10.0
 
         # L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
         L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
