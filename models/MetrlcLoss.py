@@ -10,7 +10,7 @@ class OSM_CAA_Loss():
     def __init__(self, alpha=1.2, l=0.5, use_gpu=True, batch_size=32, beta=0.5):
         self.use_gpu = use_gpu
         self.alpha = 2.0  # margin of weighted contrastive loss, as mentioned in the paper
-        self.l = 0.5  # hyperparameter controlling weights of positive set and the negative set
+        self.l = 0.7  # hyperparameter controlling weights of positive set and the negative set
         self.osm_sigma = 0.8  # \sigma OSM (0.8) as mentioned in paper
         self.n = batch_size
 
@@ -107,7 +107,7 @@ class OSM_CAA_Loss():
         # L_N = tf.reduce_sum(W_N) / 2
 
 
-        # L = (1 - self.l) * L_P + self.l * L_N
+        L = (1 - self.l) * L_P + self.l * L_N
 
         return L_N, [L_P, L_N]
 
