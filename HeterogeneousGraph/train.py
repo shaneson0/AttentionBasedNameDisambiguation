@@ -15,9 +15,10 @@ name = "hongbin_li"
 
 def testHAN(name):
     han = HAN()
-    prec, rec, f1 = han.prepare_and_train(name=name)
-    print ("name: ", name)
-    return prec, rec, f1
+    han.prepare_and_train()
+    # prec, rec, f1 = han.prepare_and_train(name=name)
+    # print ("name: ", name)
+    # return prec, rec, f1
 
     # print (prec, rec, f1)
 

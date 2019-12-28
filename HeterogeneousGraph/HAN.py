@@ -65,15 +65,17 @@ class HAN():
         X_train, X_val = train_test_split(X, test_size=0.2, random_state=1)
         return X_train, X_val, X, X
 
-    def getPATH(self, name, idf_threshold, filename):
-        # graph_dir = join(settings.DATA_DIR, 'AttentionNetwork' , 'graph-{}'.format(idf_threshold))
-        # graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
-        graph_dir = join(settings.DATA_DIR, 'AttentionNetwork', 'graph-{}'.format(idf_threshold))
+    def getPATH(self, name, idf_threshold, filename, ispretrain):
+        if ispretrain:
+            graph_dir = join(settings.DATA_DIR, 'AttentionNetwork', 'graph-{}'.format(idf_threshold))
+        else:
+            graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
+
         path = join(graph_dir, '{}_{}.txt'.format(name, filename))
         return path
 
-    def loadFeature(self, name, idf_threshold=IDF_THRESHOLD):
-        featurePath = self.getPATH(name, idf_threshold, 'feature_and_label')
+    def loadFeature(self, name, idf_threshold=IDF_THRESHOLD, ispretrain=True):
+        featurePath = self.getPATH(name, idf_threshold, 'feature_and_label', ispretrain)
         # idx_features_labels = np.genfromtxt(join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold)), dtype=np.dtype(str))
         idx_features_labels = np.genfromtxt(featurePath, dtype=np.dtype(str))
         print ("idx_features_labels: ", np.array(idx_features_labels).shape)
@@ -82,16 +84,16 @@ class HAN():
         pids = idx_features_labels[:, 0]
         return features, labels, pids, rawlabels
 
-    def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
-        PAPPATH = self.getPATH(name, idf_threshold, 'PAP')
+    def loadPAP(self, PAP, pid2idx, name, idf_threshold=IDF_THRESHOLD, ispretrain=True):
+        PAPPATH = self.getPATH(name, idf_threshold, 'PAP', ispretrain)
         PAPPath = np.genfromtxt(PAPPATH, dtype=np.dtype(str))
         for _from, _to in PAPPath:
             PAP[pid2idx[_from]][pid2idx[_to]] = 1
             PAP[pid2idx[_to]][pid2idx[_from]] = 1
         return PAP
 
-    def loadPSP(self, PSP, pid2idx, name, idf_threshold=IDF_THRESHOLD):
-        PSPPATH = self.getPATH(name, idf_threshold, 'PSP')
+    def loadPSP(self, PSP, pid2idx, name, idf_threshold=IDF_THRESHOLD, ispretrain=True):
+        PSPPATH = self.getPATH(name, idf_threshold, 'PSP', ispretrain)
         PSPPath = np.genfromtxt(PSPPATH, dtype=np.dtype(str))
         for _from, _to in PSPPath:
             PSP[pid2idx[_from]][pid2idx[_to]] = 1
@@ -130,9 +132,7 @@ class HAN():
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
-
-    def prepare_and_train(self, name = 'zhigang_zeng'):
-
+    def pretrain(self, name = 'hongbin_li'):
         self.name = name
         # loadData(name)
         rawFeatures, labels, pids, rawlabels = self.loadFeature(name)
@@ -157,6 +157,27 @@ class HAN():
         print ("set of labels: ", len(set(rawlabels)))
         return prec, rec, f1
 
+    def prepare_and_train(self, name = 'hongbin_li'):
+        self.name = name
+        # loadData(name)
+        rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=False)
+        #
+        PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
+
+        PAP = self.loadPAP(PAP, pid2idx, name , ispretrain=False)
+        PSP = self.loadPSP(PSP, pid2idx, name, ispretrain=False)
+
+        N = len(pids)
+        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
+
+        #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
+
+        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
+
+        self.MetricDebug(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
+
+
+
     def sample_mask(self, idx, l):
         """Create mask."""
         mask = np.zeros(l)
@@ -177,6 +198,125 @@ class HAN():
         Tlabels = self.enc.inverse_transform(Y)
         labels = [T[1] for T in Tlabels]
         return labels, len(set(labels))
+
+
+    def MetricDebug(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=False, rawFeature=[]):
+        prec, rec, f1 = 0.0, 0.0, 0.0
+        nb_nodes = fea_list[0].shape[0]
+        ft_size = fea_list[0].shape[1]
+        nb_classes = y_train.shape[1]
+        # nb_classes = len(set(rawlabels))
+
+        # adj = adj.todense()
+
+        # features = features[np.newaxis]  # [1, nb_node, ft_size]
+        fea_list = [fea[np.newaxis] for fea in fea_list]
+        adj_list = [adj[np.newaxis] for adj in adj_list]
+        y_train = y_train[np.newaxis]
+        y_val = y_val[np.newaxis]
+        y_test = y_test[np.newaxis]
+        y_all = y_all[np.newaxis]
+
+        train_mask = train_mask[np.newaxis]
+        val_mask = val_mask[np.newaxis]
+        test_mask = test_mask[np.newaxis]
+        all_mask = all_mask[np.newaxis]
+
+        biases_list = [process.adj_to_bias(adj, [nb_nodes], nhood=1) for adj in adj_list]
+
+        print('build graph...')
+        with tf.Graph().as_default():
+            with tf.name_scope('input'):
+                metric_ftr_in = tf.placeholder(dtype=tf.float32, shape=(nb_nodes, ft_size), name='metric_ftr_in')
+                ftr_in_list = [tf.placeholder(dtype=tf.float32,
+                                              shape=(batch_size, nb_nodes, ft_size),
+                                              name='ftr_in_{}'.format(i))
+                               for i in range(len(fea_list))]
+                bias_in_list = [tf.placeholder(dtype=tf.float32,
+                                               shape=(batch_size, nb_nodes, nb_nodes),
+                                               name='bias_in_{}'.format(i))
+                                for i in range(len(biases_list))]
+                lbl_in = tf.placeholder(dtype=tf.int32, shape=(
+                    batch_size, nb_nodes, nb_classes), name='lbl_in')
+                msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes),
+                                        name='msk_in')
+                attn_drop = tf.placeholder(dtype=tf.float32, shape=(), name='attn_drop')
+                ffd_drop = tf.placeholder(dtype=tf.float32, shape=(), name='ffd_drop')
+                is_train = tf.placeholder(dtype=tf.bool, shape=(), name='is_train')
+
+            # forward
+            logits, final_embedding, att_val, centers_embed, test_final_embeed = model.inference(ftr_in_list, nb_classes, nb_nodes, is_train,
+                                                               attn_drop, ffd_drop,
+                                                               bias_mat_list=bias_in_list,
+                                                               hid_units=hid_units, n_heads=n_heads, features=fea_list, labels=rawlabels,
+                                                               residual=residual, activation=nonlinearity, feature_size=ft_size)
+
+            log_resh = tf.reshape(logits, [-1, nb_classes])
+            lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
+            msk_resh = tf.reshape(msk_in, [-1])
+
+            osm_caa_loss = OSM_CAA_Loss(batch_size=nb_nodes)
+            osm_loss = osm_caa_loss.forward
+
+            osmLoss, checkvalue = osm_loss(final_embedding, rawlabels, centers_embed)
+            SoftMaxloss = model.masked_softmax_cross_entropy(log_resh, lab_resh, msk_resh)
+            loss = osmLoss
+
+            accuracy = model.masked_accuracy(log_resh, lab_resh, msk_resh)
+            # optimzie
+            train_op = model.training(loss, lr, l2_coef)
+
+            Path = 'pre_trained/{}/{}/{}'.format(dataset, dataset, self.name)
+            self.mkdir(Path)
+            checkpt_file = '{}/allMP_multi_{}_.ckpt'.format(Path, featype)
+            saver = tf.train.Saver()
+
+            init_op = tf.group(tf.global_variables_initializer(),
+                               tf.local_variables_initializer())
+
+            ts_size = fea_list[0].shape[0]
+            ts_step = 0
+            ts_loss = 0.0
+            ts_acc = 0.0
+
+            with tf.Session(config=config) as sess:
+                sess.run(init_op)
+                saver.restore(sess, checkpt_file)
+
+                while ts_step * batch_size < ts_size:
+                    fd1 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                           for i, d in zip(ftr_in_list, fea_list)}
+                    fd2 = {i: d[ts_step * batch_size:(ts_step + 1) * batch_size]
+                           for i, d in zip(bias_in_list, biases_list)}
+                    fd3 = {lbl_in: y_all[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           msk_in: all_mask[ts_step * batch_size:(ts_step + 1) * batch_size],
+                           metric_ftr_in: rawFeature,
+                          is_train: False,
+                          attn_drop: 0.0,
+                          ffd_drop: 0.0}
+
+                    fd = fd1
+                    fd.update(fd2)
+                    fd.update(fd3)
+                    test_final_embeed_check = sess.run([ test_final_embeed], feed_dict=fd)
+                    ts_step += 1
+
+                xx2 = np.expand_dims(test_final_embeed_check, axis=0)[all_mask]
+                yy = y_all[all_mask]
+
+                labels, numberofLabels = self.getLabel(yy)
+
+                from utils import  clustering, pairwise_precision_recall_f1
+
+                clusters_pred = clustering(xx2, num_clusters=numberofLabels)
+                prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+                print ('prec: ', prec, ', rec: ', rec, ', f1: ', f1, ', originNumberOfClusterlabels: ', numberofLabels)
+
+                if needtSNE:
+                    tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "MetricLearning", "rawReature_%s_features.png" % (self.name)))
+                    tSNEAnanlyse(xx2, labels, join(settings.PIC_DIR, "MetricLearning", "rawReature_%s_xx2.png" % (self.name)))
+
+
 
     def train(self, adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=False, rawFeature=[]):
 
@@ -429,6 +569,8 @@ class HAN():
 
                 # my_KNN(xx, yy)
                 # my_Kmeans(xx, yy)
+
+
 
                 sess.close()
 
