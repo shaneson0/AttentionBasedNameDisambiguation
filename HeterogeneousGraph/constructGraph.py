@@ -71,8 +71,7 @@ def genPAPandPSP(idf_threshold=10):
     idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
     raw_word2vec = 'author_100.emb.weighted'
     lc_emb = LMDBClient(raw_word2vec)
-    INTER_LMDB_NAME = 'author_triplets.emb'
-    lc_inter = LMDBClient(INTER_LMDB_NAME)
+
     LMDB_AUTHOR_FEATURE = "pub_authors.feature"
     lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
     graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))

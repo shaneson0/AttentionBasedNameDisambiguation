@@ -135,16 +135,16 @@ class HAN():
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
-    def prepare_and_train(self, name = 'hongbin_li'):
+    def prepare_and_train(self, name = 'hongbin_li', ispretrain=False):
         self.name = name
         # loadData(name)
-        rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=False)
+        rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=ispretrain)
         print ("rawlabes: ", len(set(rawlabels)))
         #
         PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
 
-        PAP = self.loadPAP(PAP, pid2idx, name, ispretrain=False)
-        PSP = self.loadPSP(PSP, pid2idx, name, ispretrain=False)
+        PAP = self.loadPAP(PAP, pid2idx, name, ispretrain=ispretrain)
+        PSP = self.loadPSP(PSP, pid2idx, name, ispretrain=ispretrain)
 
         N = len(pids)
         X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
