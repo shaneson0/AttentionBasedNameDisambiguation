@@ -70,54 +70,55 @@ class OSM_CAA_Loss():
         dist = tf.clip_by_value(dist, clip_value_min=tf.constant(1e-12),
                                 clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
 
-        # p_mask = tf.cast(tf.equal(labels[:, tf.newaxis], labels[tf.newaxis, :]), tf.float32)
-        # n_mask = 1 - p_mask
-        #
-        # S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),clip_value_max=tf.constant(1e12))
-        #
-        # # history reason
-        # embd = tf.math.l2_normalize(embd, 0)
-        #
-        # CenterDistance = self.pairwise_dist(x, tf.transpose(embd)) # x: (n,d), embed(c,d), CenterDistance(n,m)
-        # CenterDistance = self.safe_divisor(CenterDistance)
-        # denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
-        # # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
-        # PointDistance = self.EuclideanDistance(x , tf.transpose(tf.gather(embd, labels, axis=1)))
-        # PointDistance = self.safe_divisor(PointDistance)
-        # # PointDistance = x * tf.transpose(tf.gather(embd, labels, axis=1))
-        # print ("PointDistance: ", PointDistance)
-        # num = tf.exp(tf.reduce_sum(PointDistance,1))
-        #
-        #
-        # atten_class = num / denom
+        p_mask = tf.cast(tf.equal(labels[:, tf.newaxis], labels[tf.newaxis, :]), tf.float32)
+        n_mask = 1 - p_mask
+
+        S_ = tf.clip_by_value(tf.nn.relu(self.alpha - dist), clip_value_min=tf.constant(1e-12),clip_value_max=tf.constant(1e12))
+
+        # history reason
+        embd = tf.math.l2_normalize(embd, 0)
+
+        CenterDistance = self.pairwise_dist(x, tf.transpose(embd)) # x: (n,d), embed(c,d), CenterDistance(n,m)
+        CenterDistance = self.safe_divisor(CenterDistance)
+        denom = tf.reduce_sum(tf.exp(CenterDistance), 1)
+        # num = tf.exp(tf.reduce_sum(x * tf.transpose(tf.gather(embd, labels, axis=1)), 1))
+        PointDistance = self.EuclideanDistance(x , tf.transpose(tf.gather(embd, labels, axis=1)))
+        PointDistance = self.safe_divisor(PointDistance)
+        # PointDistance = x * tf.transpose(tf.gather(embd, labels, axis=1))
+        print ("PointDistance: ", PointDistance)
+        num = tf.exp(tf.reduce_sum(PointDistance,1))
+
+
+        atten_class = num / denom
+        temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
+        A = tf.math.maximum(temp, tf.transpose(temp))
+
+        # atten_class = 1.0 - num / denom
         # temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
-        # A = tf.math.maximum(temp, tf.transpose(temp))
-        #
-        # # atten_class = 1.0 - num / denom
-        # # temp = tf.tile(tf.expand_dims(atten_class, 0), [n, 1])
-        # # NegtiveA = tf.math.maximum(temp, tf.transpose(temp))
-        #
-        # W_P = A * p_mask
+        # NegtiveA = tf.math.maximum(temp, tf.transpose(temp))
+
+        W_P = A * p_mask
+        W_N = n_mask
+        # W_P = p_mask
         # W_N = n_mask
-        # # W_P = p_mask
-        # # W_N = n_mask
-        # # improve the effect of attention
-        # W_P = W_P * (1 - tf.eye(n))
-        # W_N = W_N * (1 - tf.eye(n))
-        #
-        # # L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
-        # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
-        # # L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
-        # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
-        # # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
-        # # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
-        # # L_P = tf.reduce_sum(W_P) / 2
-        # # L_N = tf.reduce_sum(W_N) / 2
-        #
-        #
+        # improve the effect of attention
+        W_P = W_P * (1 - tf.eye(n))
+        W_N = W_N * (1 - tf.eye(n))
+
+        # L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
+        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
+        # L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
+        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
+        # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
+        # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
+        # L_P = tf.reduce_sum(W_P) / 2
+        # L_N = tf.reduce_sum(W_N) / 2
+
+
         # L = (1 - self.l) * L_P + self.l * L_N
         L = tf.constant(0.1, dtype='float')
-        return L, [x, dist]
+
+        return L, [x, dist, L_P, L_N]
         # return L, [x, dist, p_mask, n_mask]
 
 if __name__ == '__main__':
