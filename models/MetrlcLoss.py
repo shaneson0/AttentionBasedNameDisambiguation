@@ -105,20 +105,13 @@ class OSM_CAA_Loss():
         W_P = W_P * (1 - tf.eye(n))
         W_N = W_N * (1 - tf.eye(n))
 
-        # L_P = tf.reduce_mean(W_P * tf.pow(dist, 2)) / 2
-        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / (2 * tf.reduce_sum(W_P))
-        # L_N = tf.reduce_mean(W_N * tf.pow(S_, 2)) / 2
-        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / (2 * tf.reduce_sum(W_N))
-        # L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / 2
-        # L_N = tf.reduce_sum(W_N * tf.pow(S_, 2) ) / 2
-        # L_P = tf.reduce_sum(W_P) / 2
-        # L_N = tf.reduce_sum(W_N) / 2
+        L_P = tf.reduce_sum(W_P * tf.pow(dist, 2)) / self.safe_divisor(2 * tf.reduce_sum(W_P))
+        L_N = tf.reduce_sum(W_N * tf.pow(S_, 2)) / self.safe_divisor(2 * tf.reduce_sum(W_N))
 
-        # L = (1 - self.l) * L_P + self.l * L_N
-        L = tf.constant(0.1, dtype='float')
+        L = (1 - self.l) * L_P + self.l * L_N
+
 
         return L, [x, dist, L_P, L_N, p_mask, n_mask]
-        # return L, [x, dist, p_mask, n_mask]
 
 if __name__ == '__main__':
     sess = tf.Session()
