@@ -114,11 +114,10 @@ class OSM_CAA_Loss():
         # L_P = tf.reduce_sum(W_P) / 2
         # L_N = tf.reduce_sum(W_N) / 2
 
-
         # L = (1 - self.l) * L_P + self.l * L_N
         L = tf.constant(0.1, dtype='float')
 
-        return L, [x, dist, L_P, L_N]
+        return L, [x, dist, L_P, L_N, p_mask, n_mask]
         # return L, [x, dist, p_mask, n_mask]
 
 if __name__ == '__main__':
