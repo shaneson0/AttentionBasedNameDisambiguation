@@ -5,22 +5,33 @@ from utils import data_utils, eval_utils
 import codecs
 from os.path import abspath, dirname, join
 import numpy as np
+from utils.cache import LMDBClient
 
 def load_test_names():
     return data_utils.load_json(settings.DATA_DIR, 'test_name_list2.json')
+
+def load_train_names():
+    name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
+    return name_to_pubs_train
 
 # name="kexin_xu"
 name = "hongbin_li"
 
 
 def testHAN(name):
-    han = HAN()
-    # han.prepare_and_train()
-    prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
-    # print ("name: ", name)
-    # return prec, rec, f1
+    LMDB_NAME_EMB = "lc_attention_network_embedding"
+    lc_emb = LMDBClient(LMDB_NAME_EMB)
+    han = HAN(lc_emb)
 
-    # print (prec, rec, f1)
+
+    name_to_pubs_train = load_train_names()
+    for name in name_to_pubs_train:
+        prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
+
+        print (name, prec, rec, f1)
+
+
+    #
 
 def main():
     names = load_test_names()

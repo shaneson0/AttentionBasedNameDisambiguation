@@ -41,8 +41,9 @@ from HeterogeneousGraph import IDF_THRESHOLD
 
 
 class HAN():
-    def __init__(self):
+    def __init__(self, lc_attention):
         self.enc = OneHotEncoder()
+        self.lc_attention = lc_attention
 
     def encode_labels(self, labels):
         classes = set(labels)
@@ -155,11 +156,19 @@ class HAN():
         print (test_mask)
         print (all_mask)
         print (y_all)
-        prec, rec, f1 = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
+        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
         # print ("labels: ", rawlabels)
-        print ("set of labels: ", len(set(rawlabels)))
+
+        print ("save final embedding")
+        self.saveFinalEmbedding(pids, attentionEmbeddings)
+
         return prec, rec, f1
 
+    def saveFinalEmbedding(self, pids, attentionEmbeddings):
+
+        for pid, attentionEmbedding in zip(pids, attentionEmbeddings):
+            # lc_emb.set(pid_order, cur_emb)
+            self.lc_attention.set(pid, attentionEmbedding)
 
     def pretrain(self, name = 'hongbin_li'):
         self.name = name
@@ -571,14 +580,15 @@ class HAN():
                     tSNEAnanlyse(xx2, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_xx2.png" % (self.name)))
                     tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
 
-                # my_KNN(xx, yy)
-                # my_Kmeans(xx, yy)
+
+                # lc load
+
 
 
 
                 sess.close()
 
-        return prec, rec, f1
+        return prec, rec, f1, xx2
 
 if __name__ == '__main__':
     pass
