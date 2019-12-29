@@ -142,25 +142,25 @@ class HAN():
         rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=ispretrain)
         print ("rawlabes: ", len(set(rawlabels)))
         #
-        PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
-
-        PAP = self.loadPAP(PAP, pid2idx, name, ispretrain=ispretrain)
-        PSP = self.loadPSP(PSP, pid2idx, name, ispretrain=ispretrain)
-
-        N = len(pids)
-        X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
-
-        #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
-
-        adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
-        print (test_mask)
-        print (all_mask)
-        print (y_all)
-        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
-        # print ("labels: ", rawlabels)
-
-        print ("save final embedding")
-        self.saveFinalEmbedding(pids, attentionEmbeddings)
+        # PAP, PSP, pid2idx, idx2pid = self.constructAdj(pids)
+        #
+        # PAP = self.loadPAP(PAP, pid2idx, name, ispretrain=ispretrain)
+        # PSP = self.loadPSP(PSP, pid2idx, name, ispretrain=ispretrain)
+        #
+        # N = len(pids)
+        # X_train, X_val, X_test, Allidx = self.constructIdx(list(range(N)), labels)
+        #
+        # #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
+        #
+        # adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
+        # print (test_mask)
+        # print (all_mask)
+        # print (y_all)
+        # prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
+        # # print ("labels: ", rawlabels)
+        #
+        # print ("save final embedding")
+        # self.saveFinalEmbedding(pids, attentionEmbeddings)
 
         return prec, rec, f1
 
