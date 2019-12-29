@@ -156,7 +156,7 @@ class HAN():
         print (test_mask)
         print (all_mask)
         print (y_all)
-        # prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
+        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
         # # print ("labels: ", rawlabels)
         #
         # print ("save final embedding")
