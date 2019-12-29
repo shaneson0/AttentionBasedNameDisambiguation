@@ -58,8 +58,8 @@ class OSM_CAA_Loss():
         labels : (n,)
         embd : Fully Connected weights of classification layer (dxC), C is the number of classes: represents the vectors for class
         '''
-        # x = self.safe_divisor(x)
-        # x = tf.math.l2_normalize(x, 1)
+        x = self.safe_divisor(x)
+        x = tf.math.l2_normalize(x, 1)
         # n = self.n
         # r = tf.ones([n, 1], tf.float32)
         #
