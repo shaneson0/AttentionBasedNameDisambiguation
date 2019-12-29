@@ -29,6 +29,7 @@ def testHAN(name):
         prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
 
         print (name, prec, rec, f1)
+        break
 
 
     #
