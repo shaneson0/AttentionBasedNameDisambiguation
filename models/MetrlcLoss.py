@@ -116,7 +116,7 @@ class OSM_CAA_Loss():
         #
         #
         # L = (1 - self.l) * L_P + self.l * L_N
-        L = 0.1
+        L = tf.constant(0.1, dtype='float')
         return L, [x]
         # return L, [x, dist, p_mask, n_mask]
 
