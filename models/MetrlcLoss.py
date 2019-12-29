@@ -60,16 +60,16 @@ class OSM_CAA_Loss():
         '''
         x = self.safe_divisor(x)
         x = tf.math.l2_normalize(x, 1)
-        # n = self.n
-        # r = tf.ones([n, 1], tf.float32)
-        #
-        # print ("r: ", r)
-        #
-        # dist = self.safe_divisor(r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r))
-        # dist = self.safe_divisor(tf.math.sqrt(dist))
-        # dist = tf.clip_by_value(dist, clip_value_min=tf.constant(1e-12),
-        #                         clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
-        #
+        n = self.n
+        r = tf.ones([n, 1], tf.float32)
+
+        print ("r: ", r)
+
+        dist = self.safe_divisor(r - 2 * tf.matmul(x, tf.transpose(x)) + tf.transpose(r))
+        dist = self.safe_divisor(tf.math.sqrt(dist))
+        dist = tf.clip_by_value(dist, clip_value_min=tf.constant(1e-12),
+                                clip_value_max=tf.constant(1e12))  # 0 value sometimes becomes nan
+
         # p_mask = tf.cast(tf.equal(labels[:, tf.newaxis], labels[tf.newaxis, :]), tf.float32)
         # n_mask = 1 - p_mask
         #
@@ -117,7 +117,7 @@ class OSM_CAA_Loss():
         #
         # L = (1 - self.l) * L_P + self.l * L_N
         L = tf.constant(0.1, dtype='float')
-        return L, [x]
+        return L, [x, dist]
         # return L, [x, dist, p_mask, n_mask]
 
 if __name__ == '__main__':
