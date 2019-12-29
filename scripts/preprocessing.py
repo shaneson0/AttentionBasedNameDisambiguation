@@ -154,15 +154,20 @@ if __name__ == '__main__':
     """
     some pre-processing
     """
+    print ("pass0")
     dump_author_features_to_file()
+    print ("pass1")
     dump_author_features_to_cache()
+    print ("pass2")
     emb_model = EmbeddingModel.Instance()
     emb_model.train('aminer')  # training word embedding model
     cal_feature_idf()
+    print ("pass3")
     dump_author_embs()
     # print('done', datetime.now()-start_time)
 
     # Author social relation
+    print ("pass4")
     dump_author_social_relation_to_file()
 
 
