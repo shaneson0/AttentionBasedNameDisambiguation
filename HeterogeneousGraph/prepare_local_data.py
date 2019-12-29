@@ -21,7 +21,7 @@ def dump_inter_emb():
     Res = defaultdict(list)
     LMDB_NAME = "lc_attention_network_embedding"
     lc_input = LMDBClient(LMDB_NAME)
-    INTER_LMDB_NAME = 'author_triplets.emb'
+    INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
     lc_inter = LMDBClient(INTER_LMDB_NAME)
     global_model = GlobalTripletModel(data_scale=1000000)
     trained_global_model = global_model.load_triplets_model()
@@ -74,7 +74,7 @@ def gen_local_data(idf_threshold=10):
 
     name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
     idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
-    INTER_LMDB_NAME = 'author_triplets.emb'
+    INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
     lc_inter = LMDBClient(INTER_LMDB_NAME)
     LMDB_AUTHOR_FEATURE = "pub_authors.feature"
     lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
@@ -147,50 +147,13 @@ def gen_local_data(idf_threshold=10):
             for j in range(i + 1, n_pubs):
                 Graph1Socials = AuthorSocial[pids_filter[i]]
                 Graph2Socials = AuthorSocial[pids_filter[j]]
-                # 具有两个相同作者才能写入图
                 if CountNumber(Graph1Socials, Graph2Socials) >= 1:
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
 
         wf_network.close()
 
 
-def test_prepare_local_data(Name):
-    name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
-    INTER_LMDB_NAME = 'author_triplets.emb'
-    lc_inter = LMDBClient(INTER_LMDB_NAME)
-    # cnt = 0
-    wf_contents = []
-    for i, name in enumerate(name_to_pubs_test):
-        if name != Name: continue
-        print(i, name)
-        cur_person_dict = name_to_pubs_test[name]
-        pids_set = set()
-        pids = []
-        pids2label = {}
-
-        # generate content
-        for i, aid in enumerate(cur_person_dict):
-            items = cur_person_dict[aid]
-            # if len(items) < 5:
-            #     continue
-            for pid in items:
-                pids2label[pid] = aid
-                pids.append(pid)
-        shuffle(pids)
-        for pid in pids:
-            cur_pub_emb = lc_inter.get(pid)
-            if cur_pub_emb is not None:
-                pids_set.add(pid)
-                wf_contents.append({'pid': pid, 'label': pids2label[pid]})
-                # cur_pub_emb = list(map(str, cur_pub_emb))
-                # wf_content.write('{}\t'.format(pid))
-                # wf_content.write('\t'.join(cur_pub_emb))
-                # wf_content.write('\t{}\n'.format(pids2label[pid]))
-    PidsLabels = [x['label'] for x in wf_contents]
-    print(len(set(PidsLabels)))
-
 if __name__ == '__main__':
-    # test_prepare_local_data('hongbin_li')
     dump_inter_emb()
     gen_local_data(idf_threshold=IDF_THRESHOLD)
     # print('done')

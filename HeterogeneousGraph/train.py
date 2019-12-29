@@ -15,8 +15,16 @@ def load_train_names():
     return name_to_pubs_train
 
 # name="kexin_xu"
-name = "hongbin_li"
+# name = "hongbin_li"
+# feiyu_kang
+name = "feiyu_kang"
 
+def test(name):
+    LMDB_NAME_EMB = "lc_attention_network_embedding"
+    lc_emb = LMDBClient(LMDB_NAME_EMB)
+    han = HAN(lc_emb)
+    prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
+    print (name, prec, rec, f1)
 
 def testHAN(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding"
@@ -63,9 +71,10 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
+    test(name)
     # main()
     # name = "hongbin_li"
-    testHAN(name)
+    # testHAN(name)
     # names = load_test_names()
     # wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
     # wf.write('name,precision,recall,f1\n')
