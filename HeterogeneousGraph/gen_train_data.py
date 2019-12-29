@@ -68,7 +68,7 @@ class DataGenerator:
         lc_emb = LMDBClient(raw_word2vec)
         LMDB_AUTHOR_FEATURE = "pub_authors.feature"
         lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
-        cur_person_dict = self.names_train[authorName]
+        cur_person_dict = self.name2pubs_train[authorName]
         pids_set = set()
         pids = []
         pids2label = {}
