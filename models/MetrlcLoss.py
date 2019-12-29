@@ -95,7 +95,7 @@ class OSM_CAA_Loss():
         # NegtiveA = tf.math.maximum(temp, tf.transpose(temp))
 
         W_P = A * p_mask
-        W_N = A * n_mask
+        W_N = n_mask
         # W_P = p_mask
         # W_N = n_mask
         # improve the effect of attention
