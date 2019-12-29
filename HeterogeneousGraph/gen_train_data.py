@@ -56,11 +56,11 @@ class DataGenerator:
         self.names_train = self.name2pubs_train.keys()
         self.names_test = self.name2pubs_test.keys()
         assert not set(self.names_train).intersection(set(self.names_test))
-        #
-        # for name in self.names_train:
-        #     name_pubs_dict = self.name2pubs_train[name]
-        #     for aid in name_pubs_dict:
-        #         self.pids_train += name_pubs_dict[aid]
+
+        for authorName in self.names_train:
+            self.genPAPandPSP(authorName=authorName)
+
+
 
     def genPAPandPSP(self, authorName="hongbin_li", idf_threshold=10):
         idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
@@ -68,7 +68,7 @@ class DataGenerator:
         lc_emb = LMDBClient(raw_word2vec)
         LMDB_AUTHOR_FEATURE = "pub_authors.feature"
         lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
-        cur_person_dict = self.name2pubs_test[authorName]
+        cur_person_dict = self.names_train[authorName]
         pids_set = set()
         pids = []
         pids2label = {}
