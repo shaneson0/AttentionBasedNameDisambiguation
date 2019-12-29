@@ -155,4 +155,3 @@ if __name__ == '__main__':
     dump_inter_emb()
     datagenerator = DataGenerator()
     datagenerator.prepare_data()
-    datagenerator.genPAPandPSP()
