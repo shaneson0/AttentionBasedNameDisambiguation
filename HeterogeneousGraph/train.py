@@ -18,6 +18,7 @@ def load_train_names():
 # name = "hongbin_li"
 # feiyu_kang
 name = "feiyu_kang"
+# din_ping_tsai
 
 def test(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding"
@@ -30,13 +31,17 @@ def testHAN(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
+    start = False
 
 
     name_to_pubs_train = load_train_names()
     for name in name_to_pubs_train:
-        prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
+        if name == 'din_ping_tsai':
+            start = True
 
-        print (name, prec, rec, f1)
+        if start:
+            prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
+            print (name, prec, rec, f1)
 
 
     #
