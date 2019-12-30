@@ -17,6 +17,7 @@ names = ["gang_yin", "gang_zou", "guo_hua_zhang", "h_hu", "hai_yan_chen", "hai_y
 for name in names:
     name_data = name_to_pubs_train[name]
 
+    res_embs = []
     embs_input = []
     pids = []
     for i, aid in enumerate(name_data.keys()):
@@ -29,13 +30,16 @@ for name in names:
             embs_input.append(cur_emb)
             pids.append(pid)
 
-    embedding = lc_input.get(name)
+
     embs_input = np.stack(embs_input)
     inter_embs = get_hidden_output(trained_global_model, embs_input)
     labels = encode_labels(pids)
 
+    for i, pid_ in enumerate(pids):
+        res_embs.append(inter_embs[i])
+
     # Clustering and save the result
-    tSNEAnanlyse(inter_embs, labels, join(settings.PIC_DIR, "OnlyTriplete", "rawReature_%s_triplet.png" % (name)))
+    tSNEAnanlyse(res_embs, labels, join(settings.PIC_DIR, "OnlyTriplete", "rawReature_%s_triplet.png" % (name)))
     tSNEAnanlyse(embs_input, labels, join(settings.PIC_DIR, "OnlyTriplete", "rawReature_%s_features.png" % (name)))
 
 
