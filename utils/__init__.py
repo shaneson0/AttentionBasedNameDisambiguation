@@ -50,6 +50,12 @@ def getSetting():
 
     return flags
 
+def encode_labels(labels):
+    classes = set(labels)
+    print ("the number of class:" , len(classes))
+    classes_dict = {c: i for i, c in enumerate(classes)}
+    rawlabels = [classes_dict[label] for label in labels]
+    return  np.array(rawlabels)
 
 from sklearn.manifold import TSNE
 def tSNEAnanlyse(emb, labels, savepath=False):
