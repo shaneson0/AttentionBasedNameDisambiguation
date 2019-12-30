@@ -12,7 +12,7 @@ global_model = GlobalTripletModel(data_scale=1000000)
 trained_global_model = global_model.load_triplets_model()
 name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
 
-names = ["gang_yin", "gang_zou", "guo_hua", "h_hu", "hai_yan_chen", "hai_yang_li"]
+names = ["gang_yin", "gang_zou", "guo_hua_zhang", "h_hu", "hai_yan_chen", "hai_yang_li"]
 
 for name in names:
     name_data = name_to_pubs_train[name]
