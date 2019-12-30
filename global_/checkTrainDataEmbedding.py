@@ -19,6 +19,7 @@ for name in names:
 
     res_embs = []
     embs_input = []
+    labels = []
     pids = []
     for i, aid in enumerate(name_data.keys()):
         if len(name_data[aid]) < 5:  # n_pubs of current author is too small
@@ -29,11 +30,12 @@ for name in names:
                 continue
             embs_input.append(cur_emb)
             pids.append(pid)
+            labels.append(aid)
 
 
     embs_input = np.stack(embs_input)
     inter_embs = get_hidden_output(trained_global_model, embs_input)
-    labels = encode_labels(pids)
+    labels = encode_labels(labels)
 
     for i, pid_ in enumerate(pids):
         res_embs.append(inter_embs[i])
