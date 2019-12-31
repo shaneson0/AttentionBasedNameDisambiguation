@@ -23,6 +23,7 @@ def testHAN():
     for name in name_to_pubs_train:
         prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
         print (name, prec, rec, f1)
+        break
 
 if __name__ == '__main__':
     testHAN()
