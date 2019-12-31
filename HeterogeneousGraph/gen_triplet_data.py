@@ -117,7 +117,7 @@ class TripletsGenerator:
 
     def getLMDBEmbedding(self, pid):
         emb1 = lc.get(pid)
-        if emb1 is None
+        if emb1 is None:
             emb1 = lc2.get(pid)
         return emb1
 
