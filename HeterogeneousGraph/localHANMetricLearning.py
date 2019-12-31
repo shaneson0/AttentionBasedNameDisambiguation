@@ -37,7 +37,7 @@ def testUser(name):
 if __name__ == '__main__':
     # testHAN()
     name = "gang_yin"
-    testHAN(name)
+    testUser(name)
 
 
 
