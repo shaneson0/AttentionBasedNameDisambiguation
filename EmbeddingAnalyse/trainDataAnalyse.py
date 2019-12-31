@@ -2,6 +2,8 @@
 from os.path import abspath, dirname, join
 from utils.cache import LMDBClient
 from utils import data_utils, settings, encode_labels, tSNEAnanlyse
+from utils import clustering, pairwise_precision_recall_f1
+
 
 rawFeatureLMDBName = "author_100.emb.weighted"
 rawFeature = LMDBClient(rawFeatureLMDBName)
@@ -40,13 +42,26 @@ for aid in cur_author:
         attentionf.append(lc_emb.get(pid))
 
 labels = encode_labels(labels)
+numberofLabels = len(set(labels))
+
+
+def clusterTest(embedding, numberofLabels):
+    clusters_pred = clustering(embedding, num_clusters=numberofLabels)
+    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+    return [prec, rec, f1]
+
 
 tSNEAnanlyse(rf, labels, join(settings.PIC_DIR, "FINALResult", "%s_rawFeature.png" % (name)))
 tSNEAnanlyse(tf, labels, join(settings.PIC_DIR, "FINALResult", "%s_tripletFeature.png" % (name)))
 tSNEAnanlyse(attentionf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbFeature.png" % (name)))
 
-res = lc_emb.get('5b5433eee1cd8e4e150b7d98-1')
-print ("res test: ", res)
+Res = {}
+Res['rawfeature'] = clusterTest(rf, numberofLabels=numberofLabels)
+Res['tripletfeature'] = clusterTest(tf, numberofLabels=numberofLabels)
+Res['lcmbfeature'] = clusterTest(attentionf, numberofLabels=numberofLabels)
+
+print ("Res: ", Res)
+
 
 
 
