@@ -26,10 +26,18 @@ def testHAN():
         print (name, prec, rec, f1)
         break
 
+def testUser(name):
+    LMDB_NAME_EMB = "lc_attention_network_embedding2"
+    lc_emb = LMDBClient(LMDB_NAME_EMB)
+    han = HAN(lc_emb)
+
+    prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
+    print (name, prec, rec, f1)
+
 if __name__ == '__main__':
-    testHAN()
-
-
+    # testHAN()
+    name = "gang_yin"
+    testHAN(name)
 
 
 
