@@ -19,7 +19,8 @@ def load_train_names():
 
 name_to_pubs_train= load_train_names()
 # for name in name_to_pubs_train:
-name = "yanjun_zhang"
+
+name = "gang_yin"
 cur_author = name_to_pubs_train[name]
 pids = []
 labels = []
