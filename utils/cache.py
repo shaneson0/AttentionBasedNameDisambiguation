@@ -25,6 +25,11 @@ class LMDBClient(object):
         else:
             return None
 
+    def getAllDataLength(self):
+        with self.db.begin() as txn:
+            length = txn.stat()['entries']
+            return length
+
     def get_batch(self, keys):
         values = []
         with self.db.begin() as txn:
