@@ -15,7 +15,7 @@ def load_train_names():
     return name_to_pubs_train
 
 
-def testHAN(name):
+def testHAN():
     LMDB_NAME_EMB = "lc_attention_network_embedding2"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
@@ -27,8 +27,7 @@ def testHAN(name):
 
 
 if __name__ == '__main__':
-
-    testHAN(name)
+    testHAN()
 
 
 
