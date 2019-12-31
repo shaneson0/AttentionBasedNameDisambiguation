@@ -17,7 +17,8 @@ def load_train_names():
 # name="kexin_xu"
 # name = "hongbin_li"
 # feiyu_kang
-name = "feiyu_kang"
+# name = "feiyu_kang"
+name = "hai_yan_chen"
 # din_ping_tsai
 
 def test(name):
