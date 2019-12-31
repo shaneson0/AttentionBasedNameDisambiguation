@@ -2,7 +2,7 @@
 from HeterogeneousGraph.HAN import HAN
 from utils.cache import LMDBClient, data_utils,settings
 
-LMDB_NAME_EMB = "lc_attention_network_embedding"
+LMDB_NAME_EMB = "lc_attention_network_embedding2"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
 print (lc_emb.getAllDataLength())
