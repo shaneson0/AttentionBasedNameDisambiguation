@@ -156,7 +156,7 @@ class HAN():
 
         self.saveFinalEmbedding(pids, attentionEmbeddings)
 
-        return prec, rec, f1
+        return prec, rec, f1, pids, attentionEmbeddings
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
