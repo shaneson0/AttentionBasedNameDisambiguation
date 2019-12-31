@@ -154,9 +154,9 @@ class HAN():
 
         prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
 
-        self.saveFinalEmbedding(pids, attentionEmbeddings)
+        # self.saveFinalEmbedding(pids, attentionEmbeddings)
 
-        return prec, rec, f1
+        return prec, rec, f1, pids, attentionEmbeddings
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
