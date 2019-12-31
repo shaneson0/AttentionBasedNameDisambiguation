@@ -117,7 +117,7 @@ class TripletsGenerator:
                 break
             emb1 = lc.get(pid1)
             emb_pos = lc.get(pid_pos)
-                emb_neg = lc.get(pid_neg)
+            emb_neg = lc.get(pid_neg)
             if emb1 is not None and emb_pos is not None and emb_neg is not None:
                 emb_q.put((emb1, emb_pos, emb_neg))
         emb_q.put((False, False, False))
