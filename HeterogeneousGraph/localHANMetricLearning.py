@@ -21,10 +21,7 @@ def testHAN():
 
     name_to_pubs_train = load_train_names()
     for name in name_to_pubs_train:
-        prec, rec, f1, pids, embedds = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
-        for pid, attentionEmbedding in zip(pids, embedds):
-            print ("pid: attentionEmbedding", pid, attentionEmbedding)
-            lc_emb.set(pid, attentionEmbedding)
+        prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
 
         print (name, prec, rec, f1)
         break
