@@ -9,7 +9,7 @@ rawFeature = LMDBClient(rawFeatureLMDBName)
 tripleteLossLMDBName = 'author_triplets.emb'
 tripletFeature = LMDBClient(tripleteLossLMDBName)
 
-LMDB_NAME_EMB = "lc_attention_network_embedding"
+LMDB_NAME_EMB = "lc_attention_network_embedding2"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
 def load_train_names():
