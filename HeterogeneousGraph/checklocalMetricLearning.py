@@ -1,4 +1,5 @@
 
+from HeterogeneousGraph.HAN import HAN
 from utils.cache import LMDBClient, data_utils,settings
 
 LMDB_NAME_EMB = "lc_attention_network_embedding"
@@ -20,3 +21,19 @@ for name in name2pubs_train:
 
 
 print ("all number of paper: ", len(set(cntpapers)))
+
+
+def testHAN():
+    han = HAN(lc_emb)
+    cntpapers = []
+
+    for name in name2pubs_train:
+        rawFeatures, labels, pids, rawlabels = han.loadFeature(name, ispretrain=True)
+        for pid in pids:
+            cntpapers.append(pid)
+
+    return len(set(cntpapers))
+
+print ("all number of train pids: ", testHAN())
+
+
