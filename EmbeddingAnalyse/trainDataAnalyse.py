@@ -27,6 +27,9 @@ for name in name_to_pubs_train:
     attentionf = []
 
     for aid in cur_author:
+        if len(cur_author[aid]) < 5:
+            continue
+
         for pid in cur_author[aid]:
             pids.append(pid)
             labels.append(aid)
