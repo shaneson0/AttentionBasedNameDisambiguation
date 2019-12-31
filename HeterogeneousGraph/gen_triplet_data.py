@@ -10,6 +10,11 @@ from utils import settings
 # LMDB_NAME = "author_100.emb.weighted"
 LMDB_NAME = "lc_attention_network_embedding"
 lc = LMDBClient(LMDB_NAME)
+
+rawFeatureEmbedding = "author_100.emb.weighted"
+lc2 = LMDBClient(rawFeatureEmbedding)
+
+
 start_time = datetime.now()
 
 """
@@ -110,14 +115,23 @@ class TripletsGenerator:
         for j in range(N_PROC):
             task_q.put((None, None, None))
 
+    def getLMDBEmbedding(self, pid):
+        emb1 = lc.get(pid)
+        if emb1 is None
+            emb1 = lc2.get(pid)
+        return emb1
+
     def gen_emb_mp(self, task_q, emb_q):
         while True:
             pid1, pid_pos, pid_neg = task_q.get()
             if pid1 is None:
                 break
-            emb1 = lc.get(pid1)
-            emb_pos = lc.get(pid_pos)
-            emb_neg = lc.get(pid_neg)
+            emb1 = self.getLMDBEmbedding(pid1)
+            emb_pos = self.getLMDBEmbedding(pid_pos)
+            emb_neg = self.getLMDBEmbedding(pid_neg)
+            # emb1 = lc.get(pid1)
+            # emb_pos = lc.get(pid_pos)
+            # emb_neg = lc.get(pid_neg)
             if emb1 is not None and emb_pos is not None and emb_neg is not None:
                 emb_q.put((emb1, emb_pos, emb_neg))
         emb_q.put((False, False, False))

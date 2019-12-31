@@ -19,7 +19,7 @@ def dump_inter_emb():
     dump hidden embedding via trained global_ model for local model to use
     """
     Res = defaultdict(list)
-    LMDB_NAME = "lc_attention_network_embedding"
+    LMDB_NAME = "author_100.emb.weighted"
     lc_input = LMDBClient(LMDB_NAME)
     INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
     lc_inter = LMDBClient(INTER_LMDB_NAME)
