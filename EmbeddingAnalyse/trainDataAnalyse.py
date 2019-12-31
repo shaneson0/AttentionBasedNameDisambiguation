@@ -22,7 +22,7 @@ def load_train_names():
 name_to_pubs_train= load_train_names()
 # for name in name_to_pubs_train:
 
-name = "gang_yin"
+name = "hai_yan_chen"
 cur_author = name_to_pubs_train[name]
 pids = []
 labels = []
@@ -68,8 +68,8 @@ print ("Res: ", Res)
 
 
 
-
-
+# gang_yin
+# Res:  {'rawfeature': [0.6346938775510204, 0.3823770491803279, 0.47723785166240407], 'tripletfeature': [0.8391248391248392, 0.5344262295081967, 0.6529794692038057], 'lcmbfeature': [0.9170305676855895, 0.860655737704918, 0.8879492600422833]}
 
 
 
