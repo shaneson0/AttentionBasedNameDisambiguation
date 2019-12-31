@@ -25,7 +25,7 @@ featype = 'fea'
 
 # training params
 batch_size = 1
-nb_epochs = 500
+nb_epochs = 300
 patience = 100
 lr = 0.01  # learning rate
 l2_coef = 0.0001  # weight decay
@@ -134,7 +134,7 @@ class HAN():
         return rownetworks, truefeatures_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask
 
 
-    def prepare_and_train(self, name = 'hongbin_li', ispretrain=False):
+    def prepare_and_train(self, name = 'hongbin_li', ispretrain=False, needtSNE=True):
         self.name = name
         # loadData(name)
         rawFeatures, labels, pids, rawlabels = self.loadFeature(name, ispretrain=ispretrain)
@@ -151,23 +151,16 @@ class HAN():
         #  truelabels, truefeatures, PAP, PSP, train_idx, val_idx, test_idx, allIdx
 
         adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask = self.load_data_dblp(labels, rawlabels,  rawFeatures, PAP, PSP, X_train, X_val, X_test, Allidx)
-        print (test_mask)
-        print (all_mask)
-        print (y_all)
-        print ("adj_list: ", fea_list)
 
-        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=True, rawFeature=rawFeatures)
-        # # print ("labels: ", rawlabels)
-        #
-        # print ("save final embedding")
-        # self.saveFinalEmbedding(pids, attentionEmbeddings)
+        prec, rec, f1, attentionEmbeddings = self.train(adj_list, fea_list, y_train, y_val, y_test, train_mask, val_mask, test_mask, y_all, all_mask, rawlabels, needtSNE=needtSNE, rawFeature=rawFeatures)
+
+        self.saveFinalEmbedding(pids, attentionEmbeddings)
 
         return prec, rec, f1
 
     def saveFinalEmbedding(self, pids, attentionEmbeddings):
 
         for pid, attentionEmbedding in zip(pids, attentionEmbeddings):
-            # lc_emb.set(pid_order, cur_emb)
             self.lc_attention.set(pid, attentionEmbedding)
 
     def pretrain(self, name = 'hongbin_li'):
@@ -578,10 +571,7 @@ class HAN():
                     tSNEAnanlyse(xx, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_final.png" % (self.name)))
                     tSNEAnanlyse(rawFeature, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_features.png" % (self.name)))
                     tSNEAnanlyse(xx2, labels, join(settings.PIC_DIR, "HAN", "rawReature_%s_xx2.png" % (self.name)))
-                    tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
-
-
-                # lc load
+                    tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name))
 
 
 
