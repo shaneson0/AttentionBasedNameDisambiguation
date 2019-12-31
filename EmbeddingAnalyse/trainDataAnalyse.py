@@ -44,6 +44,10 @@ tSNEAnanlyse(rf, labels, join(settings.PIC_DIR, "FINALResult", "%s_rawFeature.pn
 tSNEAnanlyse(tf, labels, join(settings.PIC_DIR, "FINALResult", "%s_tripletFeature.png" % (name)))
 tSNEAnanlyse(attentionf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbFeature.png" % (name)))
 
+res = lc_emb.get('5b5433eee1cd8e4e150b7d98-1')
+print ("res test: ", res)
+
+
 
 
 
