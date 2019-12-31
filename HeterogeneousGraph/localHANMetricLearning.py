@@ -14,7 +14,6 @@ def load_train_names():
     name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
     return name_to_pubs_train
 
-
 def testHAN():
     LMDB_NAME_EMB = "lc_attention_network_embedding2"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
@@ -24,7 +23,6 @@ def testHAN():
     for name in name_to_pubs_train:
         prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
         print (name, prec, rec, f1)
-
 
 if __name__ == '__main__':
     testHAN()

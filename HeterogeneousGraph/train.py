@@ -33,7 +33,6 @@ def testHAN(name):
     han = HAN(lc_emb)
     start = False
 
-
     name_to_pubs_train = load_train_names()
     for name in name_to_pubs_train:
         if name == 'din_ping_tsai':
@@ -43,8 +42,17 @@ def testHAN(name):
             prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
             print (name, prec, rec, f1)
 
+def testDataRun():
+    LMDB_NAME_EMB = "graph_auto_encoder_embedding"
+    lc_emb = LMDBClient(LMDB_NAME_EMB)
+    han = HAN(lc_emb)
+    name_to_pubs_test = load_test_names()
+    for name in name_to_pubs_test:
+        prec, rec, f1 = han.prepare_and_train(name=name, needtSNE=True)
+        print (name, prec, rec, f1)
+        break
 
-    #
+
 
 def main():
     names = load_test_names()

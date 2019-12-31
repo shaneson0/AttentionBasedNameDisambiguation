@@ -574,8 +574,6 @@ class HAN():
                     tSNEAnanlyse(xx, clusters_pred, join(settings.PIC_DIR, "HAN", "rawReature_%s_result_label.png" % (self.name)))
 
 
-
-
                 sess.close()
 
         return prec, rec, f1, xx2
