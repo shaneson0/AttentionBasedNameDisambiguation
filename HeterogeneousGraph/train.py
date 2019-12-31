@@ -84,8 +84,7 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-
-    testHAN(name)
+    testDataRun()
 
 
 
