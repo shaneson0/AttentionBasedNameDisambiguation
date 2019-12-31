@@ -22,9 +22,7 @@ def testHAN():
     name_to_pubs_train = load_train_names()
     for name in name_to_pubs_train:
         prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
-
         print (name, prec, rec, f1)
-        break
 
 def testUser(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding2"
@@ -35,9 +33,9 @@ def testUser(name):
     print (name, prec, rec, f1)
 
 if __name__ == '__main__':
-    # testHAN()
-    name = "hai_yan_chen"
-    testUser(name)
+    testHAN()
+    # name = "hai_yan_chen"
+    # testUser(name)
 
 
 
