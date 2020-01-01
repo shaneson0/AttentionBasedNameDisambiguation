@@ -8,7 +8,7 @@ from utils import data_utils
 from utils import settings
 
 # LMDB_NAME = "author_100.emb.weighted"
-LMDB_NAME = "lc_attention_network_embedding"
+LMDB_NAME = "lc_attention_network_embedding2"
 lc = LMDBClient(LMDB_NAME)
 
 rawFeatureEmbedding = "author_100.emb.weighted"
