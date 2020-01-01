@@ -105,7 +105,6 @@ def getNewClusterLabel(emb, initClusterlabel, NumberOfCluster):
 def train(name, needtSNE=False, savefile=True):
     adj, adj2, features, labels, Clusterlabels, Ids = load_local_data(name=name)
 
-
     initClusterlabel = Clusterlabels
     oneHotClusterLabels = toOneHot(Clusterlabels)
     num_logits = len(oneHotClusterLabels[0])
@@ -306,8 +305,8 @@ def main():
     wf.close()
 
 if __name__ == '__main__':
-    # main()
-    train('kexin_xu', needtSNE=True, savefile=True)
+    main()
+    # train('kexin_xu', needtSNE=True, savefile=True)
     # test('kexin_xu')
     # train('hongbin_li', needtSNE=True, savefile=True)
     # test('hongbin_li')
