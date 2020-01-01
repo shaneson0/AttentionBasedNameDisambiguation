@@ -28,7 +28,7 @@ def test(name):
     prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=True)
     print (name, prec, rec, f1)
 
-def testHAN(name):
+def testHAN():
     LMDB_NAME_EMB = "lc_attention_network_embedding"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
@@ -49,9 +49,10 @@ def testDataRun():
     han = HAN(lc_emb)
     name_to_pubs_test = load_test_names()
     for name in name_to_pubs_test:
-        prec, rec, f1 = han.prepare_and_train(name=name, needtSNE=True)
+        prec, rec, f1, pids, attentionEmbeddings = han.prepare_and_train(name=name, needtSNE=True)
         print (name, prec, rec, f1)
-        break
+        for pid, embedding in zip(pids, attentionEmbeddings):
+            lc_emb.set(pid, embedding)
 
 
 
