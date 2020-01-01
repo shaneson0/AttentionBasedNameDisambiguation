@@ -44,6 +44,9 @@ def testHAN():
             print (name, prec, rec, f1)
 
 def testDataRun():
+    cnt = 0
+    metrics = np.zeros(3)
+    wf = codecs.open(join(settings.OUT_DIR, 'local_clustering_results.csv'), 'w', encoding='utf-8')
     LMDB_NAME_EMB = "graph_auto_encoder_embedding"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
@@ -51,9 +54,24 @@ def testDataRun():
     for name in name_to_pubs_test:
         prec, rec, f1, pids, attentionEmbeddings = han.prepare_and_train(name=name, needtSNE=True)
         print (name, prec, rec, f1)
+        wf.write('{0},{1:.5f},{2:.5f},{3:.5f}\n'.format(
+            name, prec, rec, f1))
+        wf.flush()
+
+        metrics[0] = metrics[0] + prec
+        metrics[1] = metrics[1] + rec
+        metrics[2] = metrics[2] + f1
+        cnt += 1
+
         for pid, embedding in zip(pids, attentionEmbeddings):
             lc_emb.set(pid, embedding)
 
+    macro_prec = metrics[0] / cnt
+    macro_rec = metrics[1] / cnt
+    macro_f1 = eval_utils.cal_f1(macro_prec, macro_rec)
+    wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}\n'.format(
+        macro_prec, macro_rec, macro_f1))
+    wf.close()
 
 
 def main():
