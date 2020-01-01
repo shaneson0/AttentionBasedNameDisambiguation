@@ -26,26 +26,27 @@ def dump_inter_emb():
     lc_inter = LMDBClient(INTER_LMDB_NAME)
     global_model = GlobalTripletModel(data_scale=1000000)
     trained_global_model = global_model.load_triplets_model()
-    name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
-    # print(name_to_pubs_test)
-    for name in name_to_pubs_test:
-        name_data = name_to_pubs_test[name]
-        embs_input = []
-        pids = []
-        for i, aid in enumerate(name_data.keys()):
-            if len(name_data[aid]) < 5:  # n_pubs of current author is too small
-                continue
-            for pid in name_data[aid]:
-                cur_emb = lc_input.get(pid)
-                if cur_emb is None:
-                    continue
-                embs_input.append(cur_emb)
-                pids.append(pid)
-        embs_input = np.stack(embs_input)
-        inter_embs = get_hidden_output(trained_global_model, embs_input)
-        for i, pid_ in enumerate(pids):
-            lc_inter.set(pid_, inter_embs[i])
-            Res[pid_].append(inter_embs[i])
+
+    # name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
+    # # print(name_to_pubs_test)
+    # for name in name_to_pubs_test:
+    #     name_data = name_to_pubs_test[name]
+    #     embs_input = []
+    #     pids = []
+    #     for i, aid in enumerate(name_data.keys()):
+    #         if len(name_data[aid]) < 5:  # n_pubs of current author is too small
+    #             continue
+    #         for pid in name_data[aid]:
+    #             cur_emb = lc_input.get(pid)
+    #             if cur_emb is None:
+    #                 continue
+    #             embs_input.append(cur_emb)
+    #             pids.append(pid)
+    #     embs_input = np.stack(embs_input)
+    #     inter_embs = get_hidden_output(trained_global_model, embs_input)
+    #     for i, pid_ in enumerate(pids):
+    #         lc_inter.set(pid_, inter_embs[i])
+    #         Res[pid_].append(inter_embs[i])
 
     name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
     for name in name_to_pubs_train:
