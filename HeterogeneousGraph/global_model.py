@@ -95,6 +95,11 @@ class GlobalTripletModel:
         )([pos_dist, neg_dist])
 
         model = Model([emb_anchor, emb_pos, emb_neg], stacked_dists, name='triple_siamese')
+        import time
+        model.summary()
+        time.sleep(5.5)
+
+
         model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
         inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
