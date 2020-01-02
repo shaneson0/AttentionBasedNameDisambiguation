@@ -148,7 +148,7 @@ def gae_for_na(name):
 
 
 def load_test_names():
-    return load_json(settings.DATA_DIR, 'test_name_list.json')
+    return load_json(settings.DATA_DIR, 'test_name_list2.json')
 
 
 def main():
