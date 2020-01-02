@@ -73,13 +73,13 @@ def clusterTest(embedding, numberofLabels):
 tSNEAnanlyse(rf, labels, join(settings.PIC_DIR, "FINALResult", "%s_rawFeature.png" % (name)))
 tSNEAnanlyse(tf, labels, join(settings.PIC_DIR, "FINALResult", "%s_tripletFeature.png" % (name)))
 tSNEAnanlyse(attentionf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbFeature.png" % (name)))
-tSNEAnanlyse(transferEmbedding, labels, join(settings.PIC_DIR, "FINALResult", "%s_transferFeature.png" % (name)))
+tSNEAnanlyse(transferF, labels, join(settings.PIC_DIR, "FINALResult", "%s_transferFeature.png" % (name)))
 
 Res = {}
 Res['rawfeature'] = clusterTest(rf, numberofLabels=numberofLabels)
 Res['tripletfeature'] = clusterTest(tf, numberofLabels=numberofLabels)
 Res['lcmbfeature'] = clusterTest(attentionf, numberofLabels=numberofLabels)
-Res['transferfeature'] = clusterTest(transferEmbedding, numberofLabels=numberofLabels)
+Res['transferfeature'] = clusterTest(transferF, numberofLabels=numberofLabels)
 
 print ("Res: ", Res)
 
