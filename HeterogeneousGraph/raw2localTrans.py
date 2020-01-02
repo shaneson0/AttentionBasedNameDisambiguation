@@ -76,5 +76,7 @@ raw2localTrans.fit(X_train, y_train,
                 validation_data=(X_val, y_val))
 
 
-raw2localTrans.evaluate(X_test, y_test)
+res = raw2localTrans.evaluate(X_test, y_test)
+
+print (res)
 
