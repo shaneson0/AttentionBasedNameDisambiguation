@@ -107,6 +107,7 @@ lc_emb = LMDBClient(LMDB_NAME_EMB)
 
 for idx, pid in enumerate(TestDataEmbedding):
     print (idx, pid)
-    # lc_emb.set(pid, embedd)
+    embedd = lc_emb[idx]
+    lc_emb.set(pid, embedd.tolist())
 
 print ("done")
