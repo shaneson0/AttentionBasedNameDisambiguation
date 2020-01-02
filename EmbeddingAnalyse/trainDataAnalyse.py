@@ -11,29 +11,38 @@ rawFeature = LMDBClient(rawFeatureLMDBName)
 tripleteLossLMDBName = 'author_triplets.emb'
 tripletFeature = LMDBClient(tripleteLossLMDBName)
 
-LMDB_NAME_EMB = "lc_attention_network_embedding2"
+# LMDB_NAME_EMB = "lc_attention_network_embedding2"
+LMDB_NAME_EMB = "triplete_loss_lc_attention_network_embedding"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
-LMDB_NAME_EMB = "triplete_loss_lc_attention_network_embedding"
-lc_triplet_emb = LMDBClient(LMDB_NAME_EMB)
+# LMDB_NAME_EMB = "triplete_loss_lc_attention_network_embedding"
+# lc_triplet_emb = LMDBClient(LMDB_NAME_EMB)
 
 def load_train_names():
     name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
     return name_to_pubs_train
 
+def load_test_names():
+    name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
+    return name_to_pubs_test
 
-name_to_pubs_train= load_train_names()
+
+# name_to_pubs_train= load_train_names()
+name_to_pubs_test= load_test_names()
 # for name in name_to_pubs_train:
 
 # name = "hai_yan_chen"
-name = "gang_yin"
-cur_author = name_to_pubs_train[name]
+# name = "gang_yin"
+name = "hongbin_li"
+
+
+cur_author = name_to_pubs_test[name]
 pids = []
 labels = []
 rf = []
 tf = []
 attentionf = []
-attentionTripletf = []
+# attentionTripletf = []
 
 for aid in cur_author:
     if len(cur_author[aid]) < 5:
@@ -45,7 +54,7 @@ for aid in cur_author:
         rf.append(rawFeature.get(pid))
         tf.append(tripletFeature.get(pid))
         attentionf.append(lc_emb.get(pid))
-        attentionTripletf.append(lc_triplet_emb.get(pid))
+        # attentionTripletf.append(lc_triplet_emb.get(pid))
 
 labels = encode_labels(labels)
 numberofLabels = len(set(labels))
@@ -60,13 +69,13 @@ def clusterTest(embedding, numberofLabels):
 tSNEAnanlyse(rf, labels, join(settings.PIC_DIR, "FINALResult", "%s_rawFeature.png" % (name)))
 tSNEAnanlyse(tf, labels, join(settings.PIC_DIR, "FINALResult", "%s_tripletFeature.png" % (name)))
 tSNEAnanlyse(attentionf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbFeature.png" % (name)))
-tSNEAnanlyse(attentionTripletf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbTripletFeature.png" % (name)))
+# tSNEAnanlyse(attentionTripletf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbTripletFeature.png" % (name)))
 
 Res = {}
 Res['rawfeature'] = clusterTest(rf, numberofLabels=numberofLabels)
 Res['tripletfeature'] = clusterTest(tf, numberofLabels=numberofLabels)
 Res['lcmbfeature'] = clusterTest(attentionf, numberofLabels=numberofLabels)
-Res['lcmbTripletefeature'] = clusterTest(attentionTripletf, numberofLabels=numberofLabels)
+# Res['lcmbTripletefeature'] = clusterTest(attentionTripletf, numberofLabels=numberofLabels)
 
 print ("Res: ", Res)
 
