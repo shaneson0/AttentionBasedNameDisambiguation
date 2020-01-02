@@ -32,15 +32,16 @@ lc_emb = LMDBClient(LMDB_NAME_EMB)
 
 
 def getPids():
-    pids = []
-    name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
-    for name in name_to_pubs_train:
-        for aid in name_to_pubs_train[name]:
-            if len(name_to_pubs_train[name]) < 5:
+    name2pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')  # for test
+    cntpapers = []
+    for name in name2pubs_train:
+        papers = name2pubs_train[name]
+        for aid in papers:
+            if len(papers[aid]) < 5:
                 continue
-            for pid in name_to_pubs_train[name][aid]:
-                pids.append(pid)
-    return pids
+            for pid in papers[aid]:
+                cntpapers.append(pid)
+    return cntpapers
 
 def getRawEmbedding(pids):
     rawEmbedding = []
@@ -54,6 +55,7 @@ def getlocalTransEmbedding(pids):
     TransEmbedding = []
     for pid in pids:
         emb = lc_emb.get(pid)
+        if emb
         TransEmbedding.append(emb.reshape(1,-1))
     TransEmbedding = np.array(TransEmbedding)
     TransEmbedding.reshape(-1,1)
