@@ -2,7 +2,8 @@ from os.path import join
 import numpy as np
 import scipy.sparse as sp
 from utils import settings
-from global_.prepare_local_data import IDF_THRESHOLD
+# from global_.prepare_local_data import IDF_THRESHOLD
+IDF_THRESHOLD = 10
 
 local_na_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(IDF_THRESHOLD))
 
