@@ -78,5 +78,36 @@ raw2localTrans.fit(X_train, y_train,
 
 res = raw2localTrans.evaluate(X_test, y_test)
 
-print (res)
+# ============= get test data new embedding ============
 
+def load_test_names():
+    name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
+    return name_to_pubs_test
+
+TestDataPids = []
+name_to_test = load_test_names()
+for name in name_to_test:
+    for aid in name_to_test[name]:
+        if len(name_to_test[name][aid]) < 5:
+            for pid in name_to_test[name][aid]:
+                TestDataPids.append(pid)
+
+
+def getRawEmbedding(pids):
+    rawEmbedding = []
+    for pid in pids:
+        rawEmbedding.append(rawFeature.get(pid))
+    rawEmbedding = np.array(rawEmbedding)
+    rawEmbedding.reshape(-1,1)
+    return rawEmbedding
+
+TestDataEmbedding = getRawEmbedding(TestDataPids)
+transformEmbedding = rawFeatureLMDBName.predict(TestDataEmbedding)
+
+LMDB_NAME_EMB = "raw_transform_local_embedding"
+lc_emb = LMDBClient(LMDB_NAME_EMB)
+
+for pid, embedd in zip(TestDataEmbedding, transformEmbedding):
+    lc_emb.set(pid, embedd)
+
+print ("done")
