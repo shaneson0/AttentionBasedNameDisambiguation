@@ -70,7 +70,7 @@ X_train, X_test, y_train, y_test = train_test_split(rawEmbedding, TransEmbedding
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
 
 raw2localTrans.fit(X_train, y_train,
-                epochs=25,
+                epochs=50,
                 batch_size=256,
                 shuffle=True,
                 validation_data=(X_val, y_val))
@@ -110,7 +110,7 @@ lc_emb = LMDBClient(LMDB_NAME_EMB)
 # print (transformEmbedding)
 
 for pid, embedd in zip(TestDataEmbedding, transformEmbedding):
-    print (pid, embedd)
+    # print (pid, embedd)
     # lc_emb.set(pid, np.array(embedd))
 
 print ("done")
