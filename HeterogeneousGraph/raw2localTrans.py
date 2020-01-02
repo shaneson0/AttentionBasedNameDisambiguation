@@ -67,8 +67,15 @@ TransEmbedding = getlocalTransEmbedding(pids)
 
 print (rawEmbedding.shape)
 print (TransEmbedding.shape)
-
 print (TransEmbedding)
+print (rawEmbedding)
+
+
+
+
+
+
+
 
 # raw2localTrans.fit(X_train, y_train,
 #                 epochs=50,
