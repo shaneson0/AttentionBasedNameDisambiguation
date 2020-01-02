@@ -36,6 +36,8 @@ def getPids():
     name_to_pubs_train = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_train_500.json')
     for name in name_to_pubs_train:
         for aid in name_to_pubs_train[name]:
+            if len(name_to_pubs_train[name]) < 5:
+                continue
             for pid in name_to_pubs_train[name][aid]:
                 pids.append(pid)
     return pids
@@ -51,7 +53,7 @@ def getRawEmbedding(pids):
 def getlocalTransEmbedding(pids):
     TransEmbedding = []
     for pid in pids:
-        TransEmbedding.append(list(lc_emb.get(pid)))
+        TransEmbedding.append(lc_emb.get(pid))
     TransEmbedding = np.array(TransEmbedding)
     TransEmbedding.reshape(-1,1)
     return TransEmbedding
