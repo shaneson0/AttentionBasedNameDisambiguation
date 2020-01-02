@@ -25,7 +25,7 @@ def test(name):
     LMDB_NAME_EMB = "lc_attention_network_embedding"
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
-    prec, rec, f1 = han.prepare_and_train(name=name, ispretrain=False, needtSNE=True)
+    prec, rec, f1, pids, embedding = han.prepare_and_train(name=name, ispretrain=False, needtSNE=True)
     print (name, prec, rec, f1)
 
 def testHAN():
