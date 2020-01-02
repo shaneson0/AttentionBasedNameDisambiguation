@@ -116,17 +116,17 @@ class TripletsGenerator:
             task_q.put((None, None, None))
 
     def getLMDBEmbedding(self, pid):
-        emb1 = lc.get(pid)
-        if emb1 is None:
-            emb1 = lc2.get(pid)
-        return emb1
+        return lc.get(pid)
+
+    def getAnchorEmbedding(self, pid):
+        return lc2.get(pid)
 
     def gen_emb_mp(self, task_q, emb_q):
         while True:
             pid1, pid_pos, pid_neg = task_q.get()
             if pid1 is None:
                 break
-            emb1 = self.getLMDBEmbedding(pid1)
+            emb1 = self.getAnchorEmbedding(pid1)
             emb_pos = self.getLMDBEmbedding(pid_pos)
             emb_neg = self.getLMDBEmbedding(pid_neg)
             # emb1 = lc.get(pid1)
