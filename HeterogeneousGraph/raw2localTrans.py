@@ -70,11 +70,11 @@ X_train, X_test, y_train, y_test = train_test_split(rawEmbedding, TransEmbedding
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
 
 raw2localTrans.fit(X_train, y_train,
-                epochs=50,
+                epochs=25,
                 batch_size=256,
                 shuffle=True,
                 validation_data=(X_val, y_val))
 
 
-
+raw2localTrans.evaluate(X_test, y_test)
 
