@@ -5,7 +5,7 @@ from keras.layers import Input, Dense, Dropout
 from utils import data_utils, settings
 from utils.cache import LMDBClient
 from sklearn.model_selection import train_test_split
-from numpy as np
+import numpy as np
 
 input_dim = 100
 
