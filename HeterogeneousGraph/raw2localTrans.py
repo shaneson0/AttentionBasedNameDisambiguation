@@ -85,8 +85,9 @@ name_to_test = load_test_names()
 for name in name_to_test:
     for aid in name_to_test[name]:
         if len(name_to_test[name][aid]) < 5:
-            for pid in name_to_test[name][aid]:
-                TestDataPids.append(pid)
+            continue
+        for pid in name_to_test[name][aid]:
+            TestDataPids.append(pid)
 
 
 def getRawEmbedding(pids):
