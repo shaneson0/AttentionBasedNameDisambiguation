@@ -11,11 +11,7 @@ input_dim = 100
 
 input = Input(shape=(input_dim,))
 d1 = Dense(50, activation='tanh')(input)
-dr1 = Dropout(0.25)(d1)
-d2 = Dense(25, activation='tanh')(dr1)
-dr2 = Dropout(0.25)(d2)
-d3 = Dense(50, activation='tanh')(dr2)
-dr3 = Dropout(0.25)(d3)
+dr3 = Dropout(0.25)(d1)
 output = Dense(input_dim, activation='tanh')(dr3)
 
 raw2localTrans = Model(input,output)
