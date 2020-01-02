@@ -1,3 +1,4 @@
+# coding=utf-8
 from os.path import join
 import os
 import numpy as np
@@ -10,8 +11,8 @@ from utils import settings, string_utils
 from collections import defaultdict
 
 IDLength = 24
-# IDF_THRESHOLD = 32  # small data
-IDF_THRESHOLD = 10
+IDF_THRESHOLD = 32  # small data
+# IDF_THRESHOLD = 10
 
 
 def dump_inter_emb():
@@ -148,7 +149,8 @@ def gen_local_data(idf_threshold=10):
                 for f in common_features:
                     idf_sum += idf.get(f, idf_threshold)
                     # print(f, idf.get(f, idf_threshold))
-                if idf_sum >= idf_threshold:
+
+                if idf_sum >= 10:
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
         wf_network.close()
 
