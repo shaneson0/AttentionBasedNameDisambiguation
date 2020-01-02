@@ -5,6 +5,7 @@ from keras.layers import Input, Dense, Dropout
 from utils import data_utils, settings
 from utils.cache import LMDBClient
 from sklearn.model_selection import train_test_split
+from numpy as np
 
 input_dim = 100
 
@@ -43,12 +44,16 @@ def getRawEmbedding(pids):
     rawEmbedding = []
     for pid in pids:
         rawEmbedding.append(rawFeature.get(pid))
+    rawEmbedding = np.array(rawEmbedding)
+    rawEmbedding.reshape(-1,1)
     return rawEmbedding
 
 def getlocalTransEmbedding(pids):
     TransEmbedding = []
     for pid in pids:
         TransEmbedding.append(lc_emb.get(pid))
+    TransEmbedding = np.array(TransEmbedding)
+    TransEmbedding.reshape(-1,1)
     return TransEmbedding
 
 
