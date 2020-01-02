@@ -108,6 +108,6 @@ LMDB_NAME_EMB = "raw_transform_local_embedding"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
 for pid, embedd in zip(TestDataEmbedding, transformEmbedding):
-    lc_emb.set(pid, embedd)
+    lc_emb.set(pid, list(embedd))
 
 print ("done")
