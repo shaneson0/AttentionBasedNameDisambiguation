@@ -127,8 +127,8 @@ class TripletsGenerator:
             if pid1 is None:
                 break
             emb1 = self.getAnchorEmbedding(pid1)
-            emb_pos = self.getLMDBEmbedding(pid_pos)
-            emb_neg = self.getLMDBEmbedding(pid_neg)
+            emb_pos = self.getAnchorEmbedding(pid_pos)
+            emb_neg = self.getAnchorEmbedding(pid_neg)
             # emb1 = lc.get(pid1)
             # emb_pos = lc.get(pid_pos)
             # emb_neg = lc.get(pid_neg)
