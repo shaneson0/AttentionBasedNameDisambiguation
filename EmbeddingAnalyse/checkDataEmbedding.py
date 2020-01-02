@@ -44,7 +44,7 @@ for name in names:
     tSNEAnanlyse(features, rawlabels, join(settings.PIC_DIR, "MetricLearning", "rawReature_%s_train.png" % (name)))
     numberofLabels = len(set(rawlabels))
     clusters_pred = clustering(features, num_clusters=numberofLabels)
-    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, labels)
+    prec, rec, f1 = pairwise_precision_recall_f1(clusters_pred, rawlabels)
     Res[name] = {"prec": prec, "rec": rec, "f1": f1}
 
 
