@@ -44,7 +44,7 @@ Res = {}
 
 names = load_test_names()
 for name in names:
-    features, labels, pids, rawlabels = load_test_names()
+    features, labels, pids, rawlabels = loadFeature(name, ispretrain=False)
     tSNEAnanlyse(features, rawlabels, join(settings.PIC_DIR, "MetricLearning", "rawReature_%s_train.png" % (name)))
     numberofLabels = len(set(rawlabels))
     clusters_pred = clustering(features, num_clusters=numberofLabels)
