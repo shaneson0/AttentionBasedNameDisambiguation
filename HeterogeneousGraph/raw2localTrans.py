@@ -55,7 +55,7 @@ def getlocalTransEmbedding(pids):
     TransEmbedding = []
     for pid in pids:
         emb = lc_emb.get(pid)
-        TransEmbedding.append(emb.reshape(1,-1))
+        TransEmbedding.append(list(emb))
     TransEmbedding = np.array(TransEmbedding)
     TransEmbedding.reshape(-1,1)
     return TransEmbedding
