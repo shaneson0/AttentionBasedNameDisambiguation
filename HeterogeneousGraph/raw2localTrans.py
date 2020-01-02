@@ -102,7 +102,7 @@ def getRawEmbedding(pids):
     return rawEmbedding
 
 TestDataEmbedding = getRawEmbedding(TestDataPids)
-transformEmbedding = rawFeatureLMDBName.predict(TestDataEmbedding)
+transformEmbedding = raw2localTrans.predict(TestDataEmbedding)
 
 LMDB_NAME_EMB = "raw_transform_local_embedding"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
