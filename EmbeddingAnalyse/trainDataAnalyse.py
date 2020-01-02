@@ -15,6 +15,9 @@ tripletFeature = LMDBClient(tripleteLossLMDBName)
 LMDB_NAME_EMB = "triplete_loss_lc_attention_network_embedding"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
+LMDB_NAME_EMB = "raw_transform_local_embedding"
+transferEmbedding = LMDBClient(LMDB_NAME_EMB)
+
 # LMDB_NAME_EMB = "triplete_loss_lc_attention_network_embedding"
 # lc_triplet_emb = LMDBClient(LMDB_NAME_EMB)
 
@@ -33,8 +36,8 @@ name_to_pubs_test= load_test_names()
 
 # name = "hai_yan_chen"
 # name = "gang_yin"
-# name = "hongbin_li"
-name = "kexin_xu"
+name = "hongbin_li"
+# name = "kexin_xu"
 
 
 cur_author = name_to_pubs_test[name]
@@ -43,7 +46,7 @@ labels = []
 rf = []
 tf = []
 attentionf = []
-# attentionTripletf = []
+transferF = []
 
 for aid in cur_author:
     if len(cur_author[aid]) < 5:
@@ -55,7 +58,7 @@ for aid in cur_author:
         rf.append(rawFeature.get(pid))
         tf.append(tripletFeature.get(pid))
         attentionf.append(lc_emb.get(pid))
-        # attentionTripletf.append(lc_triplet_emb.get(pid))
+        transferF.append(transferEmbedding.get(pid))
 
 labels = encode_labels(labels)
 numberofLabels = len(set(labels))
@@ -70,13 +73,13 @@ def clusterTest(embedding, numberofLabels):
 tSNEAnanlyse(rf, labels, join(settings.PIC_DIR, "FINALResult", "%s_rawFeature.png" % (name)))
 tSNEAnanlyse(tf, labels, join(settings.PIC_DIR, "FINALResult", "%s_tripletFeature.png" % (name)))
 tSNEAnanlyse(attentionf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbFeature.png" % (name)))
-# tSNEAnanlyse(attentionTripletf, labels, join(settings.PIC_DIR, "FINALResult", "%s_lcmbTripletFeature.png" % (name)))
+tSNEAnanlyse(transferEmbedding, labels, join(settings.PIC_DIR, "FINALResult", "%s_transferFeature.png" % (name)))
 
 Res = {}
 Res['rawfeature'] = clusterTest(rf, numberofLabels=numberofLabels)
 Res['tripletfeature'] = clusterTest(tf, numberofLabels=numberofLabels)
 Res['lcmbfeature'] = clusterTest(attentionf, numberofLabels=numberofLabels)
-# Res['lcmbTripletefeature'] = clusterTest(attentionTripletf, numberofLabels=numberofLabels)
+Res['transferfeature'] = clusterTest(transferEmbedding, numberofLabels=numberofLabels)
 
 print ("Res: ", Res)
 
