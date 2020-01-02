@@ -10,13 +10,13 @@ import numpy as np
 input_dim = 100
 
 input = Input(shape=(input_dim,))
-d1 = Dense(50)(input)
+d1 = Dense(50, activation='tanh')(input)
 dr1 = Dropout(0.25)(d1)
-d2 = Dense(25)(dr1)
+d2 = Dense(25, activation='tanh')(dr1)
 dr2 = Dropout(0.25)(d2)
-d3 = Dense(50)(dr2)
+d3 = Dense(50, activation='tanh')(dr2)
 dr3 = Dropout(0.25)(d3)
-output = Dense(input_dim)(dr3)
+output = Dense(input_dim, activation='tanh')(dr3)
 
 raw2localTrans = Model(input,output)
 raw2localTrans.compile(optimizer='adadelta', loss='binary_crossentropy')
@@ -107,9 +107,10 @@ transformEmbedding = raw2localTrans.predict(TestDataEmbedding)
 LMDB_NAME_EMB = "raw_transform_local_embedding"
 lc_emb = LMDBClient(LMDB_NAME_EMB)
 
-print (transformEmbedding)
+# print (transformEmbedding)
 
 for pid, embedd in zip(TestDataEmbedding, transformEmbedding):
-    lc_emb.set(pid, np.array(embedd))
+    print (pid, embedd)
+    # lc_emb.set(pid, np.array(embedd))
 
 print ("done")
