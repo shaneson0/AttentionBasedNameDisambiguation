@@ -13,12 +13,11 @@ def encode_labels(labels):
     classes_dict = {c: i for i, c in enumerate(classes)}
     return list(map(lambda x: classes_dict[x], labels))
 
-
 def load_local_data(path=local_na_dir, name='cheng_cheng'):
     # Load local paper network dataset
     print('Loading {} dataset...'.format(name), 'path=', path)
 
-    idx_features_labels = np.genfromtxt(join(path, "{}_pubs_content.txt".format(name)), dtype=np.dtype(str))
+    idx_features_labels = np.genfromtxt(join(path, "local" , "{}_pubs_content.txt".format(name)), dtype=np.dtype(str))
     features = np.array(idx_features_labels[:, 1:-1], dtype=np.float32)  # sparse?
     labels = encode_labels(idx_features_labels[:, -1])
 
@@ -37,6 +36,7 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
     print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
 
     return adj, features, labels
+
 
 
 if __name__ == '__main__':

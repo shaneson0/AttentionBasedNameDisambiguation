@@ -23,6 +23,7 @@ from utils.data_utils import load_json
 from utils.eval_utils import pairwise_precision_recall_f1, cal_f1
 from utils import settings
 
+
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
