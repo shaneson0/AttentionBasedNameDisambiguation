@@ -65,27 +65,15 @@ pids = getPids()
 rawEmbedding = getRawEmbedding(pids)
 TransEmbedding = getlocalTransEmbedding(pids)
 
-# X_train, X_test, y_train, y_test = train_test_split(rawEmbedding, TransEmbedding, test_size=0.2, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(rawEmbedding, TransEmbedding, test_size=0.2, random_state=1)
 
-# X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
 
-print (rawEmbedding.shape)
-print (TransEmbedding.shape)
-print (TransEmbedding)
-print (rawEmbedding)
-
-
-
-
-
-
-
-
-# raw2localTrans.fit(X_train, y_train,
-#                 epochs=50,
-#                 batch_size=256,
-#                 shuffle=True,
-#                 validation_data=(X_val, y_val))
+raw2localTrans.fit(X_train, y_train,
+                epochs=50,
+                batch_size=256,
+                shuffle=True,
+                validation_data=(X_val, y_val))
 
 
 
