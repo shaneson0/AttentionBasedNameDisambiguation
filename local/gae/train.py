@@ -5,8 +5,9 @@ import os
 import time
 from os.path import join
 from utils import settings
-from global_.prepare_local_data import IDF_THRESHOLD
+# from global_.prepare_local_data import IDF_THRESHOLD
 
+IDF_THRESHOLD = 10
 # Train on CPU (hide GPU) due to memory constraints
 os.environ['CUDA_VISIBLE_DEVICES'] = ""
 local_na_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(IDF_THRESHOLD))
