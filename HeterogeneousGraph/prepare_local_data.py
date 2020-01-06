@@ -109,6 +109,7 @@ def gen_local_data(idf_threshold=10):
         pids = []
         pids2label = {}
 
+        # 286 hongbin_li_pubs_content.txt
         # generate content
         wf_content = open(join(graph_dir, '{}_pubs_content.txt'.format(name)), 'w')
         for i, aid in enumerate(cur_person_dict):
