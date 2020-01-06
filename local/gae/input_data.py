@@ -10,7 +10,7 @@ local_na_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(IDF_THRESHOLD)
 
 def encode_labels(labels):
     classes = set(labels)
-    classes_dict = {c: i for i, c in enumerate(classes)}
+    classes_dict = {c: i for i, c in enumerate(classwes)}
     return list(map(lambda x: classes_dict[x], labels))
 
 
