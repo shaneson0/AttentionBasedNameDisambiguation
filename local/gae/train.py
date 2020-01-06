@@ -234,9 +234,12 @@ def main():
 
 
 if __name__ == '__main__':
-    gae_for_na('hongbin_li')
+    # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
-    # gae_for_na('kexin_xu')
+    gae_for_na('kexin_xu')
     # main()
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
+
+# 12987 kexin_xu_pubs_network.txt
+# 2671 kexin_xu_pubs_network.txt
