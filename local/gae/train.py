@@ -21,7 +21,7 @@ from local.gae.preprocessing import preprocess_graph, construct_feed_dict, \
 from utils.cluster import clustering
 from utils.data_utils import load_json
 from utils.eval_utils import pairwise_precision_recall_f1, cal_f1
-from utils import settings
+from utils import settings, tSNEAnanlyse
 
 
 # Settings
@@ -151,6 +151,10 @@ def gae_for_na(name):
     print('pairwise precision', '{:.5f}'.format(prec2),
           'recall', '{:.5f}'.format(rec2),
           'f1', '{:.5f}'.format(f12))
+
+    tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final.png" % (name)))
+    tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features.png" % (name)))
+
 
     return [prec, rec, f1], num_nodes, n_clusters
 
