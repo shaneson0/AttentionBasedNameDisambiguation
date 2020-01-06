@@ -150,7 +150,7 @@ def gen_local_data(idf_threshold=10):
                     idf_sum += idf.get(f, idf_threshold)
                     # print(f, idf.get(f, idf_threshold))
 
-                if idf_sum >= 10:
+                if idf_sum >= 45:
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
         wf_network.close()
 
