@@ -145,6 +145,13 @@ def gae_for_na(name):
     print('pairwise precision', '{:.5f}'.format(prec),
           'recall', '{:.5f}'.format(rec),
           'f1', '{:.5f}'.format(f1))
+
+    clusters_pred2 = clustering(features, num_clusters=n_clusters)
+    prec2, rec2, f12 =  pairwise_precision_recall_f1(clusters_pred2, labels)
+    print('pairwise precision', '{:.5f}'.format(prec2),
+          'recall', '{:.5f}'.format(rec2),
+          'f1', '{:.5f}'.format(f12))
+
     return [prec, rec, f1], num_nodes, n_clusters
 
 
