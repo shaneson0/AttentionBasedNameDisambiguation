@@ -13,38 +13,7 @@ def encode_labels(labels):
     classes_dict = {c: i for i, c in enumerate(classes)}
     return list(map(lambda x: classes_dict[x], labels))
 
-from utils.cache import LMDBClient
-INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
-lc_inter = LMDBClient(INTER_LMDB_NAME)
 
-def load_local_data(path=local_na_dir, name='cheng_cheng'):
-    # Load local paper network dataset
-    print('Loading {} dataset...'.format(name), 'path=', path, name)
-
-    idx_features_labels = np.genfromtxt(join(path , "{}_pubs_content.txt".format(name)), dtype=np.dtype(str))
-    # features = np.array(idx_features_labels[:, 1:-2], dtype=np.float32)  # sparse?
-    labels = encode_labels(idx_features_labels[:, -2])
-
-    features = []
-    # build graph
-    idx = np.array(idx_features_labels[:, 0], dtype=np.str)
-    for id in idx:
-        features.append(lc_inter.get(id))
-    features = np.array(features, dtype=np.float32)
-
-    idx_map = {j: i for i, j in enumerate(idx)}
-    edges_unordered = np.genfromtxt(join(path, "{}_pubs_network.txt".format(name)), dtype=np.dtype(str))
-    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
-                     dtype=np.int32).reshape(edges_unordered.shape)
-    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
-                        shape=(features.shape[0], features.shape[0]), dtype=np.float32)
-
-    # build symmetric adjacency matrix
-    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-
-    print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
-
-    return adj, features, labels
 
 
 
