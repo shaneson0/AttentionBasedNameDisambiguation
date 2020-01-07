@@ -129,6 +129,7 @@ def test(idf_threshold):
         # generate network1
         # generate network1
         all_idf_sum = 0
+        pathCnt = 0
         pids_filter = list(pids_set)
         n_pubs = len(pids_filter)
         for i in range(n_pubs-1):
@@ -141,9 +142,12 @@ def test(idf_threshold):
                 for f in common_features:
                     idf_sum += idf.get(f, idf_threshold)
                 all_idf_sum += idf_sum
+                if idf_sum >= 10:
+                    pathCnt = pathCnt + 1
 
         if name == "kexin_xu":
             print ("all_idf_sum: ", all_idf_sum)
+            print ("pathCnt: ", pathCnt)
 
 
 
