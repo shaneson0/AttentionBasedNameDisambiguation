@@ -243,9 +243,9 @@ def gen_local_data(idf_threshold=10):
 
 
 if __name__ == '__main__':
-    # dump_inter_emb()
-    # gen_local_data(idf_threshold=IDF_THRESHOLD)
-    test(idf_threshold=IDF_THRESHOLD)
+    dump_inter_emb()
+    gen_local_data(idf_threshold=IDF_THRESHOLD)
+    # test(idf_threshold=IDF_THRESHOLD)
     # print('done')
 
 
