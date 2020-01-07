@@ -142,7 +142,7 @@ def test(idf_threshold):
                 for f in common_features:
                     idf_sum += idf.get(f, idf_threshold)
                 all_idf_sum += idf_sum
-                if idf_sum >= 10:
+                if idf_sum >= idf_threshold:
                     pathCnt = pathCnt + 1
 
         if name == "kexin_xu":
