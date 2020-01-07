@@ -86,6 +86,44 @@ def getLabelId(pid, authorName):
             return Author2Id[author['name'] + ':' + author.get('org', 'null')]
     return -1
 
+def test(idf_threshold):
+    name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
+    idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
+    INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
+    lc_inter = LMDBClient(INTER_LMDB_NAME)
+    LMDB_AUTHOR_FEATURE = "pub_authors.feature"
+    lc_feature = LMDBClient(LMDB_AUTHOR_FEATURE)
+    graph_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(idf_threshold))
+    os.makedirs(graph_dir, exist_ok=True)
+    for i, name in enumerate(name_to_pubs_test):
+        print(i, name)
+        cur_person_dict = name_to_pubs_test[name]
+        pids_set = set()
+        pids = []
+        pids2label = {}
+
+        # 286 hongbin_li_pubs_content.txt
+        # generate content
+        for i, aid in enumerate(cur_person_dict):
+            items = cur_person_dict[aid]
+            if len(items) < 5:
+                continue
+            for pid in items:
+                pids2label[pid] = aid
+                pids.append(pid)
+        shuffle(pids)
+
+        for pid in pids:
+            cur_pub_emb = lc_inter.get(pid)
+            if cur_pub_emb is not None:
+                pids_set.add(pid)
+
+
+        # generate network1
+        pids_filter = list(pids_set)
+        print ("pids_filter: ", len(pids_filter))
+
+
 def gen_local_data(idf_threshold=10):
     """
     generate local data (including paper features and paper network) for each associated name
@@ -179,7 +217,8 @@ def gen_local_data(idf_threshold=10):
 
 if __name__ == '__main__':
     # dump_inter_emb()
-    gen_local_data(idf_threshold=IDF_THRESHOLD)
+    # gen_local_data(idf_threshold=IDF_THRESHOLD)
+    test(idf_threshold=IDF_THRESHOLD)
     # print('done')
 
 
