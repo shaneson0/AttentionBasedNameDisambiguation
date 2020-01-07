@@ -132,8 +132,6 @@ def test(idf_threshold):
         pids_filter = list(pids_set)
         n_pubs = len(pids_filter)
         for i in range(n_pubs-1):
-            if i % 10 == 0:
-                print(i)
             author_feature1 = set(lc_feature.get(pids_filter[i]))
             for j in range(i+1, n_pubs):
                 author_feature2 = set(lc_feature.get(pids_filter[j]))
