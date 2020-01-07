@@ -87,8 +87,11 @@ class TripletsGenerator:
             name_pubs_dict = name2pubs[name]
             for aid in name_pubs_dict:
                 pub_items = name_pubs_dict[aid]
-                if len(pub_items) == 1:
-                    continue
+
+                # try it
+                # if len(pub_items) == 1:
+                #     continue
+
                 pids = pub_items
                 cur_n_pubs = len(pids)
                 random.shuffle(pids)
