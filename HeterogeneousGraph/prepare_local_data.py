@@ -121,7 +121,8 @@ def test(idf_threshold):
 
         # generate network1
         pids_filter = list(pids_set)
-        print ("pids_filter: ", len(pids_filter))
+        if name == "kexin_xu":
+            print ("pids_filter: ", len(pids_filter))
 
 
 def gen_local_data(idf_threshold=10):
