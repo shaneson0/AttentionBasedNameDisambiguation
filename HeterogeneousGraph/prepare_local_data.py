@@ -86,6 +86,13 @@ def getLabelId(pid, authorName):
             return Author2Id[author['name'] + ':' + author.get('org', 'null')]
     return -1
 
+
+# 39 kexin_xu
+# pids_filter:  203
+
+#
+
+
 def test(idf_threshold):
     name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')
     idf = data_utils.load_data(settings.GLOBAL_DATA_DIR, 'feature_idf.pkl')
@@ -120,9 +127,26 @@ def test(idf_threshold):
 
 
         # generate network1
+        # generate network1
+        all_idf_sum = 0
         pids_filter = list(pids_set)
+        n_pubs = len(pids_filter)
+        for i in range(n_pubs-1):
+            if i % 10 == 0:
+                print(i)
+            author_feature1 = set(lc_feature.get(pids_filter[i]))
+            for j in range(i+1, n_pubs):
+                author_feature2 = set(lc_feature.get(pids_filter[j]))
+                # print('author_feature2: ', author_feature2)
+                common_features = author_feature1.intersection(author_feature2)
+                idf_sum = 0
+                for f in common_features:
+                    idf_sum += idf.get(f, idf_threshold)
+                all_idf_sum += idf_sum
+
         if name == "kexin_xu":
-            print ("pids_filter: ", len(pids_filter))
+            print ("all_idf_sum: ", all_idf_sum)
+
 
 
 def gen_local_data(idf_threshold=10):
