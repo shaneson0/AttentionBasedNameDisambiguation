@@ -9,6 +9,7 @@ from utils import data_utils, inputData
 from utils import settings, string_utils
 from collections import defaultdict
 
+
 IDLength = 24
 # IDF_THRESHOLD = 32  # small data
 IDF_THRESHOLD = 10

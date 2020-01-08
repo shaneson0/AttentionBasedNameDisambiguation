@@ -90,8 +90,6 @@ def getLabelId(pid, authorName):
 # 39 kexin_xu
 # pids_filter:  203
 
-#
-
 
 def test(idf_threshold):
     name_to_pubs_test = data_utils.load_json(settings.GLOBAL_DATA_DIR, 'name_to_pubs_test_100.json')

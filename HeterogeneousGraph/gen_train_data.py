@@ -58,7 +58,7 @@ class DataGenerator:
         assert not set(self.names_train).intersection(set(self.names_test))
 
         for authorName in self.names_train:
-            self.genPAPandPSP(authorName=authorName)
+            self.genPAPandPSP(authorName=authorName, idf_threshold=IDF_THRESHOLD)
 
 
 
