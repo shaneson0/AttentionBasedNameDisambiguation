@@ -31,8 +31,8 @@ name_to_pubs_train= load_train_names()
 # name_to_pubs_test= load_test_names()
 # for name in name_to_pubs_train:
 
-name = "hai_yan_chen"
-# name = "gang_yin"
+# name = "hai_yan_chen"
+name = "gang_yin"
 # name = "hongbin_li" #Res:  {'rawfeature': [0.6501069645828381, 0.5840273329062566, 0.6152980877390326], 'tripletfeature': [0.6968630900029317, 0.5075806107196241, 0.5873486533234493], 'lcmbfeature': [0.7999494821924729, 0.6762758915225283, 0.7329321916223098], 'transferfeature': [0.3861209964412811, 0.27802690582959644, 0.3232774674115456]}
 # name = "kexin_xu"
 
