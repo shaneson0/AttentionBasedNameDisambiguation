@@ -27,8 +27,8 @@ def load_test_names():
     return name_to_pubs_test
 
 
-# name_to_pubs_train= load_train_names()
-name_to_pubs_test= load_test_names()
+name_to_pubs_train= load_train_names()
+# name_to_pubs_test= load_test_names()
 # for name in name_to_pubs_train:
 
 name = "hai_yan_chen"
