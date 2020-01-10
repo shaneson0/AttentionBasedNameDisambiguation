@@ -37,7 +37,7 @@ name = "hai_yan_chen"
 # name = "kexin_xu"
 
 
-cur_author = name_to_pubs_test[name]
+cur_author = name_to_pubs_train[name]
 pids = []
 labels = []
 rf = []
