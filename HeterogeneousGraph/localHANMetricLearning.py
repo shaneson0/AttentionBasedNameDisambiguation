@@ -35,9 +35,9 @@ def testUser(name):
     print (name, prec, rec, f1)
 
 if __name__ == '__main__':
-    testHAN()
-    # name = "hai_yan_chen"
-    # testUser(name)
+    # testHAN()
+    name = "gang_yin"
+    testUser(name)
 
 
 
