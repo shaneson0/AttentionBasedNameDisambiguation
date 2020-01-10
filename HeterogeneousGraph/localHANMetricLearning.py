@@ -31,7 +31,7 @@ def testUser(name):
     lc_emb = LMDBClient(LMDB_NAME_EMB)
     han = HAN(lc_emb)
 
-    prec, rec, f1, pids, attentionEmbeddings = han.prepare_and_train(name=name, ispretrain=True, needtSNE=False)
+    prec, rec, f1, pids, attentionEmbeddings = han.prepare_and_train(name=name, ispretrain=True, needtSNE=True)
     print (name, prec, rec, f1)
 
 if __name__ == '__main__':
