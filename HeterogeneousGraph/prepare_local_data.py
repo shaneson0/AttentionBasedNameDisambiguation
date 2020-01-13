@@ -149,7 +149,7 @@ def test(idf_threshold):
 
 
 
-def gen_local_data(idf_threshold=10):
+def gen_local_data(idf_threshold):
     """
     generate local data (including paper features and paper network) for each associated name
     :param idf_threshold: threshold for determining whether there exists an edge between two papers (for this demo we set 29)
@@ -244,7 +244,7 @@ if __name__ == '__main__':
     print ("dump_inter_emb()")
     dump_inter_emb()
     print ("gen_local_data()")
-    gen_local_data(idf_threshold=10)
+    gen_local_data(idf_threshold=IDF_THRESHOLD)
     # test(idf_threshold=IDF_THRESHOLD)
     # print('done')
 
