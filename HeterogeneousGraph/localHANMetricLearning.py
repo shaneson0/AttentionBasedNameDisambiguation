@@ -35,11 +35,11 @@ def testUser(name):
     print (name, prec, rec, f1)
 
 if __name__ == '__main__':
-    # testHAN()
+    testHAN()
     # name = "xiaofei_zhang"
-    name = "hai_yan_chen"
+    # name = "hai_yan_chen"
     # name = "gang_yin"
-    testUser(name)
+    # testUser(name)
 
 
 
