@@ -7,7 +7,7 @@ from utils.cache import LMDBClient
 from utils import data_utils
 from utils import settings
 
-# LMDB_NAME = "author_100.emb.weighted"
+LMDB_NAME = "author_100.emb.weighted"
 lc = LMDBClient(LMDB_NAME)
 start_time = datetime.now()
 
