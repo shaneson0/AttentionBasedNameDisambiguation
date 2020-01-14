@@ -93,13 +93,13 @@ def load_local_data(path=local_na_dir, name='cheng_cheng', rawfeature=False):
 
     return adj, features, labels
 
-def gae_for_na(name):
+def gae_for_na(name, rawfeature=False):
     """
     train and evaluate disambiguation results for a specific name
     :param name:  author name
     :return: evaluation results
     """
-    adj, features, labels = load_local_data(name=name)
+    adj, features, labels = load_local_data(name=name, rawfeature=rawfeature)
 
     # Store original adjacency matrix (without diagonal entries) for later
     adj_orig = adj
@@ -245,7 +245,7 @@ def main():
 if __name__ == '__main__':
     # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
-    gae_for_na('kexin_xu')
+    gae_for_na('kexin_xu', rawfeature=True)
     # main()
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
