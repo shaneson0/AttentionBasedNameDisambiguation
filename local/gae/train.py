@@ -54,7 +54,13 @@ lc_inter = LMDBClient(INTER_LMDB_NAME)
 RAW_INTER_NAME = 'author_100.emb.weighted'
 lc_inter_raw = LMDBClient(INTER_LMDB_NAME)
 
+tripleteLossLMDBName = 'author_triplets.emb'
+tripletFeature = LMDBClient(tripleteLossLMDBName)
 
+
+RAWFEATURE = "rawfeature"
+ATTENTIONFEATURE = "attention_feature"
+TRIPLETFEATURE = "triplet_feature"
 
 def encode_labels(labels):
     classes = set(labels)
@@ -73,10 +79,15 @@ def load_local_data(path=local_na_dir, name='cheng_cheng', rawfeature=False):
     # build graph
     idx = np.array(idx_features_labels[:, 0], dtype=np.str)
     for id in idx:
-        if rawfeature is False:
+
+        if rawfeature == ATTENTIONFEATURE:
             features.append(lc_inter.get(id))
-        else:
+        elif rawfeature == RAW_INTER_NAME:
             features.append(lc_inter_raw.get(id))
+        else:
+            features.append(tripletFeature.get(id))
+
+
     features = np.array(features, dtype=np.float32)
 
     idx_map = {j: i for i, j in enumerate(idx)}
@@ -93,7 +104,7 @@ def load_local_data(path=local_na_dir, name='cheng_cheng', rawfeature=False):
 
     return adj, features, labels
 
-def gae_for_na(name, rawfeature=False):
+def gae_for_na(name, rawfeature):
     """
     train and evaluate disambiguation results for a specific name
     :param name:  author name
@@ -201,12 +212,15 @@ def gae_for_na(name, rawfeature=False):
           'recall', '{:.5f}'.format(rec2),
           'f1', '{:.5f}'.format(f12))
 
-    if rawfeature:
+    if rawfeature == RAW_INTER_NAME:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_raw.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_raw.png" % (name)))
-    else:
+    elif rawfeature == ATTENTIONFEATURE:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features.png" % (name)))
+    else:
+        tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_triplet.png" % (name)))
+        tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_triplet.png" % (name)))
 
     return [prec, rec, f1], num_nodes, n_clusters
 
@@ -248,10 +262,12 @@ def main():
 if __name__ == '__main__':
     # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
-    Res1 = gae_for_na('kexin_xu', rawfeature=True)
-    Res2 = gae_for_na('kexin_xu', rawfeature=False)
+    Res1 = gae_for_na('kexin_xu', rawfeature="rawfeature")
+    Res2 = gae_for_na('kexin_xu', rawfeature="attention_feature")
+    Res3 = gae_for_na('kexin_xu', rawfeature="triplet_feature")
     print ("raw feature: ", Res1)
     print ("not raw feature: ", Res2)
+    print ("triplet raw feature: ", Res3)
     # main()
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
