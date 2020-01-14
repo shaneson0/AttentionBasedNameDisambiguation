@@ -51,13 +51,17 @@ from utils.cache import LMDBClient
 INTER_LMDB_NAME = 'triplete_loss_lc_attention_network_embedding'
 lc_inter = LMDBClient(INTER_LMDB_NAME)
 
+RAW_INTER_NAME = 'author_100.emb.weighted'
+lc_inter_raw = LMDBClient(INTER_LMDB_NAME)
+
+
 
 def encode_labels(labels):
     classes = set(labels)
     classes_dict = {c: i for i, c in enumerate(classes)}
     return list(map(lambda x: classes_dict[x], labels))
 
-def load_local_data(path=local_na_dir, name='cheng_cheng'):
+def load_local_data(path=local_na_dir, name='cheng_cheng', rawfeature=False):
     # Load local paper network dataset
     print('Loading {} dataset...'.format(name), 'path=', path, name)
 
@@ -69,7 +73,10 @@ def load_local_data(path=local_na_dir, name='cheng_cheng'):
     # build graph
     idx = np.array(idx_features_labels[:, 0], dtype=np.str)
     for id in idx:
-        features.append(lc_inter.get(id))
+        if rawfeature is False:
+            features.append(lc_inter.get(id))
+        else:
+            features.append(lc_inter_raw.get(id))
     features = np.array(features, dtype=np.float32)
 
     idx_map = {j: i for i, j in enumerate(idx)}
@@ -231,6 +238,8 @@ def main():
     wf.write('average,,,{0:.5f},{1:.5f},{2:.5f}\n'.format(
         macro_prec, macro_rec, macro_f1))
     wf.close()
+
+
 
 
 if __name__ == '__main__':
