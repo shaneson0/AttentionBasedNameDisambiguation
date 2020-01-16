@@ -125,7 +125,7 @@ class TripletsGenerator:
         return lc2.get(pid)
 
     def embeddings(self, anchorPid, pid_pos, pid_neg):
-        if self.getLMDBEmbedding(anchorPid) is not None:
+        if self.getLMDBEmbedding(anchorPid) is not None and self.getAnchorEmbedding(anchorPid) is not None and self.getAnchorEmbedding(pid_pos) is not None and self.getAnchorEmbedding(pid_neg) is not None:
             return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getLMDBEmbedding(anchorPid)
 
     # def embeddings(self, anchorPid, pid_pos, pid_neg):
