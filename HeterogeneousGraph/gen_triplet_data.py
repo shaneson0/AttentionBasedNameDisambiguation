@@ -159,7 +159,7 @@ class TripletsGenerator:
         emb_q = mp.Queue(1000)
 
         producer_p = mp.Process(target=self.sample_triplet_ids, args=(task_q, role, N_PROC))
-        consumer_ps = [mp.Process(target=self.gen_emb_mp, args=(task_q, emb_q)) for _ in range(N_PROC)]
+        consumer_ps = [mp.Process(target=self.gen_emb_mp, args=(task_q, emb_q, role)) for _ in range(N_PROC)]
         producer_p.start()
         [p.start() for p in consumer_ps]
 
