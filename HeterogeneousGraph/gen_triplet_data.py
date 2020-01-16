@@ -185,18 +185,21 @@ class TripletsGenerator:
         anchor_embs = []
         pos_embs = []
         neg_embs = []
+        atten_embs = []
         f_idx = 0
         for i, t in enumerate(triplets):
             if i % 100 == 0:
                 print(i, datetime.now()-start_time)
-            emb_anc, emb_pos, emb_neg = t[0], t[1], t[2]
+            emb_anc, emb_pos, emb_neg, emb_atten = t[0], t[1], t[2], t[3]
             anchor_embs.append(emb_anc)
             pos_embs.append(emb_pos)
             neg_embs.append(emb_neg)
+            atten_embs.append(emb_atten)
             if len(anchor_embs) == self.batch_size:
                 data_utils.dump_data(anchor_embs, out_dir, 'anchor_embs_{}_{}.pkl'.format(role, f_idx))
                 data_utils.dump_data(pos_embs, out_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
                 data_utils.dump_data(neg_embs, out_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
+                data_utils.dump_data(atten_embs, out_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
                 f_idx += 1
                 anchor_embs = []
                 pos_embs = []
@@ -205,6 +208,8 @@ class TripletsGenerator:
             data_utils.dump_data(anchor_embs, out_dir, 'anchor_embs_{}_{}.pkl'.format(role, f_idx))
             data_utils.dump_data(pos_embs, out_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
             data_utils.dump_data(neg_embs, out_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
+            data_utils.dump_data(atten_embs, out_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
+
         print('dumped')
 
 
