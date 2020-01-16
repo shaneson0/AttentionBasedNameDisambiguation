@@ -125,12 +125,8 @@ class TripletsGenerator:
         return lc2.get(pid)
 
     def embeddings(self, anchorPid, pid_pos, pid_neg):
-        if self.getLMDBEmbedding(anchorPid) is not None and \
-                self.getLMDBEmbedding(pid_pos) is not None and \
-                self.getLMDBEmbedding(pid_neg) is not None:
-            return self.getLMDBEmbedding(anchorPid), self.getLMDBEmbedding(pid_pos), self.getLMDBEmbedding(pid_neg)
-        else:
-            return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
+        if self.getLMDBEmbedding(anchorPid) is not None:
+            return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getLMDBEmbedding(anchorPid)
 
     # def embeddings(self, anchorPid, pid_pos, pid_neg):
     #     return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
@@ -143,13 +139,13 @@ class TripletsGenerator:
             # emb1 = self.getAnchorEmbedding(pid1)
             # emb_pos = self.getAnchorEmbedding(pid_pos)
             # emb_neg = self.getAnchorEmbedding(pid_neg)
-            emb1, emb_pos, emb_neg = self.embeddings(pid1, pid_pos, pid_neg)
+            emb1, emb_pos, emb_neg, attentionEmb = self.embeddings(pid1, pid_pos, pid_neg)
             # emb1 = lc.get(pid1)
             # emb_pos = lc.get(pid_pos)
             # emb_neg = lc.get(pid_neg)
-            if emb1 is not None and emb_pos is not None and emb_neg is not None:
-                emb_q.put((emb1, emb_pos, emb_neg))
-        emb_q.put((False, False, False))
+            if emb1 is not None and emb_pos is not None and emb_neg is not None and attentionEmb is not None:
+                emb_q.put((emb1, emb_pos, emb_neg, attentionEmb))
+        emb_q.put((False, False, False, False))
 
     def gen_triplets_mp(self, role='train'):
         N_PROC = 8
