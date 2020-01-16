@@ -87,10 +87,10 @@ class TripletsGenerator:
             name_pubs_dict = name2pubs[name]
             for aid in name_pubs_dict:
                 pub_items = name_pubs_dict[aid]
-
+                #
                 # try it
-                # if len(pub_items) == 1:
-                #     continue
+                if len(pub_items) == 1:
+                    continue
 
                 pids = pub_items
                 cur_n_pubs = len(pids)
@@ -124,16 +124,16 @@ class TripletsGenerator:
     def getAnchorEmbedding(self, pid):
         return lc2.get(pid)
 
-    # def embeddings(self, anchorPid, pid_pos, pid_neg):
-    #     if self.getLMDBEmbedding(anchorPid) is not None and \
-    #             self.getLMDBEmbedding(pid_pos) is not None and \
-    #             self.getLMDBEmbedding(pid_neg) is not None:
-    #         return self.getLMDBEmbedding(anchorPid), self.getLMDBEmbedding(pid_pos), self.getLMDBEmbedding(pid_neg)
-    #     else:
-    #         return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
-
     def embeddings(self, anchorPid, pid_pos, pid_neg):
-        return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
+        if self.getLMDBEmbedding(anchorPid) is not None and \
+                self.getLMDBEmbedding(pid_pos) is not None and \
+                self.getLMDBEmbedding(pid_neg) is not None:
+            return self.getLMDBEmbedding(anchorPid), self.getLMDBEmbedding(pid_pos), self.getLMDBEmbedding(pid_neg)
+        else:
+            return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
+
+    # def embeddings(self, anchorPid, pid_pos, pid_neg):
+    #     return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
 
     def gen_emb_mp(self, task_q, emb_q):
         while True:
