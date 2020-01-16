@@ -130,10 +130,10 @@ class TripletsGenerator:
         else:
             return None, None, None, None
 
-    # def embeddings(self, anchorPid, pid_pos, pid_neg):
-    #     return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
+    def testembeddings(self, anchorPid, pid_pos, pid_neg):
+        return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getAnchorEmbedding(anchorPid)
 
-    def gen_emb_mp(self, task_q, emb_q):
+    def gen_emb_mp(self, task_q, emb_q, role):
         while True:
             pid1, pid_pos, pid_neg = task_q.get()
             if pid1 is None:
@@ -141,7 +141,10 @@ class TripletsGenerator:
             # emb1 = self.getAnchorEmbedding(pid1)
             # emb_pos = self.getAnchorEmbedding(pid_pos)
             # emb_neg = self.getAnchorEmbedding(pid_neg)
-            emb1, emb_pos, emb_neg, attentionEmb = self.embeddings(pid1, pid_pos, pid_neg)
+            if role == "test":
+                emb1, emb_pos, emb_neg, attentionEmb = self.testembeddings(pid1, pid_pos, pid_neg)
+            else:
+                emb1, emb_pos, emb_neg, attentionEmb = self.embeddings(pid1, pid_pos, pid_neg)
             # emb1 = lc.get(pid1)
             # emb_pos = lc.get(pid_pos)
             # emb_neg = lc.get(pid_neg)
