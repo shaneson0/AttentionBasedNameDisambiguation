@@ -163,7 +163,7 @@ class TripletsGenerator:
         while True:
             if cnt % 1000 == 0:
                 print('get', cnt, datetime.now()-start_time)
-            emb1, emb_pos, emb_neg = emb_q.get()
+            emb1, emb_pos, emb_neg, attentionEmb = emb_q.get()
             if emb1 is False:
                 producer_p.terminate()
                 producer_p.join()
@@ -171,7 +171,7 @@ class TripletsGenerator:
                 [p.join() for p in consumer_ps]
                 break
             cnt += 1
-            yield (emb1, emb_pos, emb_neg)
+            yield (emb1, emb_pos, emb_neg, attentionEmb)
 
     def dump_triplets(self, role='train'):
         triplets = self.gen_triplets_mp(role)
