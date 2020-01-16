@@ -104,6 +104,7 @@ class GlobalTripletModel:
         emb_anchor = Input(shape=(EMB_DIM, ), name='anchor_input')
         emb_pos = Input(shape=(EMB_DIM, ), name='pos_input')
         emb_neg = Input(shape=(EMB_DIM, ), name='neg_input')
+        emb_atten = Input(shape=(EMB_DIM, ), name='attention_input')
 
         # shared layers
         layer1 = Dense(128, activation='relu', name='first_emb_layer')
@@ -113,9 +114,12 @@ class GlobalTripletModel:
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
+        encoded_emb_atten = norm_layer(layer2(layer1(emb_atten)))
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
+        atten_dist = Lambda(euclidean_distance, name='atten_dist')([encoded_emb, encoded_emb_atten])
+
 
         def cal_output_shape(input_shape):
             shape = list(input_shape[0])
@@ -127,9 +131,9 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([pos_dist, neg_dist])
+        )([pos_dist, neg_dist, atten_dist])
 
-        model = Model([emb_anchor, emb_pos, emb_neg], stacked_dists, name='triple_siamese')
+        model = Model([emb_anchor, emb_pos, emb_neg, emb_atten], stacked_dists, name='triple_siamese')
         import time
         model.summary()
         time.sleep(5.5)
