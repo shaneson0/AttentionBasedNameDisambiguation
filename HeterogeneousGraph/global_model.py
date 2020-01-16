@@ -77,27 +77,32 @@ class GlobalTripletModel:
         X1 = data_utils.load_data(cur_dir, 'anchor_embs_{}_{}.pkl'.format(role, f_idx))
         X2 = data_utils.load_data(cur_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
         X3 = data_utils.load_data(cur_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
-        return X1, X2, X3
+        X4 = data_utils.load_data(cur_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
+        return X1, X2, X3, X4
 
     def load_triplets_data(self, role='train'):
         X1 = np.empty([0, EMB_DIM])
         X2 = np.empty([0, EMB_DIM])
         X3 = np.empty([0, EMB_DIM])
+        X4 = np.empty([0, EMB_DIM])
         if role == 'train':
             f_num = self.train_triplet_files_num
         else:
             f_num = self.test_triplet_files_num
         for i in range(f_num):
             print('load', i)
-            x1_batch, x2_batch, x3_batch = self.load_batch_triplets(i, role)
+            x1_batch, x2_batch, x3_batch, x4_batch = self.load_batch_triplets(i, role)
             p = np.random.permutation(len(x1_batch))
             x1_batch = np.array(x1_batch)[p]
             x2_batch = np.array(x2_batch)[p]
             x3_batch = np.array(x3_batch)[p]
+            x4_batch = np.array(x4_batch)[p]
+
             X1 = np.concatenate((X1, x1_batch))
             X2 = np.concatenate((X2, x2_batch))
             X3 = np.concatenate((X3, x3_batch))
-        return X1, X2, X3
+            X4 = np.concatenate((X4, x4_batch))
+        return X1, X2, X3, X4
 
     @staticmethod
     def create_triplet_model():
@@ -155,14 +160,14 @@ class GlobalTripletModel:
         return loaded_model
 
     def train_triplets_model(self):
-        X1, X2, X3 = self.load_triplets_data()
+        X1, X2, X3, X4 = self.load_triplets_data()
         n_triplets = len(X1)
         print('loaded')
         model, inter_model = self.create_triplet_model()
         # print(model.summary())
 
-        X_anchor, X_pos, X_neg = X1, X2, X3
-        X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg}
+        X_anchor, X_pos, X_neg, X_atten = X1, X2, X3, X4
+        X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg, 'attention_input': X_atten}
         model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=5, shuffle=True, validation_split=0.2)
 
         model_json = model.to_json()
