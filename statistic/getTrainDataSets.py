@@ -10,8 +10,8 @@ TrainAuthorCount = 0
 TrainPaperCount = 0
 for name in name_to_pubs_train:
     TrainAuthorCount = TrainAuthorCount + 1
-    aid = name_to_pubs_train[name]
-    for pid in  name_to_pubs_train[name][aid]:
+    object = name_to_pubs_train[name]
+    for pid in  object:
         TrainPaperCount = TrainPaperCount + 1
 
 print ("TrainAuthorCount: ", TrainAuthorCount)
@@ -22,8 +22,8 @@ TestAuthorCount = 0
 TestPaperCount = 0
 for name in name_to_pubs_test:
     TestAuthorCount = TestAuthorCount + 1
-    aid = name_to_pubs_test[name]
-    for pid in  name_to_pubs_test[name][aid]:
+    object = name_to_pubs_test[name]
+    for pid in object:
         TestPaperCount = TestPaperCount + 1
 
 print ("TestAuthorCount: ", TestAuthorCount)
