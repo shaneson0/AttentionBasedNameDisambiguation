@@ -262,9 +262,11 @@ def main():
 if __name__ == '__main__':
     # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
-    Res1 = gae_for_na('kexin_xu', rawfeature="rawfeature")
-    Res2 = gae_for_na('kexin_xu', rawfeature="attention_feature")
-    Res3 = gae_for_na('kexin_xu', rawfeature="triplet_feature")
+    # kexin_xu
+    author = 'hongbin_li'
+    Res1 = gae_for_na(author, rawfeature="rawfeature")
+    Res2 = gae_for_na(author, rawfeature="attention_feature")
+    Res3 = gae_for_na(author, rawfeature="triplet_feature")
     print ("raw feature: ", Res1)
     print ("not raw feature: ", Res2)
     print ("triplet raw feature: ", Res3)
