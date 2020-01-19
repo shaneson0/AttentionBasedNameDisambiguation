@@ -134,9 +134,11 @@ class GlobalTripletModel:
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
+
+
         encoded_emb_atten = norm_layer(layer2(layer1(emb_atten)))
-        encoded_emb_atten_pos = norm_layer(layer2(layer1(emb_atten)))
-        encoded_emb_atten_neg = norm_layer(layer2(layer1(emb_atten)))
+        encoded_emb_atten_pos = norm_layer(layer2(layer1(emb_atten_pos)))
+        encoded_emb_atten_neg = norm_layer(layer2(layer1(emb_atten_neg)))
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
