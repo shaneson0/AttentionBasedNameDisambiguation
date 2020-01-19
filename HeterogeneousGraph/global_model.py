@@ -128,8 +128,8 @@ class GlobalTripletModel:
         layer1 = Dense(128, activation='relu', name='first_emb_layer')
         layer2 = Dense(64, activation='relu', name='last_emb_layer')
 
-        layer1_Atten = Dense(128, activation='relu', name='first_emb_layer')
-        layer2_Atten = Dense(64, activation='relu', name='last_emb_layer')
+        layer1_Atten = Dense(128, activation='relu', name='layer1_Atten')
+        layer2_Atten = Dense(64, activation='relu', name='layer2_Atten')
 
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
 
