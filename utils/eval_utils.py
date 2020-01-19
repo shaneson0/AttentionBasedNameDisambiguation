@@ -64,7 +64,7 @@ def full_auc(model, test_triplets):
     grnds = []
     preds = []
     preds_before = []
-    embs_anchor, embs_pos, embs_neg = test_triplets
+    embs_anchor, embs_pos, embs_neg, embs_atten, X_atten_pos, X_atten_neg = test_triplets
 
     inter_embs_anchor = get_hidden_output(model, embs_anchor)
     inter_embs_pos = get_hidden_output(model, embs_pos)
