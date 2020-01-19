@@ -14,5 +14,15 @@ def triplet_loss(_, y_pred):
     return K.mean(K.maximum(K.constant(0), K.square(y_pred[:,2,0]) + K.square(y_pred[:,0,0]) - K.square(y_pred[:,1,0]) + margin))
 
 
+def global_triplet_loss(_, y_pred):
+    margin = K.constant(1)
+    L1 =  K.mean(K.maximum(K.constant(0),  K.square(y_pred[:,0,0]) - K.square(y_pred[:,1,0]) + margin))
+    L2 =  K.mean(K.maximum(K.constant(0),  K.square(y_pred[:,2,0]) - K.square(y_pred[:,3,0]) + margin))
+    L3 = K.square(y_pred[:,3,0])
+    return L1 + L2 + L3
+
 def accuracy(_, y_pred):
     return K.mean(y_pred[:,0,0] < y_pred[:,1,0])
+
+
+

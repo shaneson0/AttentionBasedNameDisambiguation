@@ -32,7 +32,6 @@ def dump_inter_emb():
         name_data = name_to_pubs_test[name]
         embs_input = []
         pids = []
-        # print('name', name, '， name_data： ', name_data)
         for i, aid in enumerate(name_data.keys()):
             if len(name_data[aid]) < 5:  # n_pubs of current author is too small
                 continue
@@ -169,7 +168,6 @@ def gen_local_data(idf_threshold=10):
             for j in range(i + 1, n_pubs):
                 Graph1Socials = AuthorSocial[pids_filter[i]]
                 Graph2Socials = AuthorSocial[pids_filter[j]]
-                # 具有两个相同作者才能写入图
                 if CountNumber(Graph1Socials, Graph2Socials) >= 1:
                     wf_network.write('{}\t{}\n'.format(pids_filter[i], pids_filter[j]))
 
