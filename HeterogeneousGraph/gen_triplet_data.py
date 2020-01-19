@@ -129,7 +129,7 @@ class TripletsGenerator:
                 and self.getAnchorEmbedding(anchorPid) is not None and self.getAnchorEmbedding(pid_pos) is not None and self.getAnchorEmbedding(pid_neg) is not None:
             return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getLMDBEmbedding(anchorPid), self.getLMDBEmbedding(pid_pos), self.getLMDBEmbedding(pid_neg)
         else:
-            return None, None, None, None
+            return None, None, None, None, None, None
 
     def testembeddings(self, anchorPid, pid_pos, pid_neg):
         return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
@@ -151,7 +151,7 @@ class TripletsGenerator:
             # emb_neg = lc.get(pid_neg)
             if emb1 is not None and emb_pos is not None and emb_neg is not None and attentionEmb is not None:
                 emb_q.put((emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg))
-        emb_q.put((False, False, False, False))
+        emb_q.put((False, False, False, False, False, False))
 
     def gen_triplets_mp(self, role='train'):
         N_PROC = 8
