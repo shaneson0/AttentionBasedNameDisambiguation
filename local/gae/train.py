@@ -236,7 +236,7 @@ def main():
     metrics = np.zeros(3)
     cnt = 0
     for name in names:
-        cur_metric, num_nodes, n_clusters = gae_for_na(name)
+        cur_metric, num_nodes, n_clusters = gae_for_na(name, rawfeature="attention_feature")
         wf.write('{0},{1},{2},{3:.5f},{4:.5f},{5:.5f}\n'.format(
             name, num_nodes, n_clusters, cur_metric[0], cur_metric[1], cur_metric[2]))
         wf.flush()
@@ -264,14 +264,14 @@ if __name__ == '__main__':
     # gae_for_na('j_yu')
     # kexin_xu
     # author = 'hongbin_li'
-    author = 'kexin_xu'
-    Res1 = gae_for_na(author, rawfeature="rawfeature")
-    Res2 = gae_for_na(author, rawfeature="attention_feature")
-    Res3 = gae_for_na(author, rawfeature="triplet_feature")
-    print ("raw feature: ", Res1)
-    print ("not raw feature: ", Res2)
-    print ("triplet raw feature: ", Res3)
-    # main()
+    # author = 'kexin_xu'
+    # Res1 = gae_for_na(author, rawfeature="rawfeature")
+    # Res2 = gae_for_na(author, rawfeature="attention_feature")
+    # Res3 = gae_for_na(author, rawfeature="triplet_feature")
+    # print ("raw feature: ", Res1)
+    # print ("not raw feature: ", Res2)
+    # print ("triplet raw feature: ", Res3)
+    main()
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
 
