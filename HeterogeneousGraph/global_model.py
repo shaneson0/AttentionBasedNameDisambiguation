@@ -3,7 +3,7 @@ import os
 import numpy as np
 from keras import backend as K
 from keras.models import Model, model_from_json
-from keras.layers import Dense, Input, Lambda, Average, concatenate
+from keras.layers import Dense, Input, Lambda, Average, concatenate, Add
 from keras.optimizers import Adam
 from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy, global_triplet_loss
 from global_.embedding import EMB_DIM
@@ -145,16 +145,16 @@ class GlobalTripletModel:
 
 
         Trans = Dense(64, activation=None, name='Anchor')
-        # T1 = K.concatenate([encoded_emb, encoded_emb_atten])
-        # T2 = K.concatenate([encoded_emb_pos, encoded_emb_atten_pos])
-        # T3 = K.concatenate([encoded_emb_neg, encoded_emb_atten_neg])
+        T1 = Add()[encoded_emb, encoded_emb_atten]
+        T2 = Add()([encoded_emb_pos, encoded_emb_atten_pos])
+        T3 = Add()([encoded_emb_neg, encoded_emb_atten_neg])
 
-        # Anchor = Trans(encoded_emb + encoded_emb_atten)
-        # Positive = Trans(encoded_emb_pos + encoded_emb_atten_pos)
-        # Negative = Trans(encoded_emb_neg + encoded_emb_atten_neg)
+        Anchor = Trans()(T1)
+        Positive = Trans()(T2)
+        Negative = Trans()(T3)
 
-        pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
-        neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
+        pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
+        neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
 
         # atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
         # atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
