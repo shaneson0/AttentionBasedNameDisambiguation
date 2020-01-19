@@ -5,7 +5,7 @@ from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Dense, Input, Lambda
 from keras.optimizers import Adam
-from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy
+from global_.triplet import l2Norm, euclidean_distance, triplet_loss, accuracy, global_triplet_loss
 from global_.embedding import EMB_DIM
 from utils import eval_utils
 from utils import data_utils
@@ -125,7 +125,9 @@ class GlobalTripletModel:
         emb_atten_neg = Input(shape=(EMB_DIM, ), name='attention_input_negive')
 
         # shared layers
+        # layer1 = Dense(128, activation=None, name='first_emb_layer')
         layer1 = Dense(128, activation='relu', name='first_emb_layer')
+        # layer2 = Dense(64, activation=None, name='last_emb_layer')
         layer2 = Dense(64, activation='relu', name='last_emb_layer')
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
 
@@ -164,7 +166,7 @@ class GlobalTripletModel:
         time.sleep(5.5)
 
 
-        model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
+        model.compile(loss=global_triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
         inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
 
