@@ -149,7 +149,7 @@ class GlobalTripletModel:
         # T2 = K.concatenate([encoded_emb_pos, encoded_emb_atten_pos])
         # T3 = K.concatenate([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Anchor = encoded_emb + encoded_emb_atten
+        Anchor = Trans(encoded_emb + encoded_emb_atten)
         Positive = Trans(encoded_emb_pos + encoded_emb_atten_pos)
         Negative = Trans(encoded_emb_neg + encoded_emb_atten_neg)
 
