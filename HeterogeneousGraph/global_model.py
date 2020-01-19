@@ -146,8 +146,8 @@ class GlobalTripletModel:
 
         Trans = Dense(64, activation=None, name='Anchor')
         T1 = K.concatenate([encoded_emb, encoded_emb_atten])
-        T2 = K.concatenate[encoded_emb_pos, encoded_emb_atten_pos]
-        T3 = K.concatenate[encoded_emb_neg, encoded_emb_atten_neg]
+        T2 = K.concatenate([encoded_emb_pos, encoded_emb_atten_pos])
+        T3 = K.concatenate([encoded_emb_neg, encoded_emb_atten_neg])
 
         Anchor = Trans(T1)
         Positive = Trans(T2)
