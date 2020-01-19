@@ -149,9 +149,9 @@ class GlobalTripletModel:
         T2 = Add()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Add()([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Anchor = Trans()(T1)
-        Positive = Trans()(T2)
-        Negative = Trans()(T3)
+        Anchor = Trans(T1)
+        Positive = Trans(T2)
+        Negative = Trans(T3)
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
