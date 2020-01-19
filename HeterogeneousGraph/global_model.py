@@ -146,6 +146,8 @@ class GlobalTripletModel:
 
 
         center_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb, encoded_emb_atten])
+        positive_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb_pos, encoded_emb_atten_pos])
+        negtive_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb_neg, encoded_emb_atten_neg])
 
 
         def cal_output_shape(input_shape):
@@ -158,7 +160,7 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([pos_dist, neg_dist, atten_pos_dist, atten_neg_dist, center_dist])
+        )([pos_dist, neg_dist, atten_pos_dist, atten_neg_dist, center_dist, positive_dist, negtive_dist])
 
         model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
         import time
