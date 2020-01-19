@@ -145,7 +145,7 @@ class GlobalTripletModel:
 
 
         Trans = Dense(64, activation=None, name='Anchor')
-        T1 = Add()[encoded_emb, encoded_emb_atten]
+        T1 = Add()([encoded_emb, encoded_emb_atten])
         T2 = Add()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Add()([encoded_emb_neg, encoded_emb_atten_neg])
 
