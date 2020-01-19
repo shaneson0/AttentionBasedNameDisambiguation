@@ -31,7 +31,7 @@ from utils import settings, tSNEAnanlyse
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
+flags.DEFINE_float('0', 0.01, 'Initial learning rate.')
 flags.DEFINE_integer('epochs', 150, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
 flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
@@ -263,7 +263,8 @@ if __name__ == '__main__':
     # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
     # kexin_xu
-    author = 'hongbin_li'
+    # author = 'hongbin_li'
+    author = 'kexin_xu'
     Res1 = gae_for_na(author, rawfeature="rawfeature")
     Res2 = gae_for_na(author, rawfeature="attention_feature")
     Res3 = gae_for_na(author, rawfeature="triplet_feature")
