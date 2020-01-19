@@ -149,12 +149,12 @@ class GlobalTripletModel:
         # T2 = K.concatenate([encoded_emb_pos, encoded_emb_atten_pos])
         # T3 = K.concatenate([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Anchor = Trans(encoded_emb + encoded_emb_atten)
-        Positive = Trans(encoded_emb_pos + encoded_emb_atten_pos)
-        Negative = Trans(encoded_emb_neg + encoded_emb_atten_neg)
+        # Anchor = Trans(encoded_emb + encoded_emb_atten)
+        # Positive = Trans(encoded_emb_pos + encoded_emb_atten_pos)
+        # Negative = Trans(encoded_emb_neg + encoded_emb_atten_neg)
 
-        pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
-        neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
+        pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
+        neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
 
         # atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
         # atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
