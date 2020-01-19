@@ -125,10 +125,12 @@ class GlobalTripletModel:
         emb_atten_neg = Input(shape=(EMB_DIM, ), name='attention_input_negive')
 
         # shared layers
-        # layer1 = Dense(128, activation=None, name='first_emb_layer')
         layer1 = Dense(128, activation='relu', name='first_emb_layer')
-        # layer2 = Dense(64, activation=None, name='last_emb_layer')
         layer2 = Dense(64, activation='relu', name='last_emb_layer')
+
+        layer1_Atten = Dense(128, activation='relu', name='first_emb_layer')
+        layer2_Atten = Dense(64, activation='relu', name='last_emb_layer')
+
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
@@ -136,17 +138,21 @@ class GlobalTripletModel:
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
 
 
-        encoded_emb_atten = norm_layer(layer2(layer1(emb_atten)))
-        encoded_emb_atten_pos = norm_layer(layer2(layer1(emb_atten_pos)))
-        encoded_emb_atten_neg = norm_layer(layer2(layer1(emb_atten_neg)))
+        encoded_emb_atten = norm_layer(layer2_Atten(layer1_Atten(emb_atten)))
+        encoded_emb_atten_pos = norm_layer(layer2_Atten(layer1_Atten(emb_atten_pos)))
+        encoded_emb_atten_neg = norm_layer(layer2_Atten(layer1_Atten(emb_atten_neg)))
 
-        pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
-        neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
+        Trans = Dense(64, activation=None, name='Anchor')
+        Anchor = Trans([encoded_emb, encoded_emb_atten])
+        Positive = Trans([encoded_emb_pos, encoded_emb_atten_pos])
+        Negative = Trans([encoded_emb_neg, encoded_emb_atten_neg])
 
-        atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
-        atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
+        pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
+        neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
 
-        center_dist =  Lambda(euclidean_distance, name='center_dist')([encoded_emb, encoded_emb_atten])
+        # atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
+        # atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
+        # center_dist =  Lambda(euclidean_distance, name='center_dist')([encoded_emb, encoded_emb_atten])
 
         def cal_output_shape(input_shape):
             shape = list(input_shape[0])
@@ -158,7 +164,7 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([pos_dist, neg_dist, atten_pos_dist, atten_neg_dist, center_dist])
+        )([pos_dist, neg_dist])
 
         model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
         import time
@@ -166,7 +172,7 @@ class GlobalTripletModel:
         time.sleep(5.5)
 
 
-        model.compile(loss=global_triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
+        model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
         inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
 
