@@ -139,8 +139,8 @@ class GlobalTripletModel:
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
 
-        atten_pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
-        atten_neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
+        atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
+        atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
 
 
         center_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb, encoded_emb_atten])
