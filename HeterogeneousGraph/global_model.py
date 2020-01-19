@@ -146,8 +146,8 @@ class GlobalTripletModel:
 
 
         center_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb, encoded_emb_atten])
-        positive_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb_pos, encoded_emb_atten_pos])
-        negtive_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb_neg, encoded_emb_atten_neg])
+        positive_dist = Lambda(euclidean_distance, name='positive_dist')([encoded_emb_pos, encoded_emb_atten_pos])
+        negtive_dist = Lambda(euclidean_distance, name='negtive_dist')([encoded_emb_neg, encoded_emb_atten_neg])
 
 
         def cal_output_shape(input_shape):
