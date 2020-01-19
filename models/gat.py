@@ -80,7 +80,7 @@ class HeteGAT_multi(BaseGAttN):
         temp = inputs_list[0]
         # temp2 = tf.reduce_sum(temp, 0)
         # print ("temp2 check: ", temp2)
-        MetricInputs = tf.layers.dense(temp, feature_size, activation=tf.nn.sigmoid)
+        MetricInputs = tf.layers.dense(temp, feature_size, activation=None)
         # ExpendMetricInputs = tf.expand_dims(MetricInputs, 0)
         print ("ExpendMetricInputs: check :", MetricInputs)
         inputs_list = [MetricInputs]
