@@ -125,13 +125,14 @@ class TripletsGenerator:
         return lc2.get(pid)
 
     def embeddings(self, anchorPid, pid_pos, pid_neg):
-        if self.getLMDBEmbedding(anchorPid) is not None and self.getAnchorEmbedding(anchorPid) is not None and self.getAnchorEmbedding(pid_pos) is not None and self.getAnchorEmbedding(pid_neg) is not None:
-            return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getLMDBEmbedding(anchorPid)
+        if self.getLMDBEmbedding(anchorPid) is not None and  self.getLMDBEmbedding(pid_pos) is not None and self.getLMDBEmbedding(pid_neg) is not None \
+                and self.getAnchorEmbedding(anchorPid) is not None and self.getAnchorEmbedding(pid_pos) is not None and self.getAnchorEmbedding(pid_neg) is not None:
+            return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getLMDBEmbedding(anchorPid), self.getLMDBEmbedding(pid_pos), self.getLMDBEmbedding(pid_neg)
         else:
             return None, None, None, None
 
     def testembeddings(self, anchorPid, pid_pos, pid_neg):
-        return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getAnchorEmbedding(anchorPid)
+        return self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg), self.getAnchorEmbedding(anchorPid), self.getAnchorEmbedding(pid_pos), self.getAnchorEmbedding(pid_neg)
 
     def gen_emb_mp(self, task_q, emb_q, role):
         while True:
@@ -142,14 +143,14 @@ class TripletsGenerator:
             # emb_pos = self.getAnchorEmbedding(pid_pos)
             # emb_neg = self.getAnchorEmbedding(pid_neg)
             if role == "test":
-                emb1, emb_pos, emb_neg, attentionEmb = self.testembeddings(pid1, pid_pos, pid_neg)
+                emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg  = self.testembeddings(pid1, pid_pos, pid_neg)
             else:
-                emb1, emb_pos, emb_neg, attentionEmb = self.embeddings(pid1, pid_pos, pid_neg)
+                emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg = self.embeddings(pid1, pid_pos, pid_neg)
             # emb1 = lc.get(pid1)
             # emb_pos = lc.get(pid_pos)
             # emb_neg = lc.get(pid_neg)
             if emb1 is not None and emb_pos is not None and emb_neg is not None and attentionEmb is not None:
-                emb_q.put((emb1, emb_pos, emb_neg, attentionEmb))
+                emb_q.put((emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg))
         emb_q.put((False, False, False, False))
 
     def gen_triplets_mp(self, role='train'):
@@ -168,7 +169,7 @@ class TripletsGenerator:
         while True:
             if cnt % 1000 == 0:
                 print('get', cnt, datetime.now()-start_time)
-            emb1, emb_pos, emb_neg, attentionEmb = emb_q.get()
+            emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg = emb_q.get()
             if emb1 is False:
                 producer_p.terminate()
                 producer_p.join()
@@ -176,7 +177,7 @@ class TripletsGenerator:
                 [p.join() for p in consumer_ps]
                 break
             cnt += 1
-            yield (emb1, emb_pos, emb_neg, attentionEmb)
+            yield (emb1, emb_pos, emb_neg, attentionEmb, attentionEmbPos, attentionEmbNeg)
 
     def dump_triplets(self, role='train'):
         triplets = self.gen_triplets_mp(role)
@@ -189,20 +190,26 @@ class TripletsGenerator:
         pos_embs = []
         neg_embs = []
         atten_embs = []
+        attenPos_embs = []
+        attenNeg_embs = []
         f_idx = 0
         for i, t in enumerate(triplets):
             if i % 100 == 0:
                 print(i, datetime.now()-start_time)
-            emb_anc, emb_pos, emb_neg, emb_atten = t[0], t[1], t[2], t[3]
+            emb_anc, emb_pos, emb_neg, emb_atten, attentionEmbPos, attentionEmbNeg = t[0], t[1], t[2], t[3], t[4], t[5]
             anchor_embs.append(emb_anc)
             pos_embs.append(emb_pos)
             neg_embs.append(emb_neg)
             atten_embs.append(emb_atten)
+            attenPos_embs.append(attentionEmbPos)
+            attenNeg_embs.append(attentionEmbNeg)
             if len(anchor_embs) == self.batch_size:
                 data_utils.dump_data(anchor_embs, out_dir, 'anchor_embs_{}_{}.pkl'.format(role, f_idx))
                 data_utils.dump_data(pos_embs, out_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
                 data_utils.dump_data(neg_embs, out_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
                 data_utils.dump_data(atten_embs, out_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
+                data_utils.dump_data(attenPos_embs, out_dir, 'atten_pos_{}_{}.pkl'.format(role, f_idx))
+                data_utils.dump_data(attenNeg_embs, out_dir, 'atten_neg_{}_{}.pkl'.format(role, f_idx))
                 f_idx += 1
                 anchor_embs = []
                 pos_embs = []
@@ -212,6 +219,8 @@ class TripletsGenerator:
             data_utils.dump_data(pos_embs, out_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
             data_utils.dump_data(neg_embs, out_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
             data_utils.dump_data(atten_embs, out_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
+            data_utils.dump_data(attenPos_embs, out_dir, 'atten_pos_{}_{}.pkl'.format(role, f_idx))
+            data_utils.dump_data(attenNeg_embs, out_dir, 'atten_neg_{}_{}.pkl'.format(role, f_idx))
 
         print('dumped')
 

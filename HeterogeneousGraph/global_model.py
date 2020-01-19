@@ -177,13 +177,14 @@ class GlobalTripletModel:
             wf.write(model_json)
         model.save_weights(join(model_dir, 'model-triplets-{}.h5'.format(self.data_scale)))
 
-        test_triplets = self.load_triplets_data(role='test')
-        auc_score = eval_utils.full_auc(model, test_triplets)
-        # print('AUC', auc_score)
-
-        loaded_model = self.load_triplets_model()
-        print('triplets model loaded')
-        auc_score = eval_utils.full_auc(loaded_model, test_triplets)
+        # don't need test
+        # test_triplets = self.load_triplets_data(role='test')
+        # auc_score = eval_utils.full_auc(model, test_triplets)
+        # # print('AUC', auc_score)
+        #
+        # loaded_model = self.load_triplets_model()
+        # print('triplets model loaded')
+        # auc_score = eval_utils.full_auc(loaded_model, test_triplets)
 
     def evaluate_triplet_model(self):
         test_triplets = self.load_triplets_data(role='test')
