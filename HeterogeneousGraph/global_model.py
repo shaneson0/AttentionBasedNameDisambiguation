@@ -78,31 +78,42 @@ class GlobalTripletModel:
         X2 = data_utils.load_data(cur_dir, 'pos_embs_{}_{}.pkl'.format(role, f_idx))
         X3 = data_utils.load_data(cur_dir, 'neg_embs_{}_{}.pkl'.format(role, f_idx))
         X4 = data_utils.load_data(cur_dir, 'atten_embs_{}_{}.pkl'.format(role, f_idx))
-        return X1, X2, X3, X4
+        X5 = data_utils.load_data(cur_dir, 'atten_pos_{}_{}.pkl'.format(role, f_idx))
+        X6 = data_utils.load_data(cur_dir, 'atten_neg_{}_{}.pkl'.format(role, f_idx))
+
+        return X1, X2, X3, X4, X5, X6
 
     def load_triplets_data(self, role='train'):
         X1 = np.empty([0, EMB_DIM])
         X2 = np.empty([0, EMB_DIM])
         X3 = np.empty([0, EMB_DIM])
         X4 = np.empty([0, EMB_DIM])
+        X5 = np.empty([0, EMB_DIM])
+        X6 = np.empty([0, EMB_DIM])
+
         if role == 'train':
             f_num = self.train_triplet_files_num
         else:
             f_num = self.test_triplet_files_num
         for i in range(f_num):
             print('load', i)
-            x1_batch, x2_batch, x3_batch, x4_batch = self.load_batch_triplets(i, role)
+            x1_batch, x2_batch, x3_batch, x4_batch, x5_batch, x6_batch = self.load_batch_triplets(i, role)
             p = np.random.permutation(len(x1_batch))
             x1_batch = np.array(x1_batch)[p]
             x2_batch = np.array(x2_batch)[p]
             x3_batch = np.array(x3_batch)[p]
             x4_batch = np.array(x4_batch)[p]
+            x5_batch = np.array(x5_batch)[p]
+            x6_batch = np.array(x6_batch)[p]
 
             X1 = np.concatenate((X1, x1_batch))
             X2 = np.concatenate((X2, x2_batch))
             X3 = np.concatenate((X3, x3_batch))
             X4 = np.concatenate((X4, x4_batch))
-        return X1, X2, X3, X4
+            X5 = np.concatenate((X5, x5_batch))
+            X6 = np.concatenate((X6, x6_batch))
+
+        return X1, X2, X3, X4, X5, X6
 
     @staticmethod
     def create_triplet_model():
@@ -110,6 +121,8 @@ class GlobalTripletModel:
         emb_pos = Input(shape=(EMB_DIM, ), name='pos_input')
         emb_neg = Input(shape=(EMB_DIM, ), name='neg_input')
         emb_atten = Input(shape=(EMB_DIM, ), name='attention_input')
+        emb_atten_pos = Input(shape=(EMB_DIM, ), name='attention_input_posive')
+        emb_atten_neg = Input(shape=(EMB_DIM, ), name='attention_input_negive')
 
         # shared layers
         layer1 = Dense(128, activation='relu', name='first_emb_layer')
@@ -120,10 +133,17 @@ class GlobalTripletModel:
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
         encoded_emb_atten = norm_layer(layer2(layer1(emb_atten)))
+        encoded_emb_atten_pos = norm_layer(layer2(layer1(emb_atten)))
+        encoded_emb_atten_neg = norm_layer(layer2(layer1(emb_atten)))
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb, encoded_emb_pos])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb, encoded_emb_neg])
-        atten_dist = Lambda(euclidean_distance, name='atten_dist')([encoded_emb, encoded_emb_atten])
+
+        atten_pos_dist = Lambda(euclidean_distance, name='pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
+        atten_neg_dist = Lambda(euclidean_distance, name='neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
+
+
+        center_dist = Lambda(euclidean_distance, name='amchor_dist')([encoded_emb, encoded_emb_atten])
 
 
         def cal_output_shape(input_shape):
@@ -136,9 +156,9 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([pos_dist, neg_dist, atten_dist])
+        )([pos_dist, neg_dist, atten_pos_dist, atten_neg_dist, center_dist])
 
-        model = Model([emb_anchor, emb_pos, emb_neg, emb_atten], stacked_dists, name='triple_siamese')
+        model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
         import time
         model.summary()
         time.sleep(5.5)
