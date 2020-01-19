@@ -143,9 +143,9 @@ class GlobalTripletModel:
         encoded_emb_atten_neg = norm_layer(layer2_Atten(layer1_Atten(emb_atten_neg)))
 
         Trans = Dense(64, activation=None, name='Anchor')
-        Anchor = Trans(concatenate([encoded_emb, encoded_emb_atten]))
-        Positive = Trans(concatenate[encoded_emb_pos, encoded_emb_atten_pos])
-        Negative = Trans(concatenate[encoded_emb_neg, encoded_emb_atten_neg])
+        Anchor = Trans(K.concatenate([encoded_emb, encoded_emb_atten]))
+        Positive = Trans(K.concatenate[encoded_emb_pos, encoded_emb_atten_pos])
+        Negative = Trans(K.concatenate[encoded_emb_neg, encoded_emb_atten_neg])
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
