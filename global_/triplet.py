@@ -16,7 +16,7 @@ def triplet_loss(_, y_pred):
 
 def global_triplet_loss(_, y_pred):
 
-    margin = K.constant(1.5)
+    margin = K.constant(1)
     L1 =  K.mean(K.maximum(K.constant(0),  K.square(y_pred[:,0,0]) - K.square(y_pred[:,1,0]) + margin))
     L2 =  K.mean(K.maximum(K.constant(0),  K.square(y_pred[:,2,0]) - K.square(y_pred[:,3,0]) + margin))
     L3 =  K.mean(K.maximum(K.constant(0),  K.square(y_pred[:,4,0]) - K.square(y_pred[:,5,0]) + margin))
