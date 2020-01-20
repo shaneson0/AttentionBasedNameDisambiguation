@@ -180,7 +180,7 @@ class GlobalTripletModel:
 
         model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
-        inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer_final').get_output_at(0))
+        inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
 
         return model, inter_layer
 

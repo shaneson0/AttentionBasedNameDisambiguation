@@ -47,7 +47,7 @@ def get_hidden_output(model, inp):
     print (model.layers[5])
     print ("check model structure.......")
 
-    get_activations = K.function(model.inputs[:0] + [K.learning_phase()], [model.get_layer('norm_layer_final').get_output_at(0), ])
+    get_activations = K.function(model.inputs[:0] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     # get_activations = K.function(model.inputs[:1] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     activations = get_activations([inp, 0])
     return activations[0]
