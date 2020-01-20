@@ -2,7 +2,7 @@ from os.path import join
 import numpy as np
 import scipy.sparse as sp
 from utils import settings
-from global_.prepare_local_data import IDF_THRESHOLD
+from HeterogeneousGraph.prepare_local_data import IDF_THRESHOLD
 import json
 import codecs
 
