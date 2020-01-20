@@ -132,19 +132,18 @@ class GlobalTripletModel:
         layer2_Atten = Dense(64, activation='relu', name='layer2_Atten')
 
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
+        norm_layer_atten = Lambda(l2Norm, name='norm_layer2', output_shape=[64])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
         encoded_emb_neg = norm_layer(layer2(layer1(emb_neg)))
 
-
-        encoded_emb_atten = norm_layer(layer2_Atten(layer1_Atten(emb_atten)))
-        encoded_emb_atten_pos = norm_layer(layer2_Atten(layer1_Atten(emb_atten_pos)))
-        encoded_emb_atten_neg = norm_layer(layer2_Atten(layer1_Atten(emb_atten_neg)))
-
-
+        encoded_emb_atten = norm_layer_atten(layer2_Atten(layer1_Atten(emb_atten)))
+        encoded_emb_atten_pos = norm_layer_atten(layer2_Atten(layer1_Atten(emb_atten_pos)))
+        encoded_emb_atten_neg = norm_layer_atten(layer2_Atten(layer1_Atten(emb_atten_neg)))
 
         Trans = Dense(64, activation=None, name='Anchor')
+
         T1 = Concatenate()([encoded_emb, encoded_emb_atten])
         T2 = Concatenate()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Concatenate()([encoded_emb_neg, encoded_emb_atten_neg])
