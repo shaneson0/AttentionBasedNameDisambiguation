@@ -133,6 +133,7 @@ class GlobalTripletModel:
 
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
         norm_layer_atten = Lambda(l2Norm, name='norm_layer2', output_shape=[64])
+        norm_layer_final = Lambda(l2Norm, name='norm_layer_final', output_shape=[64])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
@@ -148,9 +149,9 @@ class GlobalTripletModel:
         T2 = Concatenate()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Concatenate()([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Anchor = Trans(T1)
-        Positive = Trans(T2)
-        Negative = Trans(T3)
+        Anchor = norm_layer_final(Trans(T1))
+        Positive = norm_layer_final(Trans(T2))
+        Negative = norm_layer_final(Trans(T3))
 
         pos_dist = Lambda(euclidean_distance, name='pos_dist')([Anchor, Positive])
         neg_dist = Lambda(euclidean_distance, name='neg_dist')([Anchor, Negative])
@@ -179,7 +180,7 @@ class GlobalTripletModel:
 
         model.compile(loss=triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
-        inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer').get_output_at(0))
+        inter_layer = Model(inputs=model.get_input_at(0), outputs=model.get_layer('norm_layer_final').get_output_at(0))
 
         return model, inter_layer
 
