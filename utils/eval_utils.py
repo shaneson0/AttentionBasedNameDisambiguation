@@ -47,7 +47,7 @@ def get_hidden_output(model, inp):
     print (model.layers[5])
     print ("check model structure.......")
 
-    get_activations = K.function(model.inputs[:0] + [K.learning_phase()], [model.get_layer('Anchor').get_output_at(0), ])
+    get_activations = K.function(model.inputs[:0] + [K.learning_phase()], [model.get_layer('norm_layer_final').get_output_at(0), ])
     # get_activations = K.function(model.inputs[:1] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     activations = get_activations([inp, 0])
     return activations[0]
@@ -72,9 +72,10 @@ def full_auc(model, test_triplets):
     preds_before = []
     embs_anchor, embs_pos, embs_neg, embs_atten, X_atten_pos, X_atten_neg = test_triplets
 
-    inter_embs_anchor = get_hidden_output(model, embs_anchor)
-    inter_embs_pos = get_hidden_output(model, embs_pos)
-    inter_embs_neg = get_hidden_output(model, embs_neg)
+
+    inter_embs_anchor = get_hidden_output(model, {'anchor_input': embs_anchor})
+    inter_embs_pos = get_hidden_output(model, {'anchor_input': embs_pos})
+    inter_embs_neg = get_hidden_output(model, {'anchor_input': embs_neg})
     # print(inter_embs_pos.shape)
 
     accs = []
