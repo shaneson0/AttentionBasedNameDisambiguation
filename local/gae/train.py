@@ -264,15 +264,15 @@ if __name__ == '__main__':
     # gae_for_na('hongbin_li')
     # gae_for_na('j_yu')
     # kexin_xu
-    # author = 'hongbin_li'
+    author = 'hongbin_li'
     # author = 'kexin_xu'
     # Res1 = gae_for_na(author, rawfeature="rawfeature")
-    # Res2 = gae_for_na(author, rawfeature="attention_feature")
+    Res2 = gae_for_na(author, rawfeature="attention_feature")
     # Res3 = gae_for_na(author, rawfeature="triplet_feature")
     # print ("raw feature: ", Res1)
     # print ("not raw feature: ", Res2)
     # print ("triplet raw feature: ", Res3)
-    main()
+    # main()
 # 650 hongbin_li_pubs_network.txt
 # 9459 hongbin_li_pubs_network.txt
 
