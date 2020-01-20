@@ -119,7 +119,7 @@ class GlobalTripletModel:
 
         X_anchor, X_pos, X_neg = X1, X2, X3
         X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg}
-        model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=5, shuffle=True, validation_split=0.2)
+        model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=1, shuffle=True, validation_split=0.2)
 
         model_json = model.to_json()
         model_dir = join(settings.OUT_DIR, 'model')
