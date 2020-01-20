@@ -163,7 +163,7 @@ class GlobalTripletModel:
         atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
         atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
 
-        Center_dist = Lambda(euclidean_distance, name='raw_pos_dist')([encoded_emb, encoded_emb_atten])
+        Center_dist = Lambda(euclidean_distance, name='Center_dist')([encoded_emb, encoded_emb_atten])
 
         def cal_output_shape(input_shape):
             shape = list(input_shape[0])
@@ -181,7 +181,6 @@ class GlobalTripletModel:
         import time
         model.summary()
         time.sleep(5.5)
-
 
         model.compile(loss=global_triplet_loss, optimizer=Adam(lr=0.01), metrics=[accuracy])
 
