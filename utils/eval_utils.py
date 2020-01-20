@@ -42,11 +42,6 @@ def cal_f1(prec, rec):
 
 
 def get_hidden_output(model, inp):
-    print ("check model structure.......")
-    print (model.inputs[:1])
-    print (model.layers[5])
-    print ("check model structure.......")
-
     get_activations = K.function(model.inputs[:2] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     # get_activations = K.function(model.inputs[:1] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     activations = get_activations([inp, 0])
