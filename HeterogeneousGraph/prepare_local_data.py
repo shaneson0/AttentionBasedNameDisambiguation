@@ -3,7 +3,7 @@ from os.path import join
 import os
 import numpy as np
 from numpy.random import shuffle
-from global_.global_model import GlobalTripletModel
+from HeterogeneousGraph.global_model import GlobalTripletModel
 from utils.eval_utils import get_hidden_output
 from utils.cache import LMDBClient
 from utils import data_utils, inputData
