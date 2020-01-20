@@ -145,16 +145,16 @@ class GlobalTripletModel:
         encoded_emb_atten_neg = norm_layer_atten(layer2_Atten(layer1_Atten(emb_atten_neg)))
 
 
+        Trans0 = Dense(128, activation='relu', name='Anchor1')
+        Trans = Dense(64, activation='relu', name='Anchor')
 
-        Trans = Dense(64, activation=None, name='Anchor')
+        Trans_encoded_emb = norm_layer_final(Trans(Trans0(encoded_emb)))
+        Trans_encoded_emb_pos = norm_layer_final(Trans(Trans0(encoded_emb_pos)))
+        Trans_encoded_emb_neg = norm_layer_final(Trans(Trans0(encoded_emb_neg)))
 
-        Trans_encoded_emb = norm_layer_final(Trans(encoded_emb))
-        Trans_encoded_emb_pos = norm_layer_final(Trans(encoded_emb_pos))
-        Trans_encoded_emb_neg = norm_layer_final(Trans(encoded_emb_neg))
-
-        Trans_encoded_emb_atten = norm_layer_final(Trans(encoded_emb_atten))
-        Trans_encoded_emb_atten_pos = norm_layer_final(Trans(encoded_emb_atten_pos))
-        Trans_encoded_emb_atten_neg = norm_layer_final(Trans(encoded_emb_atten_neg))
+        Trans_encoded_emb_atten = norm_layer_final(Trans(Trans0(encoded_emb_atten)))
+        Trans_encoded_emb_atten_pos = norm_layer_final(Trans(Trans0(encoded_emb_atten_pos)))
+        Trans_encoded_emb_atten_neg = norm_layer_final(Trans(Trans0(encoded_emb_atten_neg)))
 
 
         raw_pos_dist = Lambda(euclidean_distance, name='raw_pos_dist')([encoded_emb, encoded_emb_pos])
