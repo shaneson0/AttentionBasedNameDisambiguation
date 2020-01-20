@@ -205,7 +205,7 @@ class GlobalTripletModel:
 
         X_anchor, X_pos, X_neg, X_atten, X_atten_pos, X_atten_neg = X1, X2, X3, X4, X5, X6
         X = {'anchor_input': X_anchor, 'pos_input': X_pos, 'neg_input': X_neg, 'attention_input': X_atten, 'attention_input_posive': X_atten_pos, 'attention_input_negive': X_atten_neg}
-        model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=3, shuffle=True, validation_split=0.2)
+        model.fit(X, np.ones((n_triplets, 2)), batch_size=64, epochs=10, shuffle=True, validation_split=0.2)
 
         model_json = model.to_json()
         model_dir = join(settings.OUT_DIR, 'model')
