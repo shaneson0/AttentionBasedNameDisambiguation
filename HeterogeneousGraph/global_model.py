@@ -149,8 +149,12 @@ class GlobalTripletModel:
         Trans = Dense(64, activation=None, name='Anchor')
 
         Trans_encoded_emb = norm_layer_final(Trans(encoded_emb))
-        Trans_encoded_emb_atten = norm_layer_final(Trans(encoded_emb_atten))
+        Trans_encoded_emb_pos = norm_layer_final(Trans(encoded_emb_pos))
+        Trans_encoded_emb_neg = norm_layer_final(Trans(encoded_emb_neg))
 
+        Trans_encoded_emb_atten = norm_layer_final(Trans(encoded_emb_atten))
+        Trans_encoded_emb_atten_pos = norm_layer_final(Trans(encoded_emb_atten_pos))
+        Trans_encoded_emb_atten_neg = norm_layer_final(Trans(encoded_emb_atten_neg))
 
 
         raw_pos_dist = Lambda(euclidean_distance, name='raw_pos_dist')([encoded_emb, encoded_emb_pos])
@@ -159,7 +163,13 @@ class GlobalTripletModel:
         atten_pos_dist = Lambda(euclidean_distance, name='atten_pos_dist')([encoded_emb_atten, encoded_emb_atten_pos])
         atten_neg_dist = Lambda(euclidean_distance, name='atten_neg_dist')([encoded_emb_atten, encoded_emb_atten_neg])
 
-        Center_dist = Lambda(euclidean_distance, name='Center_dist')([Trans_encoded_emb, Trans_encoded_emb_atten])
+        Trans_encoded_emb_dist_pos = Lambda(euclidean_distance, name='Trans_encoded_emb_dist_pos')([Trans_encoded_emb, Trans_encoded_emb_pos])
+        Trans_encoded_emb_dist_neg = Lambda(euclidean_distance, name='Trans_encoded_emb_dist_neg')([Trans_encoded_emb, Trans_encoded_emb_neg])
+
+        Trans_encoded_emb_atten_dist_pos = Lambda(euclidean_distance, name='Trans_encoded_emb_atten_dist_pos')([Trans_encoded_emb_atten, Trans_encoded_emb_atten_pos])
+        Trans_encoded_emb_atten_dist_neg = Lambda(euclidean_distance, name='Trans_encoded_emb_atten_dist_neg')([Trans_encoded_emb_atten, Trans_encoded_emb_atten_neg])
+
+
 
         def cal_output_shape(input_shape):
             shape = list(input_shape[0])
@@ -171,7 +181,7 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([raw_pos_dist, raw_neg_dist, atten_pos_dist, atten_neg_dist, Center_dist])
+        )([raw_pos_dist, raw_neg_dist, atten_pos_dist, atten_neg_dist, Trans_encoded_emb_dist_pos, Trans_encoded_emb_dist_neg, Trans_encoded_emb_atten_dist_pos, Trans_encoded_emb_atten_dist_neg])
 
         model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
         import time
