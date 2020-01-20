@@ -42,7 +42,7 @@ def cal_f1(prec, rec):
 
 
 def get_hidden_output(model, inp):
-    get_activations = K.function(model.inputs[:2] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
+    get_activations = K.function(model.inputs[:2] + [K.learning_phase()], [model.get_layer('Anchor').get_output_at(0), ])
     # get_activations = K.function(model.inputs[:1] + [K.learning_phase()], [model.get_layer('norm_layer').get_output_at(0), ])
     activations = get_activations([inp, 0])
     return activations[0]
