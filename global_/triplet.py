@@ -21,7 +21,7 @@ def global_triplet_loss(_, y_pred):
     L3 = K.square(y_pred[:,4,0])
     # L4 = K.square(y_pred[:,5,0])
 
-    return L1 + L2 + L3 + L4
+    return L1 + L2 + L3
     # return 0.6 * L1 + 0.2 * L2 + 0.2 * L3
 
 def accuracy(_, y_pred):
