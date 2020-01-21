@@ -133,7 +133,6 @@ class GlobalTripletModel:
 
         norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
         norm_layer_atten = Lambda(l2Norm, name='norm_layer2', output_shape=[64])
-        norm_layer_final = Lambda(l2Norm, name='norm_layer_final', output_shape=[64])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
@@ -151,9 +150,9 @@ class GlobalTripletModel:
         T2 = Concatenate()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Concatenate()([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Trans_encoded_emb = norm_layer_final(Trans(T1))
-        Trans_encoded_emb_pos = norm_layer_final(Trans(T2))
-        Trans_encoded_emb_neg = norm_layer_final(Trans(T3))
+        Trans_encoded_emb = Trans(T1)
+        Trans_encoded_emb_pos = Trans(T2)
+        Trans_encoded_emb_neg = Trans(T3)
 
 
         raw_pos_dist = Lambda(euclidean_distance, name='raw_pos_dist')([encoded_emb, encoded_emb_pos])
