@@ -125,14 +125,14 @@ class GlobalTripletModel:
         emb_atten_neg = Input(shape=(EMB_DIM, ), name='attention_input_negive')
 
         # shared layers
-        layer1 = Dense(128, activation='relu', name='first_emb_layer')
-        layer2 = Dense(64, activation='relu', name='last_emb_layer')
+        layer1 = Dense(300, activation='relu', name='first_emb_layer')
+        layer2 = Dense(200, activation='relu', name='last_emb_layer')
 
-        layer1_Atten = Dense(128, activation='relu', name='layer1_Atten')
-        layer2_Atten = Dense(64, activation='relu', name='layer2_Atten')
+        layer1_Atten = Dense(300, activation='relu', name='layer1_Atten')
+        layer2_Atten = Dense(200, activation='relu', name='layer2_Atten')
 
-        norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[64])
-        norm_layer_atten = Lambda(l2Norm, name='norm_layer2', output_shape=[64])
+        norm_layer = Lambda(l2Norm, name='norm_layer', output_shape=[100])
+        norm_layer_atten = Lambda(l2Norm, name='norm_layer2', output_shape=[100])
 
         encoded_emb = norm_layer(layer2(layer1(emb_anchor)))
         encoded_emb_pos = norm_layer(layer2(layer1(emb_pos)))
