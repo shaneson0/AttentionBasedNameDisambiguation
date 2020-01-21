@@ -226,8 +226,8 @@ def gae_for_na(name, rawfeature):
     elif rawfeature == ATTENTIONFEATURE:
         tSNEAnanlyse(emb_new, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final.png" % (name)))
         tSNEAnanlyse(features_new, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features.png" % (name)))
-        tSNEAnanlyse(emb_new, clusters_pred, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_true.png" % (name)))
-        tSNEAnanlyse(features_new, clusters_pred2, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_true.png" % (name)))
+        tSNEAnanlyse(emb_new, clusters_pred, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_clusterresult.png" % (name)))
+        tSNEAnanlyse(features_new, clusters_pred2, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_clusterresult.png" % (name)))
     else:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_triplet.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_triplet.png" % (name)))
