@@ -7,7 +7,7 @@ from os.path import join
 from utils import settings
 # from global_.prepare_local_data import IDF_THRESHOLD
 
-IDF_THRESHOLD = 10
+IDF_THRESHOLD = 32
 # Train on CPU (hide GPU) due to memory constraints
 os.environ['CUDA_VISIBLE_DEVICES'] = ""
 local_na_dir = join(settings.DATA_DIR, 'local', 'graph-{}'.format(IDF_THRESHOLD))
@@ -31,8 +31,8 @@ from utils import settings, tSNEAnanlyse
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-flags.DEFINE_float('learning_rate', 0.01, 'Initial learning rate.')
-flags.DEFINE_integer('epochs', 300, 'Number of epochs to train.')
+flags.DEFINE_float('learning_rate', 0.005, 'Initial learning rate.')
+flags.DEFINE_integer('epochs', 150, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden1', 128, 'Number of units in hidden layer 1.')  # 32
 flags.DEFINE_integer('hidden2', 64, 'Number of units in hidden layer 2.')  # 16
 flags.DEFINE_float('weight_decay', 0., 'Weight for L2 loss on embedding matrix.')
