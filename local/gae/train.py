@@ -213,12 +213,13 @@ def gae_for_na(name, rawfeature):
           'f1', '{:.5f}'.format(f12))
 
     from sklearn.manifold import TSNE
-    clusters_pred = np.array(clusters_pred) + 2
-    clusters_pred2 = np.array(clusters_pred2) + 2
     features_new = TSNE(learning_rate=100).fit_transform(features)
     emb_new = TSNE(learning_rate=100).fit_transform(emb_norm)
 
     labels = np.array(labels) + 2
+    clusters_pred = np.array(clusters_pred) + 2
+    clusters_pred2 = np.array(clusters_pred2) + 2
+
     if rawfeature == RAW_INTER_NAME:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_raw.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_raw.png" % (name)))
