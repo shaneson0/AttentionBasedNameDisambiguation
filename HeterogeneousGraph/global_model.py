@@ -148,9 +148,9 @@ class GlobalTripletModel:
         Trans0 = Dense(128, activation='relu', name='Anchor1')
         Trans = Dense(64, activation='relu', name='Anchor')
 
-        T1 = K.concatenate([encoded_emb,encoded_emb_atten_pos])
-        T2 = K.concatenate([encoded_emb_pos, encoded_emb_atten_pos])
-        T3 = K.concatenate([encoded_emb_neg, encoded_emb_atten_neg])
+        T1 = Concatenate([encoded_emb,encoded_emb_atten_pos])
+        T2 = Concatenate([encoded_emb_pos, encoded_emb_atten_pos])
+        T3 = Concatenate([encoded_emb_neg, encoded_emb_atten_neg])
 
         Trans_encoded_emb = norm_layer_final(Trans(Trans0(T1)))
         Trans_encoded_emb_pos = norm_layer_final(Trans(Trans0(T2)))
