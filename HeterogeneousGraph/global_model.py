@@ -145,16 +145,15 @@ class GlobalTripletModel:
         encoded_emb_atten_neg = norm_layer_atten(layer2_Atten(layer1_Atten(emb_atten_neg)))
 
 
-        Trans0 = Dense(128, activation='relu', name='Anchor1')
-        Trans = Dense(64, activation='relu', name='Anchor')
+        Trans = Dense(64, activation=None, name='Anchor')
 
         T1 = Concatenate()([encoded_emb,encoded_emb_atten_pos])
         T2 = Concatenate()([encoded_emb_pos, encoded_emb_atten_pos])
         T3 = Concatenate()([encoded_emb_neg, encoded_emb_atten_neg])
 
-        Trans_encoded_emb = norm_layer_final(Trans(Trans0(T1)))
-        Trans_encoded_emb_pos = norm_layer_final(Trans(Trans0(T2)))
-        Trans_encoded_emb_neg = norm_layer_final(Trans(Trans0(T3)))
+        Trans_encoded_emb = norm_layer_final(Trans(T1))
+        Trans_encoded_emb_pos = norm_layer_final(Trans(T2))
+        Trans_encoded_emb_neg = norm_layer_final(Trans(T3))
 
 
         raw_pos_dist = Lambda(euclidean_distance, name='raw_pos_dist')([encoded_emb, encoded_emb_pos])
