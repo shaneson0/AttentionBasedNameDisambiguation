@@ -172,7 +172,7 @@ class GlobalTripletModel:
         Trans_encoded_emb_atten_dist_neg = Lambda(euclidean_distance, name='Trans_encoded_emb_atten_dist_neg')([Trans_encoded_emb_atten, Trans_encoded_emb_atten_neg])
 
         Differ_Pos = Lambda(euclidean_distance, name='Differ_Pos')([Trans_encoded_emb_dist_pos, Trans_encoded_emb_atten_dist_pos])
-        Differ_Neg = Lambda(euclidean_distance, name='Differ_Neg')([Trans_encoded_emb_dist_neg, Trans_encoded_emb_atten_dist_neg])
+        # Differ_Neg = Lambda(euclidean_distance, name='Differ_Neg')([Trans_encoded_emb_dist_neg, Trans_encoded_emb_atten_dist_neg])
 
 
         def cal_output_shape(input_shape):
@@ -185,7 +185,7 @@ class GlobalTripletModel:
             lambda vects: K.stack(vects, axis=1),
             name='stacked_dists',
             output_shape=cal_output_shape
-        )([raw_pos_dist, raw_neg_dist, atten_pos_dist, atten_neg_dist, Differ_Pos, Differ_Neg])
+        )([raw_pos_dist, raw_neg_dist, atten_pos_dist, atten_neg_dist, Differ_Pos])
 
         model = Model([emb_anchor, emb_pos, emb_neg, emb_atten, emb_atten_pos, emb_atten_neg], stacked_dists, name='triple_siamese')
         import time
