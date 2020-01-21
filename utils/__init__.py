@@ -57,14 +57,10 @@ def encode_labels(labels):
     rawlabels = [classes_dict[label] for label in labels]
     return  np.array(rawlabels)
 
-from sklearn.manifold import TSNE
+
 def tSNEAnanlyse(emb, labels, savepath=False):
     plt.figure()
-    labels = np.array(labels) + 2
-    print('labels : ', labels)
-    print('labels type: ', len(set(labels)))
-    X_new = TSNE(learning_rate=100).fit_transform(emb)
-    plt.scatter(X_new[:, 0], X_new[:, 1], c=labels, marker='o')
+    plt.scatter(emb[:, 0], emb[:, 1], c=labels, marker='o')
     plt.show()
 
     if savepath:
