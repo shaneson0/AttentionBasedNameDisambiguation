@@ -212,17 +212,21 @@ def gae_for_na(name, rawfeature):
           'recall', '{:.5f}'.format(rec2),
           'f1', '{:.5f}'.format(f12))
 
+    from sklearn.manifold import TSNE
     clusters_pred = np.array(clusters_pred) + 2
     clusters_pred2 = np.array(clusters_pred2) + 2
+    features_new = TSNE(learning_rate=100).fit_transform(features)
+    emb_new = TSNE(learning_rate=100).fit_transform(emb_norm)
+
     labels = np.array(labels) + 2
     if rawfeature == RAW_INTER_NAME:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_raw.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_raw.png" % (name)))
     elif rawfeature == ATTENTIONFEATURE:
-        tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final.png" % (name)))
-        tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features.png" % (name)))
-        tSNEAnanlyse(emb_norm, clusters_pred, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_true.png" % (name)))
-        tSNEAnanlyse(features, clusters_pred2, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_true.png" % (name)))
+        tSNEAnanlyse(emb_new, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final.png" % (name)))
+        tSNEAnanlyse(features_new, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features.png" % (name)))
+        tSNEAnanlyse(emb_new, clusters_pred, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_true.png" % (name)))
+        tSNEAnanlyse(features_new, clusters_pred2, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_true.png" % (name)))
     else:
         tSNEAnanlyse(emb_norm, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_final_triplet.png" % (name)))
         tSNEAnanlyse(features, labels, join(settings.PIC_DIR, "FINALResult", "rawReature_%s_gae_features_triplet.png" % (name)))
