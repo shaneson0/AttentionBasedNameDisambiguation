@@ -1,6 +1,6 @@
 
 
-#Data
+# Data
 
 Please download [data][https://static.aminer.cn/misc/na-data-kdd18.zip] here. Unzip the file and put the data directory into project directory.
 
